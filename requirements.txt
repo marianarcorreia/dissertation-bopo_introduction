@@ -1,0 +1,18 @@
+# Core RL / graph pipeline
+torch==2.14.0
+torch-geometric
+numpy
+optuna
+
+# Validation-set solving (src/solver.py, src/generate_val.py)
+ortools
+
+# Clustering utility (src/cluster_policies.py)
+scikit-learn
+scipy
+
+# Dashboard (dashboard.py, pages/, optuna_dashboard.py)
+streamlit
+altair
+pandas
+matplotlib

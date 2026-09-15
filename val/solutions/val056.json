@@ -1,0 +1,770 @@
+{
+  "final_schedule": [
+    {
+      "job": 0,
+      "operation": 0,
+      "machine": 5,
+      "resource": null,
+      "start": 0,
+      "end": 24,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 0,
+      "operation": 1,
+      "machine": 6,
+      "resource": null,
+      "start": 37,
+      "end": 41,
+      "setup": 0,
+      "setup_start": 37
+    },
+    {
+      "job": 0,
+      "operation": 2,
+      "machine": 5,
+      "resource": null,
+      "start": 53,
+      "end": 74,
+      "setup": 0,
+      "setup_start": 53
+    },
+    {
+      "job": 0,
+      "operation": 3,
+      "machine": 10,
+      "resource": null,
+      "start": 102,
+      "end": 170,
+      "setup": 0,
+      "setup_start": 102
+    },
+    {
+      "job": 0,
+      "operation": 4,
+      "machine": 4,
+      "resource": null,
+      "start": 276,
+      "end": 360,
+      "setup": 0,
+      "setup_start": 276
+    },
+    {
+      "job": 1,
+      "operation": 0,
+      "machine": 4,
+      "resource": null,
+      "start": 63,
+      "end": 94,
+      "setup": 0,
+      "setup_start": 63
+    },
+    {
+      "job": 1,
+      "operation": 1,
+      "machine": 5,
+      "resource": null,
+      "start": 100,
+      "end": 179,
+      "setup": 0,
+      "setup_start": 100
+    },
+    {
+      "job": 1,
+      "operation": 2,
+      "machine": 3,
+      "resource": null,
+      "start": 179,
+      "end": 245,
+      "setup": 0,
+      "setup_start": 179
+    },
+    {
+      "job": 1,
+      "operation": 3,
+      "machine": 2,
+      "resource": null,
+      "start": 294,
+      "end": 360,
+      "setup": 0,
+      "setup_start": 294
+    },
+    {
+      "job": 1,
+      "operation": 4,
+      "machine": 4,
+      "resource": null,
+      "start": 360,
+      "end": 363,
+      "setup": 0,
+      "setup_start": 360
+    },
+    {
+      "job": 2,
+      "operation": 0,
+      "machine": 5,
+      "resource": null,
+      "start": 24,
+      "end": 53,
+      "setup": 0,
+      "setup_start": 24
+    },
+    {
+      "job": 2,
+      "operation": 1,
+      "machine": 9,
+      "resource": null,
+      "start": 72,
+      "end": 100,
+      "setup": 0,
+      "setup_start": 72
+    },
+    {
+      "job": 2,
+      "operation": 2,
+      "machine": 4,
+      "resource": null,
+      "start": 150,
+      "end": 172,
+      "setup": 0,
+      "setup_start": 150
+    },
+    {
+      "job": 2,
+      "operation": 3,
+      "machine": 2,
+      "resource": null,
+      "start": 195,
+      "end": 294,
+      "setup": 0,
+      "setup_start": 195
+    },
+    {
+      "job": 2,
+      "operation": 4,
+      "machine": 9,
+      "resource": null,
+      "start": 294,
+      "end": 361,
+      "setup": 0,
+      "setup_start": 294
+    },
+    {
+      "job": 3,
+      "operation": 0,
+      "machine": 9,
+      "resource": null,
+      "start": 31,
+      "end": 72,
+      "setup": 0,
+      "setup_start": 31
+    },
+    {
+      "job": 3,
+      "operation": 1,
+      "machine": 2,
+      "resource": null,
+      "start": 99,
+      "end": 172,
+      "setup": 0,
+      "setup_start": 99
+    },
+    {
+      "job": 3,
+      "operation": 2,
+      "machine": 7,
+      "resource": null,
+      "start": 213,
+      "end": 269,
+      "setup": 0,
+      "setup_start": 213
+    },
+    {
+      "job": 3,
+      "operation": 3,
+      "machine": 8,
+      "resource": null,
+      "start": 275,
+      "end": 284,
+      "setup": 0,
+      "setup_start": 275
+    },
+    {
+      "job": 3,
+      "operation": 4,
+      "machine": 8,
+      "resource": null,
+      "start": 284,
+      "end": 362,
+      "setup": 0,
+      "setup_start": 284
+    },
+    {
+      "job": 4,
+      "operation": 0,
+      "machine": 9,
+      "resource": null,
+      "start": 0,
+      "end": 30,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 4,
+      "operation": 1,
+      "machine": 5,
+      "resource": null,
+      "start": 74,
+      "end": 100,
+      "setup": 0,
+      "setup_start": 74
+    },
+    {
+      "job": 4,
+      "operation": 2,
+      "machine": 7,
+      "resource": null,
+      "start": 113,
+      "end": 132,
+      "setup": 0,
+      "setup_start": 113
+    },
+    {
+      "job": 4,
+      "operation": 3,
+      "machine": 7,
+      "resource": null,
+      "start": 132,
+      "end": 213,
+      "setup": 0,
+      "setup_start": 132
+    },
+    {
+      "job": 4,
+      "operation": 4,
+      "machine": 8,
+      "resource": null,
+      "start": 227,
+      "end": 248,
+      "setup": 0,
+      "setup_start": 227
+    },
+    {
+      "job": 5,
+      "operation": 0,
+      "machine": 4,
+      "resource": null,
+      "start": 32,
+      "end": 63,
+      "setup": 0,
+      "setup_start": 32
+    },
+    {
+      "job": 5,
+      "operation": 1,
+      "machine": 1,
+      "resource": null,
+      "start": 68,
+      "end": 157,
+      "setup": 0,
+      "setup_start": 68
+    },
+    {
+      "job": 5,
+      "operation": 2,
+      "machine": 10,
+      "resource": null,
+      "start": 170,
+      "end": 241,
+      "setup": 0,
+      "setup_start": 170
+    },
+    {
+      "job": 5,
+      "operation": 3,
+      "machine": 4,
+      "resource": null,
+      "start": 248,
+      "end": 276,
+      "setup": 0,
+      "setup_start": 248
+    },
+    {
+      "job": 5,
+      "operation": 4,
+      "machine": 1,
+      "resource": null,
+      "start": 284,
+      "end": 362,
+      "setup": 0,
+      "setup_start": 284
+    },
+    {
+      "job": 6,
+      "operation": 0,
+      "machine": 6,
+      "resource": null,
+      "start": 0,
+      "end": 37,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 6,
+      "operation": 1,
+      "machine": 7,
+      "resource": null,
+      "start": 42,
+      "end": 61,
+      "setup": 0,
+      "setup_start": 42
+    },
+    {
+      "job": 6,
+      "operation": 2,
+      "machine": 3,
+      "resource": null,
+      "start": 144,
+      "end": 166,
+      "setup": 0,
+      "setup_start": 144
+    },
+    {
+      "job": 6,
+      "operation": 3,
+      "machine": 5,
+      "resource": null,
+      "start": 179,
+      "end": 258,
+      "setup": 0,
+      "setup_start": 179
+    },
+    {
+      "job": 6,
+      "operation": 4,
+      "machine": 8,
+      "resource": null,
+      "start": 263,
+      "end": 275,
+      "setup": 0,
+      "setup_start": 263
+    },
+    {
+      "job": 7,
+      "operation": 0,
+      "machine": 10,
+      "resource": null,
+      "start": 41,
+      "end": 65,
+      "setup": 0,
+      "setup_start": 41
+    },
+    {
+      "job": 7,
+      "operation": 1,
+      "machine": 7,
+      "resource": null,
+      "start": 65,
+      "end": 113,
+      "setup": 0,
+      "setup_start": 65
+    },
+    {
+      "job": 7,
+      "operation": 2,
+      "machine": 6,
+      "resource": null,
+      "start": 133,
+      "end": 198,
+      "setup": 0,
+      "setup_start": 133
+    },
+    {
+      "job": 7,
+      "operation": 3,
+      "machine": 10,
+      "resource": null,
+      "start": 241,
+      "end": 314,
+      "setup": 0,
+      "setup_start": 241
+    },
+    {
+      "job": 7,
+      "operation": 4,
+      "machine": 3,
+      "resource": null,
+      "start": 314,
+      "end": 361,
+      "setup": 0,
+      "setup_start": 314
+    },
+    {
+      "job": 8,
+      "operation": 0,
+      "machine": 8,
+      "resource": null,
+      "start": 0,
+      "end": 41,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 8,
+      "operation": 1,
+      "machine": 8,
+      "resource": null,
+      "start": 41,
+      "end": 127,
+      "setup": 0,
+      "setup_start": 41
+    },
+    {
+      "job": 8,
+      "operation": 2,
+      "machine": 3,
+      "resource": null,
+      "start": 177,
+      "end": 179,
+      "setup": 0,
+      "setup_start": 177
+    },
+    {
+      "job": 8,
+      "operation": 3,
+      "machine": 4,
+      "resource": null,
+      "start": 222,
+      "end": 248,
+      "setup": 0,
+      "setup_start": 222
+    },
+    {
+      "job": 8,
+      "operation": 4,
+      "machine": 7,
+      "resource": null,
+      "start": 269,
+      "end": 359,
+      "setup": 0,
+      "setup_start": 269
+    },
+    {
+      "job": 9,
+      "operation": 0,
+      "machine": 3,
+      "resource": null,
+      "start": 0,
+      "end": 73,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 9,
+      "operation": 1,
+      "machine": 3,
+      "resource": null,
+      "start": 73,
+      "end": 144,
+      "setup": 0,
+      "setup_start": 73
+    },
+    {
+      "job": 9,
+      "operation": 2,
+      "machine": 9,
+      "resource": null,
+      "start": 163,
+      "end": 166,
+      "setup": 0,
+      "setup_start": 163
+    },
+    {
+      "job": 9,
+      "operation": 3,
+      "machine": 4,
+      "resource": null,
+      "start": 172,
+      "end": 222,
+      "setup": 0,
+      "setup_start": 172
+    },
+    {
+      "job": 9,
+      "operation": 4,
+      "machine": 8,
+      "resource": null,
+      "start": 248,
+      "end": 263,
+      "setup": 0,
+      "setup_start": 248
+    },
+    {
+      "job": 10,
+      "operation": 0,
+      "machine": 2,
+      "resource": null,
+      "start": 0,
+      "end": 99,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 10,
+      "operation": 1,
+      "machine": 8,
+      "resource": null,
+      "start": 127,
+      "end": 129,
+      "setup": 0,
+      "setup_start": 127
+    },
+    {
+      "job": 10,
+      "operation": 2,
+      "machine": 8,
+      "resource": null,
+      "start": 129,
+      "end": 227,
+      "setup": 0,
+      "setup_start": 129
+    },
+    {
+      "job": 10,
+      "operation": 3,
+      "machine": 3,
+      "resource": null,
+      "start": 245,
+      "end": 266,
+      "setup": 0,
+      "setup_start": 245
+    },
+    {
+      "job": 10,
+      "operation": 4,
+      "machine": 5,
+      "resource": null,
+      "start": 266,
+      "end": 358,
+      "setup": 0,
+      "setup_start": 266
+    },
+    {
+      "job": 11,
+      "operation": 0,
+      "machine": 1,
+      "resource": null,
+      "start": 0,
+      "end": 68,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 11,
+      "operation": 1,
+      "machine": 4,
+      "resource": null,
+      "start": 94,
+      "end": 150,
+      "setup": 0,
+      "setup_start": 94
+    },
+    {
+      "job": 11,
+      "operation": 2,
+      "machine": 9,
+      "resource": null,
+      "start": 166,
+      "end": 187,
+      "setup": 0,
+      "setup_start": 166
+    },
+    {
+      "job": 11,
+      "operation": 3,
+      "machine": 6,
+      "resource": null,
+      "start": 198,
+      "end": 264,
+      "setup": 0,
+      "setup_start": 198
+    },
+    {
+      "job": 11,
+      "operation": 4,
+      "machine": 6,
+      "resource": null,
+      "start": 264,
+      "end": 363,
+      "setup": 0,
+      "setup_start": 264
+    },
+    {
+      "job": 12,
+      "operation": 0,
+      "machine": 7,
+      "resource": null,
+      "start": 0,
+      "end": 42,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 12,
+      "operation": 1,
+      "machine": 10,
+      "resource": null,
+      "start": 65,
+      "end": 102,
+      "setup": 0,
+      "setup_start": 65
+    },
+    {
+      "job": 12,
+      "operation": 2,
+      "machine": 2,
+      "resource": null,
+      "start": 172,
+      "end": 195,
+      "setup": 0,
+      "setup_start": 172
+    },
+    {
+      "job": 12,
+      "operation": 3,
+      "machine": 3,
+      "resource": null,
+      "start": 266,
+      "end": 312,
+      "setup": 0,
+      "setup_start": 266
+    },
+    {
+      "job": 12,
+      "operation": 4,
+      "machine": 5,
+      "resource": null,
+      "start": 358,
+      "end": 363,
+      "setup": 0,
+      "setup_start": 358
+    },
+    {
+      "job": 13,
+      "operation": 0,
+      "machine": 10,
+      "resource": null,
+      "start": 0,
+      "end": 41,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 13,
+      "operation": 1,
+      "machine": 6,
+      "resource": null,
+      "start": 41,
+      "end": 133,
+      "setup": 0,
+      "setup_start": 41
+    },
+    {
+      "job": 13,
+      "operation": 2,
+      "machine": 3,
+      "resource": null,
+      "start": 166,
+      "end": 177,
+      "setup": 0,
+      "setup_start": 166
+    },
+    {
+      "job": 13,
+      "operation": 3,
+      "machine": 9,
+      "resource": null,
+      "start": 187,
+      "end": 231,
+      "setup": 0,
+      "setup_start": 187
+    },
+    {
+      "job": 13,
+      "operation": 4,
+      "machine": 9,
+      "resource": null,
+      "start": 231,
+      "end": 287,
+      "setup": 0,
+      "setup_start": 231
+    },
+    {
+      "job": 14,
+      "operation": 0,
+      "machine": 4,
+      "resource": null,
+      "start": 0,
+      "end": 32,
+      "setup": 0,
+      "setup_start": 0
+    },
+    {
+      "job": 14,
+      "operation": 1,
+      "machine": 9,
+      "resource": null,
+      "start": 100,
+      "end": 163,
+      "setup": 0,
+      "setup_start": 100
+    },
+    {
+      "job": 14,
+      "operation": 2,
+      "machine": 1,
+      "resource": null,
+      "start": 163,
+      "end": 194,
+      "setup": 0,
+      "setup_start": 163
+    },
+    {
+      "job": 14,
+      "operation": 3,
+      "machine": 1,
+      "resource": null,
+      "start": 194,
+      "end": 284,
+      "setup": 0,
+      "setup_start": 194
+    },
+    {
+      "job": 14,
+      "operation": 4,
+      "machine": 10,
+      "resource": null,
+      "start": 314,
+      "end": 322,
+      "setup": 0,
+      "setup_start": 314
+    }
+  ],
+  "indicators": {
+    "runtime": 60.025904000000004,
+    "user_time": 60.025904000000004,
+    "branches": 262,
+    "conflicts": 0,
+    "num_booleans": 225,
+    "best_objective_bound": 317.0,
+    "propagations": 262,
+    "integer_propagations": 1659,
+    "restarts": 262,
+    "lp_iterations": 0,
+    "deterministic_time": 326.058,
+    "gap_integral": 1256.08,
+    "solution_fingerprint": "0xb6f9ab9553e9be0c",
+    "num_integers": 151
+  }
+}
