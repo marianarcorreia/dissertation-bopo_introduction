@@ -369,11 +369,21 @@ def load_test_score_files(run_path: str) -> dict[str, list[dict]]:
     return out
 
 
+def _unwrap_score(value: Any) -> Any:
+    """Some older test.py output wraps score as a single-element list (e.g.
+    [141.0]) instead of a bare float — unwrap it so score is scalar everywhere
+    and datasets can be combined in one DataFrame/chart."""
+    if isinstance(value, list):
+        return value[0] if len(value) == 1 else (value[0] if value else None)
+    return value
+
+
 def test_score_df(run_path: str, label: str | None = None) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
     for dataset, records in load_test_score_files(run_path).items():
         for r in records:
             row = dict(r)
+            row["score"] = _unwrap_score(row.get("score"))
             row["dataset"] = dataset
             if label:
                 row["run"] = label

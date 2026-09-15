@@ -38,6 +38,17 @@ st.title("Benchmark & Test Results")
 bench_runs = benchmark_runs()
 t_runs = test_runs()
 
+
+def _rep_of(run: dict) -> str:
+    return run.get("representation") or run["summary"].get("representation") or "unknown"
+
+
+all_reps = sorted({_rep_of(r) for r in bench_runs + t_runs})
+if all_reps:
+    selected_reps = st.sidebar.multiselect("Representation", all_reps, default=all_reps)
+    bench_runs = [r for r in bench_runs if _rep_of(r) in selected_reps]
+    t_runs = [r for r in t_runs if _rep_of(r) in selected_reps]
+
 tab_bench, tab_test = st.tabs(["Benchmark gap % (instance_gaps.csv)", "Test scores (results_*.json)"])
 
 with tab_bench:
@@ -55,19 +66,26 @@ with tab_bench:
             st.info("Selected run(s) have no readable benchmark rows.")
         else:
             datasets = sorted(df["dataset"].dropna().unique().tolist())
-            dataset = st.selectbox("Dataset", datasets)
-            plot_df = df[df["dataset"] == dataset]
-
-            run_names = sorted(plot_df["run"].dropna().unique().tolist())
-            bar = alt.Chart(plot_df).mark_bar().encode(
-                x=alt.X("name:N", title="Instance", sort=None),
-                y=alt.Y("gap_percent:Q", title="Gap to BKS (%)"),
-                color=color_by("run", run_names, title="Run"),
-                xOffset="run:N",
-                tooltip=["run", "name", alt.Tooltip("gap_percent:Q", format=".2f")],
+            selected_datasets = st.multiselect(
+                "Dataset(s)", datasets, default=datasets, key="bench_datasets"
             )
-            st.altair_chart(bar, width='stretch')
-            st.dataframe(plot_df, width='stretch', hide_index=True)
+            plot_df = df[df["dataset"].isin(selected_datasets)]
+
+            if plot_df.empty:
+                st.info("Select at least one dataset.")
+            else:
+                run_names = sorted(plot_df["run"].dropna().unique().tolist())
+                bar = alt.Chart(plot_df).mark_bar().encode(
+                    x=alt.X("name:N", title="Instance", sort=None),
+                    y=alt.Y("gap_percent:Q", title="Gap to BKS (%)"),
+                    color=color_by("run", run_names, title="Run"),
+                    xOffset="run:N",
+                    tooltip=["run", "dataset", "name", alt.Tooltip("gap_percent:Q", format=".2f")],
+                )
+                if len(selected_datasets) > 1:
+                    bar = bar.facet(row=alt.Row("dataset:N", title="Dataset"))
+                st.altair_chart(bar, width='stretch')
+                st.dataframe(plot_df, width='stretch', hide_index=True)
 
 with tab_test:
     if not t_runs:
@@ -81,24 +99,31 @@ with tab_test:
             st.info("Selected run(s) have no readable test-score rows.")
         else:
             datasets = sorted(df["dataset"].dropna().unique().tolist())
-            dataset = st.selectbox("Dataset", datasets, key="test_dataset")
-            plot_df = df[df["dataset"] == dataset].copy()
-
-            run_names = sorted(plot_df["run"].dropna().unique().tolist())
-            metric = st.radio("Metric", ["score", "time"], horizontal=True)
-            y_title = "Makespan (score)" if metric == "score" else "Wall time (s)"
-
-            bar = alt.Chart(plot_df).mark_bar().encode(
-                x=alt.X("name:N", title="Instance", sort=None),
-                y=alt.Y(f"{metric}:Q", title=y_title),
-                color=color_by("run", run_names, title="Run"),
-                xOffset="run:N",
-                tooltip=["run", "name", alt.Tooltip(f"{metric}:Q", format=".2f")],
+            selected_datasets = st.multiselect(
+                "Dataset(s)", datasets, default=datasets, key="test_datasets"
             )
-            st.altair_chart(bar, width='stretch')
+            plot_df = df[df["dataset"].isin(selected_datasets)].copy()
 
-            st.caption(
-                "No optimal/reference makespan is joined into these files today, "
-                "so only raw makespan and wall time are available here — not a gap %."
-            )
-            st.dataframe(plot_df, width='stretch', hide_index=True)
+            if plot_df.empty:
+                st.info("Select at least one dataset.")
+            else:
+                run_names = sorted(plot_df["run"].dropna().unique().tolist())
+                metric = st.radio("Metric", ["score", "time"], horizontal=True)
+                y_title = "Makespan (score)" if metric == "score" else "Wall time (s)"
+
+                bar = alt.Chart(plot_df).mark_bar().encode(
+                    x=alt.X("name:N", title="Instance", sort=None),
+                    y=alt.Y(f"{metric}:Q", title=y_title),
+                    color=color_by("run", run_names, title="Run"),
+                    xOffset="run:N",
+                    tooltip=["run", "dataset", "name", alt.Tooltip(f"{metric}:Q", format=".2f")],
+                )
+                if len(selected_datasets) > 1:
+                    bar = bar.facet(row=alt.Row("dataset:N", title="Dataset"))
+                st.altair_chart(bar, width='stretch')
+
+                st.caption(
+                    "No optimal/reference makespan is joined into these files today, "
+                    "so only raw makespan and wall time are available here — not a gap %."
+                )
+                st.dataframe(plot_df, width='stretch', hide_index=True)

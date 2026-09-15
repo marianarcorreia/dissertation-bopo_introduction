@@ -104,12 +104,24 @@ for r in all_runs:
     })
 runs_df = pd.DataFrame(table_rows)
 
-type_filter = st.multiselect(
-    "Filter by run type",
-    sorted(runs_df["type"].unique().tolist()),
-    default=sorted(runs_df["type"].unique().tolist()),
-)
-filtered_runs_df = runs_df[runs_df["type"].isin(type_filter)]
+filter_col1, filter_col2 = st.columns(2)
+with filter_col1:
+    type_filter = st.multiselect(
+        "Filter by run type",
+        sorted(runs_df["type"].unique().tolist()),
+        default=sorted(runs_df["type"].unique().tolist()),
+    )
+with filter_col2:
+    rep_options = sorted(runs_df["representation"].fillna("unknown").unique().tolist())
+    rep_filter = st.multiselect(
+        "Filter by representation",
+        rep_options,
+        default=rep_options,
+    )
+filtered_runs_df = runs_df[
+    runs_df["type"].isin(type_filter)
+    & runs_df["representation"].fillna("unknown").isin(rep_filter)
+]
 
 st.dataframe(
     filtered_runs_df.sort_values("last_modified", ascending=False),
