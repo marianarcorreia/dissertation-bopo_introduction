@@ -1,3 +1,4 @@
+from typing import Optional
 import torch
 import torch.nn as nn
 from torch_geometric.nn import GATv2Conv, Linear, to_hetero #camadas do GNN
@@ -171,7 +172,7 @@ class BOPO:
         states = [e.reset(sel_index=instance_index) for e in rollout_envs]
 
         active = list(range(self.B))
-        logp_sum = [None] * self.B
+        logp_sum: list[Optional[torch.Tensor]] = [None] * self.B
         logp_count = [0] * self.B
         rounds = 0
         all_entropies = []
@@ -191,7 +192,8 @@ class BOPO:
             still_active = []
             for j, i in enumerate(active):
                 lp = logprobs[j]
-                logp_sum[i] = lp if logp_sum[i] is None else logp_sum[i] + lp
+                prev = logp_sum[i]
+                logp_sum[i] = lp if prev is None else prev + lp
                 logp_count[i] += 1
                 all_entropies.append(float(entropies[j].item()))
                 all_valid_counts.append(valid_counts[j])
@@ -204,7 +206,12 @@ class BOPO:
 
         assert all(count > 0 for count in logp_count), "every rollout must take at least one decision step"
         makespans = torch.tensor([e.mk for e in rollout_envs], dtype=torch.float32, device=device)
-        mean_logp = torch.stack([logp_sum[i] / logp_count[i] for i in range(self.B)])
+        mean_logp_list = []
+        for i in range(self.B):
+            s = logp_sum[i]
+            assert s is not None
+            mean_logp_list.append(s / logp_count[i])
+        mean_logp = torch.stack(mean_logp_list)
         entropy_stats = summarize_action_entropy(all_entropies, all_valid_counts)
         _dbg(2, f"  sample_group | instance={instance_index} | rounds={rounds} | makespans min/mean/max={float(makespans.min()):.2f}/{float(makespans.mean()):.2f}/{float(makespans.max()):.2f}")
         return mean_logp, makespans, rounds, entropy_stats
