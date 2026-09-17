@@ -9,7 +9,7 @@ import random
 import os
 from torch.nn.parameter import UninitializedBuffer, UninitializedParameter
 
-from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy
+from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy, compute_actor_grad_norm
 from src.gat import GAT
 from src.gine import GINModel
 from src.transformer import TransformerModel
@@ -70,18 +70,24 @@ class Policy(nn.Module):
     def forward(self):
         raise NotImplementedError
 
-    #seleciona uma ação para um único grafo (não em batch) - usado em teste/validação
-    def act(self, state, sample, num):
+    #distribuição de ações mascarada para um único grafo (não em batch), com gradiente -
+    #usada por act() (amostragem) e pela fase de warm-start (behavior cloning, ver
+    #src/bopo_utils.py:run_behavior_cloning) que ajusta a política a uma ação especialista
+    #por cross-entropy antes do BOPO propriamente dito começar.
+    def action_distribution(self, state):
         action_probs = self.actor(state).T[0]
         action_probs[state['operation'].mask] = float("-inf")
         action_probs = self.soft(action_probs)
+        return Categorical(action_probs)
 
-        dist = Categorical(action_probs)
+    #seleciona uma ação para um único grafo (não em batch) - usado em teste/validação
+    def act(self, state, sample, num):
+        dist = self.action_distribution(state)
 
         if sample == 0:
             action = dist.sample()
         else:
-            action = torch.argmax(action_probs)
+            action = torch.argmax(dist.probs)
 
         action_logprob = dist.log_prob(action)
         _dbg(2, f"  act() | step={num} | sample_mode={sample} | chosen_op={int(action)} | logprob={float(action_logprob):.4f} | n_valid={int((~state['operation'].mask).sum())}")
@@ -182,25 +188,31 @@ class BOPO:
 
         assert all(count > 0 for count in logp_count), "every rollout must take at least one decision step"
         makespans = torch.tensor([e.mk for e in rollout_envs], dtype=torch.float32, device=device)
-        mean_logp = torch.stack([cast(torch.Tensor, logp_sum[i]) / logp_count[i] for i in range(self.B)])
+        # Total trajectory log-likelihood, NOT averaged by decision count: different
+        # rollouts of the same instance can take a different number of policy decisions
+        # (auto-forced single-valid-action steps aren't counted), so dividing by
+        # logp_count made "better" trajectories with fewer decisions artificially
+        # comparable in scale to "worse" ones with more - diluting the preference signal.
+        logp_total = torch.stack([cast(torch.Tensor, logp_sum[i]) for i in range(self.B)])
         entropy_stats = summarize_action_entropy(all_entropies, all_valid_counts)
         _dbg(2, f"  sample_group | instance={instance_index} | rounds={rounds} | makespans min/mean/max={float(makespans.min()):.2f}/{float(makespans.mean()):.2f}/{float(makespans.max()):.2f}")
-        return mean_logp, makespans, rounds, entropy_stats
+        return logp_total, makespans, rounds, entropy_stats
 
     #um passo de treino do BOPO: amostra o grupo de B soluções, auto-rotula pares
     #(melhor vs. K-1 piores) e otimiza a SROLoss (loss de ranking, sem critic/vantagem).
     def update(self, instance_index):
-        mean_logp, makespans, rounds, entropy_stats = self.sample_group(instance_index)
+        logp_total, makespans, rounds, entropy_stats = self.sample_group(instance_index)
 
         best_idx, worse_idx = select_pairs(makespans.detach(), self.K)
         pair_losses = [
-            sro_loss(mean_logp[best_idx], mean_logp[w], float(makespans[best_idx]), float(makespans[w]))
+            sro_loss(logp_total[best_idx], logp_total[w], float(makespans[best_idx]), float(makespans[w]))
             for w in worse_idx.tolist()
         ]
         loss = torch.stack(pair_losses).mean()
 
         self.optimizer.zero_grad()
         loss.backward()
+        entropy_stats["actor_grad_norm"] = compute_actor_grad_norm(self.policy.actor)
         self.optimizer.step()
 
         loss_val = float(loss.item())

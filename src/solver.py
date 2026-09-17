@@ -45,7 +45,7 @@ def flexible_jobshop(jobs, num_machines):
 
     # Model the flexible jobshop problem.
     model = cp_model.CpModel()
-
+    
     horizon = 0
     for job in jobs:
         for task in job:

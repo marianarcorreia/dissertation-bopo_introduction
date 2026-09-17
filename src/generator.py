@@ -142,10 +142,10 @@ class CaseGenerator:
 
 def generate_instance_list(
     n_cases: int = 1,
-    range_jobs: tuple[int, int] = (2, 3),
-    range_machines: tuple[int, int] = (2, 3),
-    range_op_per_job: tuple[int, int] = (2, 3),
-    max_processing: int= 25
+    range_jobs: tuple[int, int] = (8, 10),
+    range_machines: tuple[int, int] = (5, 10),
+    range_op_per_job: tuple[int, int] = (5, 6),
+    max_processing: int= 100
 ) -> list[str]:
 
     list_instances = []

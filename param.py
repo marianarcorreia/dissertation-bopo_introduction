@@ -19,9 +19,15 @@ Critical-parameter strategy (same search space for OO/OM/OJM):
     n_cases, new_freq, K, use_greedy
 
 Validation dataset:
-    By default (--valdata fixed) the entire fixed validation set in
-    val/instances + val/solutions is used, giving a stable, noise-free
-    objective across all trials.
+    Every trial validates on the SAME fixed split, generated once from
+    val/instances + val/solutions and persisted to val/validation_dataset.json
+    (+ a disjoint val/test_dataset.json, held out and only ever used for a final,
+    one-time report after each trial's training loop ends - see src.train.train()
+    and src/utils/validation_utils.py). This is what makes trials comparable to
+    each other, and to runs from src.train.train() invoked directly. Pass
+    --rebuild-validation-set to force both splits to be regenerated at
+    --validation-size (only do this deliberately: it invalidates comparisons
+    with every previous run/trial, since they were scored against the old split).
 
 Outputs produced:
         - Per-trial training outputs under results/optuna_<rep>_<timestamp>_<trial>/
@@ -33,8 +39,7 @@ Recommended invocation:
             --representations OO OM OJM \\
             --trials 25 \\
             --max-episodes 400 \\
-            --storage sqlite:///optuna.db \\
-            --valdata fixed
+            --storage sqlite:///optuna.db
 """
 
 import argparse
@@ -47,9 +52,8 @@ from typing import Dict, List, Optional
 import numpy as np
 import optuna
 
-from src.generate_val import generate_val
 from src.train import train
-from src.utils import open_dashboard
+from src.utils import open_dashboard, generate_fixed_splits
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -65,10 +69,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--validation-freq", type=int, default=10,
                         help="Validation frequency in episodes (default: 20).")
     parser.add_argument("--validation-size", type=int, default=30,
-                        help="Validation sample size when valdata=our.")
-    parser.add_argument("--valdata", choices=["fixed", "our", "gen"], default="fixed",
-                        help="Validation dataset: 'fixed' uses all of val/instances (default), "
-                             "'our' samples from val/instances, 'gen' uses val/validation_set.json.")
+                        help="Size of EACH split (validation and test) the first time "
+                             "they're generated. Ignored on later runs once "
+                             "val/validation_dataset.json already exists, so every run "
+                             "stays comparable - see --rebuild-validation-set.")
+    parser.add_argument("--rebuild-validation-set", action="store_true",
+                        help="Force-regenerate val/validation_dataset.json and "
+                             "val/test_dataset.json at --validation-size, discarding the "
+                             "existing fixed split. Only do this deliberately: every prior "
+                             "run/trial was scored against the old split and will no "
+                             "longer be comparable to runs made after a rebuild.")
     parser.add_argument("--sampler-seed", type=int, default=42,
                         help="Seed for Optuna TPE sampler.")
     parser.add_argument("--storage", default=None,
@@ -100,7 +110,7 @@ def _normalize_storage_url(storage: Optional[str]) -> Optional[str]:
 
 # ── prerequisites ─────────────────────────────────────────────────────────────
 
-def ensure_prerequisites(valdata: str) -> None:
+def ensure_prerequisites(validation_size: int, rebuild_validation_set: bool) -> None:
     os.makedirs("results", exist_ok=True)
     os.makedirs("candidate_models", exist_ok=True)
 
@@ -108,17 +118,31 @@ def ensure_prerequisites(valdata: str) -> None:
     if not model_params_path.exists():
         model_params_path.write_text("[]")
 
-    if valdata == "fixed":
+    val_path = Path("val/validation_dataset.json")
+    test_path = Path("val/test_dataset.json")
+
+    if rebuild_validation_set:
+        print(f"[PARAM] --rebuild-validation-set: regenerating both fixed splits at size={validation_size} "
+              f"(discarding any existing {val_path} / {test_path})...")
         if not Path("val/instances").is_dir() or not Path("val/solutions").is_dir():
             raise FileNotFoundError(
-                "val/instances and val/solutions must exist for --valdata fixed. "
-                "Ensure both directories are populated before running tuning."
+                "val/instances and val/solutions must exist to (re)build the fixed validation/test split."
             )
-    elif valdata == "gen":
-        validation_set_path = Path("val/validation_set.json")
-        if not validation_set_path.exists():
-            print("[PARAM] val/validation_set.json not found. Generating default validation set...")
-            generate_val(20)
+        generate_fixed_splits(val_size=validation_size, test_size=validation_size,
+                               val_path=str(val_path), test_path=str(test_path))
+    elif not val_path.exists():
+        if not Path("val/instances").is_dir() or not Path("val/solutions").is_dir():
+            raise FileNotFoundError(
+                "val/instances and val/solutions must exist to build the fixed validation/test split "
+                f"(no {val_path} found yet)."
+            )
+        # train.py's build_validation_dataset() would generate this on first use anyway,
+        # but doing it once here means every trial in this run (not just the first) sees
+        # it already in place, and the tuning log is explicit about when it happened.
+        print(f"[PARAM] No fixed validation dataset found at {val_path}; generating both splits now "
+              f"(size={validation_size} each)...")
+        generate_fixed_splits(val_size=validation_size, test_size=validation_size,
+                               val_path=str(val_path), test_path=str(test_path))
 
 
 # ── search spaces ─────────────────────────────────────────────────────────────
@@ -126,9 +150,14 @@ def ensure_prerequisites(valdata: str) -> None:
 def critical_param_names(rep: str, smoke: bool) -> List[str]:
     if smoke:
         return []
-    
-    return ["lr", "hidden_channels", "batch_size", "mask_option", "sel_k",
-            "num_layers", "heads", "n_cases", "new_freq", "K", "use_greedy"]
+
+    names = ["lr", "hidden_channels", "batch_size",
+             "num_layers", "heads", "n_cases", "new_freq", "K", "use_greedy"]
+    if rep != "oo":
+        # mask_option/sel_k only affect action pruning in the om/ojm envs -
+        # FJSPEnvOO.calculate_mask() ignores both, so tuning them for oo wastes trials.
+        names = names + ["mask_option", "sel_k"]
+    return names
 
 
 def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
@@ -137,28 +166,47 @@ def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
             "train_freq": 1, "new_freq": 1, "n_cases": 3,
             "mask_option": 1, "sel_k": 1, "batch_size": 8,
             "lr": 3e-4, "hidden_channels": 32, "num_layers": 1, "heads": 2,
-            "K": 2, "use_greedy": True,
-            "j_min": 4, "j_max": 5, "m_min": 3, "m_max": 4,
-            "op_max": 5, "max_processing": 10,
+            "K": 2, "use_greedy": True, "warm_start_steps": 2,
+            "j_min": 8, "j_max": 10, "m_min": 5, "m_max": 10,
+            "op_max": 6, "max_processing": 100,
         }
 
-    return {
+    params = {
         "train_freq":      4,  # keep fixed; OJM updates are expensive
-        "new_freq":        trial.suggest_categorical("new_freq",         [1, 10]),
+        # Fixed (not tuned): a short behavior-cloning warm start against a dispatch
+        # heuristic before BOPO starts, see src/bopo_utils.py:run_behavior_cloning.
+        "warm_start_steps": 100,
+        # new_freq=1 regenerates the whole n_cases pool every step, so no instance is
+        # ever revisited; 10/50 let a trial spend more than one gradient step per
+        # generated instance.
+        "new_freq":        trial.suggest_categorical("new_freq",         [1, 10, 50]),
         "n_cases":         trial.suggest_categorical("n_cases",          [40, 80, 120]),
-        "mask_option":     trial.suggest_categorical("mask_option",      [0, 1]),
-        "sel_k":           trial.suggest_categorical("sel_k",            [1, 2, 3]),
-        "batch_size":      trial.suggest_categorical("batch_size",       [32, 64, 128]),
+        "batch_size":      trial.suggest_categorical("batch_size",       [64, 128]),
         "lr":              trial.suggest_float("lr",                     5e-5, 5e-3, log=True),
         "hidden_channels": trial.suggest_categorical("hidden_channels",  [64, 128, 256, 512]),
         "num_layers":      trial.suggest_int("num_layers",               1, 3),
         "heads":           trial.suggest_categorical("heads",            [2, 3, 4]),
-        "K":               trial.suggest_categorical("K",                [2, 4, 8]),
+        "K":               trial.suggest_categorical("K",                [8, 16, 32]),
         # use_greedy: whether one of the B rollouts is a greedy decode instead of sampled.
         "use_greedy":      trial.suggest_categorical("use_greedy",       [True, False]),
-        "j_min": 5, "j_max": 15, "m_min": 4, "m_max": 13,
-        "op_max": 9, "max_processing": 25,
+        "j_min": 8, "j_max": 10, "m_min": 5, "m_max": 10,
+        "op_max": 6, "max_processing": 100,
     }
+
+    if rep == "oo":
+        # FJSPEnvOO.calculate_mask() doesn't read mask_option/sel_k at all (operation
+        # choice is unrestricted; machine choice is a fixed earliest-completion-time
+        # heuristic) - fix them instead of spending trials tuning a no-op.
+        params["mask_option"] = 1
+        params["sel_k"] = 1
+    else:
+        # om/ojm now keep the sel_k best candidates PER JOB (env.py/envheterogeneosmo.py
+        # calculate_mask), so sel_k is a real, meaningful action-space-size knob again -
+        # previously a global top-k could collapse to ~1 legal action overall.
+        params["mask_option"] = trial.suggest_categorical("mask_option", [0, 1])
+        params["sel_k"] = trial.suggest_categorical("sel_k", [1, 2, 3])
+
+    return params
 
 
 # ── objective helpers ─────────────────────────────────────────────────────────
@@ -253,6 +301,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
             m_min            = sampled["m_min"],
             op_max           = sampled["op_max"],
             max_processing   = sampled["max_processing"],
+            warm_start_steps = sampled["warm_start_steps"],
             validation_freq  = effective_val_freq,
             validation_size  = effective_val_size,
             run_name         = run_name,
@@ -277,7 +326,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
     print(
         f"[PARAM] Starting Optuna study for {rep_upper} | trials={effective_trials} | "
         f"max_episodes={effective_max_episodes} | "
-        f"objective=min(last_val_gap_Q80) | valdata={args.valdata}"
+        f"objective=min(last_val_gap_Q80)"
     )
     if not args.smoke:
         print(f"[PARAM] Critical params ({rep_upper}): {tuned_params}")
@@ -315,11 +364,10 @@ def run_tuning(args: Optional[argparse.Namespace] = None) -> List[Dict]:
     print(f"[PARAM] Trials          : {args.trials}")
     print(f"[PARAM] Max episodes    : {args.max_episodes}")
     print(f"[PARAM] Objective       : min(last_val_gap_Q80)")
-    print(f"[PARAM] Validation data : {args.valdata}")
     print(f"[PARAM] Storage         : {args.storage or 'in-memory (not persistent)'}")
     print("=" * 70)
 
-    ensure_prerequisites(args.valdata)
+    ensure_prerequisites(args.validation_size, args.rebuild_validation_set)
 
     output_dir = Path("results") / "optuna"
     output_dir.mkdir(parents=True, exist_ok=True)

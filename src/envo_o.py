@@ -1,4 +1,3 @@
-import copy
 import importlib
 import os
 import random
@@ -84,12 +83,22 @@ class FJSPEnvOO(gym.Env):
             self.data["operation"].x[op_id, 1] = self.all_pendings[op_id]
             self.data["operation"].x[op_id, 2] = 0.0
 
-    def _op_features(self, op_id):
-        op_times = [t for t in self.operations[op_id] if t > 0]
-        mean_t = float(np.mean(op_times)) if op_times else 0.0
-        min_t = float(np.min(op_times)) if op_times else 0.0
-        max_t = float(np.max(op_times)) if op_times else 1.0
-        return mean_t, min_t, max_t
+        # Precompute per-operation static features and machine-compatibility, used every
+        # step by _build_dynamic_disj_edges(). These only depend on self.operations (fixed
+        # for the whole episode), so computing them once per instance instead of on every
+        # (src, dst) pair of every decision step avoids an O(rounds * B * k^2) blow-up of
+        # tiny numpy calls that used to dominate BOPO's per-update wall-clock time.
+        ops_arr = np.asarray(self.operations, dtype=np.float64)
+        self._op_compat = ops_arr > 0
+        valid_rows = self._op_compat.any(axis=1)
+        masked = np.where(self._op_compat, ops_arr, np.nan)
+        self._op_mean = np.zeros(self.num_operations, dtype=np.float32)
+        self._op_min = np.zeros(self.num_operations, dtype=np.float32)
+        self._op_max = np.ones(self.num_operations, dtype=np.float32)
+        if valid_rows.any():
+            self._op_mean[valid_rows] = np.nanmean(masked[valid_rows], axis=1)
+            self._op_min[valid_rows] = np.nanmin(masked[valid_rows], axis=1)
+            self._op_max[valid_rows] = np.nanmax(masked[valid_rows], axis=1)
 
     def _select_machine_for_operation(self, op_id):
         job_id = self.operation_to_job[op_id]
@@ -116,35 +125,34 @@ class FJSPEnvOO(gym.Env):
 
     def _build_dynamic_disj_edges(self):
         available_ops = [op_id for op_id in self.current_operations if op_id != -1 and not self.scheduled_mask[op_id]]
-        edges = []
-        edge_attr = []
+        k = len(available_ops)
 
-        for i, src in enumerate(available_ops):
-            src_mean, src_min, src_max = self._op_features(src)
-            for j, dst in enumerate(available_ops):
-                if i == j:
-                    continue
-                dst_mean, dst_min, dst_max = self._op_features(dst)
-                overlap = 0
-                for m_id, t_src in enumerate(self.operations[src]):
-                    if t_src > 0 and self.operations[dst][m_id] > 0:
-                        overlap = 1
-                        break
-                edges.append([src, dst])
-                edge_attr.append([
-                    float(overlap),
-                    src_mean,
-                    dst_mean,
-                    abs(src_min - dst_min),
-                    abs(src_max - dst_max),
-                ])
-
-        if edges:
-            self.state["operation", "disj", "operation"].edge_index = torch.LongTensor(edges).T
-            self.state["operation", "disj", "operation"].edge_attr = torch.tensor(edge_attr, dtype=torch.float)
-        else:
+        if k <= 1:
             self.state["operation", "disj", "operation"].edge_index = torch.empty((2, 0), dtype=torch.long)
             self.state["operation", "disj", "operation"].edge_attr = torch.empty((0, 5), dtype=torch.float)
+            return
+
+        idx = np.asarray(available_ops, dtype=np.int64)
+        means = self._op_mean[idx]
+        mins = self._op_min[idx]
+        maxs = self._op_max[idx]
+        compat = self._op_compat[idx]  # (k, num_machines)
+        overlap_matrix = compat @ compat.T  # (k, k), >0 where src/dst share a machine
+
+        off_diag = ~np.eye(k, dtype=bool)
+        ii, jj = np.nonzero(off_diag)
+
+        edges = np.stack([idx[ii], idx[jj]], axis=0)
+        edge_attr = np.stack([
+            (overlap_matrix[ii, jj] > 0).astype(np.float32),
+            means[ii].astype(np.float32),
+            means[jj].astype(np.float32),
+            np.abs(mins[ii] - mins[jj]).astype(np.float32),
+            np.abs(maxs[ii] - maxs[jj]).astype(np.float32),
+        ], axis=1)
+
+        self.state["operation", "disj", "operation"].edge_index = torch.from_numpy(edges).long()
+        self.state["operation", "disj", "operation"].edge_attr = torch.from_numpy(edge_attr).float()
 
     def reset(self, sel_index=None):
         idx = sel_index if sel_index is not None else self.current_instance
@@ -158,7 +166,7 @@ class FJSPEnvOO(gym.Env):
 
         self.num_steps = 0
         self.mk = 0.0
-        self.state: Any = copy.deepcopy(self.data)
+        self.state: Any = self.data.clone()
 
         self.current_operations = [self.jobs[job_id][0] for job_id in range(self.num_jobs)]
         self.operations_ends = [0.0] * self.num_jobs
@@ -179,14 +187,30 @@ class FJSPEnvOO(gym.Env):
                 mask[op_id] = False
         self.state["operation"].mask = torch.BoolTensor(mask)
 
+    def expert_action(self):
+        """Most-Work-Remaining (MWKR) dispatch heuristic: among the currently available
+        operations, pick the one whose job has the most total remaining processing time
+        (self.all_pendings). MWKR is a standard job-shop priority rule (favors jobs that
+        would otherwise fall behind) and is used as the teacher for BOPO's warm-start
+        behavior-cloning phase (src/bopo_utils.py:run_behavior_cloning), which needs a
+        non-uniform initial policy to break the self-rewarding cold-start."""
+        candidates = [
+            op_id for op_id in self.current_operations
+            if op_id != -1 and not self.scheduled_mask[op_id]
+        ]
+        return max(candidates, key=lambda op_id: self.all_pendings[op_id])
+
     def calculate_next_state(self):
+        # x[:,1] (all_pendings) is static per instance and already set once in
+        # generate_instance(); x[:,2] (scheduled flag) is updated incrementally in step()
+        # the moment an operation is scheduled. Looping over every operation here on every
+        # single decision step to re-write values that either never change or changed for
+        # exactly one operation was the single most expensive line in the env (profiled at
+        # ~30% of BOPO's per-update wall-clock time for no behavioral benefit).
         self.state["operation"].x[:, 0] = 0
         for op_id in self.current_operations:
             if op_id != -1:
                 self.state["operation"].x[op_id, 0] = 1
-        for op_id in range(self.num_operations):
-            self.state["operation"].x[op_id, 1] = self.all_pendings[op_id]
-            self.state["operation"].x[op_id, 2] = 1.0 if self.scheduled_mask[op_id] else 0.0
 
         self._build_dynamic_disj_edges()
 
@@ -213,6 +237,7 @@ class FJSPEnvOO(gym.Env):
 
         self.operations_ends[sel_job] = final_time
         self.scheduled_mask[sel_operation] = True
+        self.state["operation"].x[sel_operation, 2] = 1.0
 
         job_ops = self.jobs[sel_job]
         curr_index = job_ops.index(sel_operation)
@@ -251,11 +276,17 @@ class FJSPEnvOO(gym.Env):
         return random.choice(valid)
 
     def normalize_state(self, state):
-        state = copy.deepcopy(state)
+        # .clone() (PyG's per-tensor clone) instead of copy.deepcopy(): this runs every
+        # decision round for every active rollout in BOPO's sample_group, and generic
+        # deepcopy's recursive python traversal of the whole HeteroData object graph is
+        # ~4x slower than cloning the stored tensors directly - it was a major chunk of
+        # BOPO's per-update wall-clock time.
+        state = state.clone()
 
-        for i in range(state["operation"].x.shape[1]):
-            values = state["operation"].x[:, i]
-            state["operation"].x[:, i] = (2 * (values - values.min()) / (values.max() - values.min() + 1e-7) - 1).float()
+        x = state["operation"].x
+        mins = x.min(dim=0, keepdim=True).values
+        maxs = x.max(dim=0, keepdim=True).values
+        state["operation"].x = (2 * (x - mins) / (maxs - mins + 1e-7) - 1).float()
 
         for edge_type in [
             ("operation", "prec", "operation"),

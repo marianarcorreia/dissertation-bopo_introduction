@@ -15,7 +15,8 @@ from datetime import datetime #timestamp  para logs
 import random
 import numpy as np
 import time #tempo de execução
-from src.utils import build_validation_dataset, run_validation, OutputManager
+from src.utils import build_validation_dataset, run_validation, OutputManager, get_test_dataset
+from src.bopo_utils import run_behavior_cloning
 
 _DBG = int(os.environ.get("FJSP_DEBUG", "0"))
 
@@ -58,9 +59,31 @@ def generate_train_instances(train_config):
 
 #o código abaixo é o código original do gerador de instancias, mantido para referência e possível reutilização futura
 def train(max_episodes = 10,
-             new_freq=1, n_cases = 100, mask_option=1, sel_k=1, B=64, K=16, use_greedy=True, lr=0.0001, hidden_channels=128, num_layers = 1, heads = 3
-         ,j_max = 15, j_min = 5, m_max = 13, m_min = 4, op_max = 9, max_processing = 25,
-         validation_freq=10, validation_size=20, run_name="train_run", representation="oo", gnn_type="gat"):
+             # new_freq=1 used to regenerate the WHOLE n_cases training pool every single
+             # step, so no instance was ever revisited and every gradient step spent its
+             # one-shot budget on a brand-new, never-repeated instance. new_freq=500 with
+             # n_cases=100 instead cycles through the same 100 instances ~5x (reshuffled
+             # each pass) before refreshing the pool, trading a bit of diversity for far
+             # more gradient signal per generated instance.
+             new_freq=500, n_cases = 100, mask_option=1, sel_k=1, B=64, K=16, use_greedy=True,
+             # lr=1e-4 combined with only ~100-1000 updates left BOPO's policy stuck near
+             # its (near-uniform) initialization the whole run (see results/*_oo -
+             # action_entropy_max_entropy_normalized stayed >0.99 for 100 straight
+             # episodes). 5e-4 gives meaningfully larger steps without the instability of
+             # going much higher on a from-scratch GNN policy.
+             lr=0.0005, hidden_channels=128,
+             # num_layers=1 gives the GNN only a 1-hop receptive field per decision -
+             # too shallow to reason about anything beyond immediate neighbors. 2 layers
+             # is a modest compute cost increase for a much larger receptive field.
+             num_layers = 2, heads = 3
+         ,j_max = 10, j_min = 8, m_max = 10, m_min = 5, op_max = 6, max_processing = 100,
+         validation_freq=10, validation_size=20, run_name="train_run", representation="oo", gnn_type="gat",
+         # Number of teacher-forced behavior-cloning updates to run BEFORE the BOPO loop
+         # starts (src/bopo_utils.py:run_behavior_cloning). BOPO bootstraps entirely from
+         # its own samples, so a near-uniform initial policy barely learns anything from
+         # the pairwise preference loss (see the module docstring). 0 disables it and
+         # matches the old behavior exactly.
+         warm_start_steps=200):
     #inicialização
     #NOTA: "max_episodes" passou a contar passos de treino do BOPO, não episódios PPO.
     #Cada passo amostra B trajetórias paralelas da MESMA instância e faz UMA atualização
@@ -69,9 +92,10 @@ def train(max_episodes = 10,
     print("[TRAIN] Training started at:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print(f"[TRAIN] Hyperparams | max_steps={max_episodes} | new_freq={new_freq}")
     print(f"[TRAIN]             | n_cases={n_cases} | B={B} | K={K} | use_greedy={use_greedy} | lr={lr}")
+    print(f"[TRAIN]             | warm_start_steps={warm_start_steps}")
     print(f"[TRAIN]             | hidden_channels={hidden_channels} | num_layers={num_layers} | heads={heads}")
     print(f"[TRAIN] Representation | {representation} | GNN | {gnn_type}")
-    print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[4,{op_max}] | max_proc={max_processing}")
+    print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[5,{op_max}] | max_proc={max_processing}")
     print("=" * 60)
     rep_name, EnvClass, BOPOClass = _resolve_representation_modules(representation)
     output_manager = OutputManager(output_dir="results", run_name=run_name)
@@ -94,7 +118,7 @@ def train(max_episodes = 10,
         "n_cases": n_cases,
         "range_jobs": (j_min, j_max),
         "range_machines": (m_min, m_max),
-        "range_op_per_job": (4, op_max),
+        "range_op_per_job": (5, op_max),
         "max_processing": max_processing
     }
 
@@ -104,6 +128,17 @@ def train(max_episodes = 10,
     env = EnvClass(instances, mask_option, sel_k)
     #cria agente BOPO (só ator, sem critic - ver src/bopo_utils.py para a SROLoss)
     bopo_agent = BOPOClass(lr, env, metadata, hidden_channels, num_layers, heads, B, K, use_greedy, gnn_type=gnn_type)
+
+    if warm_start_steps > 0:
+        print(f"[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | {warm_start_steps} step(s)...")
+        for ws in range(1, warm_start_steps + 1):
+            ws_instance = random.randrange(len(env.instances))
+            bc_loss, bc_steps = run_behavior_cloning(env, bopo_agent.policy, bopo_agent.optimizer, ws_instance)
+            if ws % max(1, warm_start_steps // 20) == 0 or ws == warm_start_steps:
+                print(f"[TRAIN][WARMSTART] step {ws}/{warm_start_steps} | instance={ws_instance} | bc_loss={bc_loss:.4f} | decisions={bc_steps}")
+        print("[TRAIN] Warm-start complete, switching to BOPO preference optimization.")
+        print("-" * 60)
+
     print(f"[TRAIN] BOPO agent ready. Starting training loop for {max_episodes} step(s)...")
     print("-" * 60)
     validation_history = []
@@ -112,6 +147,7 @@ def train(max_episodes = 10,
     best_avg_gap = float('inf')
     best_q80_gap = float('inf')
     best_difference = 0.0
+    best_model_path = None
     step_number = 1
     #ordem (baralhada) das instâncias de treino dentro de cada "epoch" sobre o pool atual
     instance_order = []
@@ -201,8 +237,9 @@ def train(max_episodes = 10,
                 with open('candidate_models/model_params.json', 'w') as outfile:
                     json.dump(model_params, outfile)
 
-                bopo_agent.save("candidate_models/" + name + ".pth")
-                shutil.copy("candidate_models/" + name + ".pth", "models/" + name + ".pth")
+                best_model_path = "candidate_models/" + name + ".pth"
+                bopo_agent.save(best_model_path)
+                shutil.copy(best_model_path, "models/" + name + ".pth")
 
         episode_entry = {
             "episode": step_number,
@@ -229,6 +266,39 @@ def train(max_episodes = 10,
     actor_param_count = int(sum(p.numel() for p in bopo_agent.policy.actor.parameters()))
     plot_episode_outputs = output_manager.plot_episode_metrics(episode_metrics)
     plot_update_outputs = output_manager.plot_update_metrics(update_metrics)
+
+    # One-time, final report on the held-out TEST split (see src/utils/validation_utils.py:
+    # get_test_dataset). Disjoint from the validation split used above for checkpoint
+    # selection, and never looked at until now - best_avg_gap/best_q80_gap above answer
+    # "which checkpoint did we pick", this answers "how good is that checkpoint", without
+    # the two questions being asked of the same data.
+    test_avg_gap = None
+    test_std_gap = None
+    test_q80_gap = None
+    test_all_gaps = None
+    if best_model_path is not None:
+        print(f"[TRAIN] Evaluating best checkpoint ({best_model_path}) on the held-out test split...")
+        test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg)
+        test_env = EnvClass(test_set, mask_option, sel_k)
+        bopo_agent.load(best_model_path)
+        test_metrics = run_validation(bopo_agent, test_env, test_set, dbg_fn=_dbg,
+                                       print_fn=lambda msg: print(msg.replace("[TRAIN][VAL]", "[TRAIN][TEST]")))
+        test_env.close()
+        test_avg_gap = float(test_metrics["avg_gap"])
+        test_std_gap = float(test_metrics["std_gap"])
+        test_q80_gap = float(test_metrics["q80_gap"])
+        test_all_gaps = test_metrics["all_gaps"]
+        output_manager.save_test_metrics({
+            "best_model_path": best_model_path,
+            "avg_gap": test_avg_gap,
+            "std_gap": test_std_gap,
+            "q80_gap": test_q80_gap,
+            "all_gaps": test_all_gaps,
+            "instances": [t["name"] for t in test_set],
+        })
+    else:
+        print("[TRAIN] No checkpoint ever improved validation avg_gap - skipping held-out test evaluation.")
+
     summary = {
         "run_name": run_name,
         "representation": rep_name,
@@ -238,6 +308,10 @@ def train(max_episodes = 10,
         "updates_completed": int(len(update_metrics)),
         "best_validation_avg_gap": float(best_avg_gap) if not np.isinf(best_avg_gap) else None,
         "best_validation_q80_gap": float(best_q80_gap) if not np.isinf(best_q80_gap) else None,
+        "best_model_path": best_model_path,
+        "test_avg_gap": test_avg_gap,
+        "test_std_gap": test_std_gap,
+        "test_q80_gap": test_q80_gap,
         "actor_param_count": actor_param_count,
         "best_difference": float(best_difference),
         "total_runtime_sec": float(time.time() - run_start_time),

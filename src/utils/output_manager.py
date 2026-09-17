@@ -16,6 +16,7 @@ class OutputManager:
         self.episode_metrics_file = "episode_metrics.json"
         self.update_metrics_file = "update_metrics.json"
         self.run_summary_file = "run_summary.json"
+        self.test_metrics_file = "test_metrics.json"
         self.run_dir = self._create_run_directory(self.run_name)
         self.plot_dir = os.path.join(self.run_dir, plot_dir)
 
@@ -69,6 +70,9 @@ class OutputManager:
     def run_summary_path(self):
         return os.path.join(self.run_dir, self.run_summary_file)
 
+    def test_metrics_path(self):
+        return os.path.join(self.run_dir, self.test_metrics_file)
+
     def save_json(self, data, path):
         with open(path, "w") as outfile:
             json.dump(data, outfile)
@@ -92,6 +96,14 @@ class OutputManager:
 
     def save_run_summary(self, summary):
         self.save_json(summary, self.run_summary_path())
+
+    def save_test_metrics(self, metrics):
+        """One-time, post-training report on the held-out test split (see
+        src/train.py's evaluate_on_test_set call and
+        src/utils/validation_utils.py:get_test_dataset). Kept in its own file, separate
+        from validation_history.json, so it's never mistaken for one of the periodic
+        during-training checkpoints."""
+        self.save_json(metrics, self.test_metrics_path())
 
     def _plot_series(self, x_values, y_values, title, x_label, y_label, save_name, color="#8da0cb"):
         if len(x_values) == 0 or len(y_values) == 0:

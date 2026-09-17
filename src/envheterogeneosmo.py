@@ -1,4 +1,3 @@
-import copy
 import importlib
 import os
 import random
@@ -50,6 +49,9 @@ class FJSPEnvMO(gym.Env):
         for job_id, job_ops in enumerate(self.jobs):
             for op_id in job_ops:
                 self.operation_to_job[op_id] = job_id
+        self._op_to_job = torch.tensor(
+            [self.operation_to_job[op_id] for op_id in range(self.num_operations)], dtype=torch.long
+        )
 
         self.num_features_oper = 2
         self.num_features_mach = 3
@@ -114,7 +116,7 @@ class FJSPEnvMO(gym.Env):
 
         self.num_steps = 0
         self.mk = 0.0
-        self.state: Any = copy.deepcopy(self.data)
+        self.state: Any = self.data.clone()
 
         self.job_start_machines = torch.full((self.num_jobs, self.num_machines), 10000.0)
         self.current_job_proc = torch.zeros((self.num_jobs, self.num_machines))
@@ -135,8 +137,13 @@ class FJSPEnvMO(gym.Env):
             for machine_id, proc_time in eligible:
                 action_edges.append([machine_id, first_op_id])
                 ratio = proc_time / op_sum if op_sum != 0 else 0.0
-                gap_norm = proc_time / den  
-                action_features.append([proc_time, ratio, ratio, proc_time, 0])
+                gap_norm = proc_time / den
+                # index 3 must be the gap-ratio-to-total (like step()'s new_features build
+                # it for every later edge), not a second copy of proc_time - otherwise the
+                # very first decision of every episode saw a raw proc_time (~1-100) here
+                # while every later decision saw a normalized ratio in [0,1] on the same
+                # feature column.
+                action_features.append([proc_time, ratio, ratio, gap_norm, 0])
                 self.job_start_machines[job_id, machine_id] = 0
                 self.current_job_proc[job_id, machine_id] = float(proc_time)
 
@@ -155,30 +162,49 @@ class FJSPEnvMO(gym.Env):
         else:
             mask_matrix = self.job_start_machines + self.current_job_proc
 
-        flat_size = int(mask_matrix.numel())
-        k = max(1, min(int(self.sel_k), flat_size))
-        smallest = torch.unique(torch.topk(torch.flatten(mask_matrix), k=k, largest=False, dim=0).values)
+        # Keep the sel_k best candidate machines PER JOB, not the sel_k best (job,machine)
+        # pairs globally across the whole matrix. A global top-k collapses to a single
+        # deterministic action once other jobs finish (or whenever sel_k is small, e.g.
+        # the default sel_k=1), leaving the policy nothing to actually decide. Doing the
+        # top-k per row instead keeps every job that still has a pending operation with
+        # up to sel_k real candidates, and is done via one vectorized gather - no python
+        # loop over (job, machine) pairs or edge_index comparisons.
+        SENTINEL = 10000.0
+        k = max(1, int(self.sel_k))
+        valid = mask_matrix < SENTINEL
+        ranked = torch.where(valid, mask_matrix, torch.full_like(mask_matrix, float("inf")))
+        keep = torch.zeros_like(valid)
+        for j in range(ranked.shape[0]):
+            n_valid = int(valid[j].sum().item())
+            if n_valid == 0:
+                continue
+            _, top_idx = torch.topk(ranked[j], k=min(k, n_valid), largest=False)
+            keep[j, top_idx] = True
 
-        candidate_pairs = []
-        for value in smallest:
-            job_indices, machine_indices = (mask_matrix == value).nonzero(as_tuple=True)
-            for job_idx, machine_idx in zip(job_indices.tolist(), machine_indices.tolist()):
-                op_id = int(self.current_operations[job_idx])
-                if op_id != -1:
-                    candidate_pairs.append((int(machine_idx), op_id))
+        edge_index = self.state["machine", "exec", "operation"].edge_index
+        machine_idx, op_idx = edge_index[0], edge_index[1]
+        job_idx = self._op_to_job[op_idx]
+        mask = ~keep[job_idx, machine_idx]
 
-        indexes = []
-        for pair in candidate_pairs:
-            pair_tensor = torch.tensor(pair, dtype=torch.long)
-            equal_pairs = self.state["machine", "exec", "operation"].edge_index.T == pair_tensor
-            both_equal = np.logical_and(equal_pairs[:, 0], equal_pairs[:, 1])
-            indexes.extend([idx for idx, value in enumerate(both_equal) if value == 1])
+        self.state["machine", "exec", "operation"].mask = mask
+        # Kept for expert_action() below (BOPO's warm-start behavior-cloning phase),
+        # so the same earliest-completion-time criterion used to build the mask doubles
+        # as the teacher's priority rule - no separate heuristic to keep in sync.
+        self._last_mask_matrix = mask_matrix
 
-        result = [True] * self.state["machine", "exec", "operation"].edge_index.shape[1]
-        for idx in indexes:
-            result[idx] = False
-
-        self.state["machine", "exec", "operation"].mask = torch.BoolTensor(result)
+    def expert_action(self):
+        """Earliest-completion-time dispatch rule: among the currently unmasked
+        (machine, operation) candidates, pick the one whose job has the smallest
+        priority value under the same criterion used to build the action mask
+        (self._last_mask_matrix from calculate_mask()). Used as the teacher for BOPO's
+        warm-start behavior-cloning phase (src/bopo_utils.py:run_behavior_cloning)."""
+        edge_index = self.state["machine", "exec", "operation"].edge_index
+        machine_idx, op_idx = edge_index[0], edge_index[1]
+        job_idx = self._op_to_job[op_idx]
+        values = self._last_mask_matrix[job_idx, machine_idx].clone()
+        mask = self.state["machine", "exec", "operation"].mask
+        values[mask] = float("inf")
+        return int(torch.argmin(values).item())
 
     def calculate_next_state(self):
         self.state["machine"].x[:, 2] = self.state["machine"].x[:, 0] - torch.min(self.state["machine"].x[:, 0])
@@ -188,10 +214,24 @@ class FJSPEnvMO(gym.Env):
             if op_id != -1:
                 self.state["operation"].x[op_id, 0] = 1
 
+        # Per-machine normalized load feature (edge_attr index 4), mirroring env.py's
+        # calculate_next_state(): previously op_to_machine_mask/machine_to_op_mask were
+        # computed and never used, so this column stayed permanently 0 for every edge in
+        # this representation.
+        op_mach_attr = self.state["operation", "exec", "machine"].edge_attr
+        op_mach_index = self.state["operation", "exec", "machine"].edge_index
+        mach_op_attr = self.state["machine", "exec", "operation"].edge_attr
+        mach_op_index = self.state["machine", "exec", "operation"].edge_index
         for machine_id in range(self.num_machines):
-            op_to_machine_mask = self.state["operation", "exec", "machine"].edge_index[1, :] == machine_id
+            op_to_machine_mask = op_mach_index[1, :] == machine_id
+            if op_to_machine_mask.any():
+                vals = op_mach_attr[op_to_machine_mask, 0]
+                op_mach_attr[op_to_machine_mask, 4] = vals / vals.max()
 
-            machine_to_op_mask = self.state["machine", "exec", "operation"].edge_index[0, :] == machine_id
+            machine_to_op_mask = mach_op_index[0, :] == machine_id
+            if machine_to_op_mask.any():
+                vals = mach_op_attr[machine_to_op_mask, 0]
+                mach_op_attr[machine_to_op_mask, 4] = vals / vals.max()
 
     def step(self, action):
         self.num_steps += 1
@@ -294,15 +334,17 @@ class FJSPEnvMO(gym.Env):
         return random.choice(valid)
 
     def normalize_state(self, state):
-        state = copy.deepcopy(state)
+        # .clone() (PyG's per-tensor clone) instead of copy.deepcopy(): this runs every
+        # decision round for every active rollout in BOPO's sample_group, and generic
+        # deepcopy's recursive python traversal of the whole HeteroData object graph is
+        # ~4x slower than cloning the stored tensors directly.
+        state = state.clone()
 
-        for i in range(state["operation"].x.shape[1]):
-            values = state["operation"].x[:, i]
-            state["operation"].x[:, i] = (2 * (values - values.min()) / (values.max() - values.min() + 1e-7) - 1).float()
-
-        for i in range(state["machine"].x.shape[1]):
-            values = state["machine"].x[:, i]
-            state["machine"].x[:, i] = (2 * (values - values.min()) / (values.max() - values.min() + 1e-7) - 1).float()
+        for node_type in ("operation", "machine"):
+            x = state[node_type].x
+            mins = x.min(dim=0, keepdim=True).values
+            maxs = x.max(dim=0, keepdim=True).values
+            state[node_type].x = (2 * (x - mins) / (maxs - mins + 1e-7) - 1).float()
 
         for edge_type in [
             ("operation", "exec", "machine"),
