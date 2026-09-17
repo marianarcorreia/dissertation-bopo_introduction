@@ -14,13 +14,9 @@ What this script does:
            (lower is better).  This rewards models that solve at least 80 % of
            validation instances well, not just the lucky best checkpoint.
 
-Critical-parameter strategy:
-    - OO:  lr, hidden_channels, batch_size, mask_option, sel_k,
-           num_layers, heads, train_freq, n_cases, new_freq 
-    - OM:  lr, hidden_channels, batch_size, mask_option, sel_k, train_freq,
-           num_layers, heads, n_cases, new_freq
-    - OJM: lr, hidden_channels, batch_size, mask_option, sel_k, num_layers,
-           heads, n_cases, new_freq
+Critical-parameter strategy (same search space for OO/OM/OJM):
+    lr, hidden_channels, batch_size, mask_option, sel_k, num_layers, heads,
+    n_cases, new_freq, K, use_greedy
 
 Validation dataset:
     By default (--valdata fixed) the entire fixed validation set in
@@ -132,7 +128,7 @@ def critical_param_names(rep: str, smoke: bool) -> List[str]:
         return []
     
     return ["lr", "hidden_channels", "batch_size", "mask_option", "sel_k",
-            "num_layers", "heads", "n_cases", "new_freq"]
+            "num_layers", "heads", "n_cases", "new_freq", "K", "use_greedy"]
 
 
 def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
@@ -141,6 +137,7 @@ def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
             "train_freq": 1, "new_freq": 1, "n_cases": 3,
             "mask_option": 1, "sel_k": 1, "batch_size": 8,
             "lr": 3e-4, "hidden_channels": 32, "num_layers": 1, "heads": 2,
+            "K": 2, "use_greedy": True,
             "j_min": 4, "j_max": 5, "m_min": 3, "m_max": 4,
             "op_max": 5, "max_processing": 10,
         }
@@ -156,6 +153,9 @@ def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
         "hidden_channels": trial.suggest_categorical("hidden_channels",  [64, 128, 256, 512]),
         "num_layers":      trial.suggest_int("num_layers",               1, 3),
         "heads":           trial.suggest_categorical("heads",            [2, 3, 4]),
+        "K":               trial.suggest_categorical("K",                [2, 4, 8]),
+        # use_greedy: whether one of the B rollouts is a greedy decode instead of sampled.
+        "use_greedy":      trial.suggest_categorical("use_greedy",       [True, False]),
         "j_min": 5, "j_max": 15, "m_min": 4, "m_max": 13,
         "op_max": 9, "max_processing": 25,
     }
@@ -226,7 +226,8 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
             f"[PARAM][{rep_upper}] Trial {trial.number} | "
             f"episodes={effective_max_episodes} | lr={sampled['lr']:.2e} | "
             f"hidden={sampled['hidden_channels']} | layers={sampled['num_layers']} | "
-            f"heads={sampled['heads']} | tf={sampled['train_freq']}"
+            f"heads={sampled['heads']} | K={sampled['K']} | use_greedy={sampled['use_greedy']} | "
+            f"tf={sampled['train_freq']}"
         )
 
         # NOTE: BOPO has no separate train_freq (every step is an update) and train()
@@ -240,6 +241,8 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
             mask_option      = sampled["mask_option"],
             sel_k            = sampled["sel_k"],
             B                = sampled["batch_size"],
+            K                = sampled["K"],
+            use_greedy       = sampled["use_greedy"],
             lr               = sampled["lr"],
             hidden_channels  = sampled["hidden_channels"],
             num_layers       = sampled["num_layers"],

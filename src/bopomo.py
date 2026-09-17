@@ -1,7 +1,7 @@
 from typing import Optional
 import torch
 import torch.nn as nn
-from torch_geometric.nn import GATv2Conv, Linear, to_hetero #camadas do GNN
+from torch_geometric.nn import Linear, to_hetero #camadas do GNN
 from torch_geometric.data import HeteroData, Batch
 from torch.distributions import Categorical #dist. de probab. para ações
 import random
@@ -9,6 +9,8 @@ import os
 from torch.nn.parameter import UninitializedBuffer, UninitializedParameter
 
 from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy
+from src.gat import GAT
+from src.gin import GINModel
 
 # Controlled by FJSP_DEBUG (same variable as env.py)
 # 1=BOPO lifecycle  2=+forward/action  3=+update internals
@@ -27,41 +29,21 @@ if(torch.cuda.is_available()) and random.random()<1:
 else:
     _dbg(1, "Device set to: cpu")
 
-#GAT
-class GAT(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2):
-        super().__init__()
-        self.lin1 = Linear(-1, 8) #camada linear inicial, -1 porque significa que se infere automaticamente o tamanho de entrada, e 8 apenas pq dava.
-        self.s = torch.nn.Softmax(dim=0) #softmax para as atenções
-        self.tanh = nn.Tanh() #função de ativação
-        self.num_layers = num_layers
-
-        self.convs = torch.nn.ModuleList()
-        for _ in range(num_layers):
-            conv = GATv2Conv(-1, hidden_channels, add_self_loops=False, edge_dim=5, heads = heads) #edge_dim são as features das arestas, os self loops estão desativados porque estes já estão explicitos no grafo
-            self.convs.append(conv)
-
-    def forward(self, x, edge_index, edge_attr_dict):
-        _dbg(3, f"  GAT.forward | x.shape={x.shape}")
-        x = self.lin1(x) #features projetadas para a dimensão 8
-        x = self.tanh(x) #função de ativação - introduz não linearidade e mantem valores entre -1 e 1
-        for conv in self.convs:
-            x = conv(x, edge_index, edge_attr_dict)
-        #ativação final - após todas as camadas de conv. Embeding adequados para serem usados pelo ator.
-        x = self.tanh(x)
-        _dbg(3, f"  GAT.forward done | out.shape={x.shape}")
-        return x
-
 #BOPO não tem critic: o único modelo treinado é o ator, que atribui um score a cada aresta
 #maquina->operação candidata. Sem baseline/valor de estado, porque a loss do BOPO (SROLoss)
 #compara diretamente a log-likelihood de trajetórias completas, em vez de usar uma vantagem.
 class ActorModel(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3):
+    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat'):
         super().__init__()
-        _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads}")
-        #modelo gat homegeneo, apenas processa um tipo de no e de aresta
-        self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
-        #to_hetero converte o modelo GAT para um modelo heterogeneo
+        _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+        #modelo gnn homogeneo, apenas processa um tipo de no e de aresta
+        if gnn_type == 'gat':
+            self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+        elif gnn_type == 'gin':
+            self.gnn = GINModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+        else:
+            raise ValueError(f"Unknown gnn_type: {gnn_type!r} (expected 'gat' or 'gin')")
+        #to_hetero converte o modelo homogeneo para um modelo heterogeneo
         self.gnn = to_hetero(self.gnn, metadata=metadata, aggr='mean')
         #um score por aresta
         self.lin3 = Linear(-1, 1)
@@ -79,10 +61,10 @@ class ActorModel(torch.nn.Module):
 
 
 class Policy(nn.Module):
-    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3):
+    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat'):
         super(Policy, self).__init__()
-        _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads}")
-        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads)
+        _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type)
         self.metadata = metadata
         self.soft = torch.nn.Softmax(dim=0)
 
@@ -141,8 +123,8 @@ class Policy(nn.Module):
 
 class BOPO:
     def __init__(self, lr, env, metadata, hidden_channels=128, num_layers=2, heads=3,
-                 B=16, K=8, use_greedy=True):
-        _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads}")
+                 B=16, K=8, use_greedy=True, gnn_type='gat'):
+        _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
 
         self.env = env
         self.metadata = metadata
@@ -150,7 +132,7 @@ class BOPO:
         self.K = K
         self.use_greedy = use_greedy
 
-        self.policy = Policy(metadata, hidden_channels, num_layers, heads).to(device)
+        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type).to(device)
         self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
 
     #inferência de uma única trajetória (usada por test_model/run_validation) - mantém a

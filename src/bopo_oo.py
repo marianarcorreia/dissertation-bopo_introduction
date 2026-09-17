@@ -1,273 +1,270 @@
-import copy
-import importlib
-import os
-import random
-from typing import Any
+from typing import cast
 
-import numpy as np
 import torch
-from torch_geometric.data import HeteroData
+import torch.nn as nn
+from torch_geometric.nn import Linear, to_hetero #camadas do GNN
+from torch_geometric.data import HeteroData, Batch
+from torch.distributions import Categorical #dist. de probab. para ações
+import random
+import os
+from torch.nn.parameter import UninitializedBuffer, UninitializedParameter
 
-gym = importlib.import_module("gymnasium")
+from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy
+from src.gat import GAT
+from src.gin import GINModel
 
+# Controlled by FJSP_DEBUG (same variable as env.py)
+# 1=BOPO lifecycle  2=+forward/action  3=+update internals
 _DBG = int(os.environ.get("FJSP_DEBUG", "0"))
-
 
 def _dbg(level, *args, **kwargs):
     if _DBG >= level:
-        print("[ENV]", *args, **kwargs)
+        print("[BOPO]", *args, **kwargs)
 
+device = torch.device('cpu')
 
-class FJSPEnvOO(gym.Env):
-    def __init__(self, instances, mask_option=3, sel_k=5):
-        super(FJSPEnvOO, self).__init__()
-        if isinstance(instances, dict):
-            instances = [instances]
-        self.instances = instances
-        self.current_instance = 0
-        self.mask_option = mask_option
-        self.sel_k = sel_k
-        self.mk = 0.0
-        _dbg(1, f"FJSPEnvOO created | instances={len(self.instances)} | mask_option={mask_option} | sel_k={sel_k}")
+if(torch.cuda.is_available()) and random.random()<1:
+    device = torch.device('cuda:0')
+    torch.cuda.empty_cache()
+    _dbg(1, f"Device set to: {torch.cuda.get_device_name(device)}")
+else:
+    _dbg(1, "Device set to: cpu")
 
-    def get_prev_op(self, o_id):
-        for job in self.jobs:
-            if o_id in job:
-                idx = job.index(o_id)
-                return None if idx == 0 else job[idx - 1]
-        return None
-
-    def generate_instance(self, instance):
-        jobs, operations = instance["jobs"], instance["operations"]
-
-        self.jobs = jobs
-        self.num_jobs = len(jobs)
-        self.operations = operations
-        self.num_operations = len(operations)
-        self.num_machines = len(instance["operations"][0])
-
-        self.operation_to_job = {}
-        for job_id, job_ops in enumerate(self.jobs):
-            for op_id in job_ops:
-                self.operation_to_job[op_id] = job_id
-
-        self.num_features_oper = 3
-
-        self.data = HeteroData()
-        self.data["operation"].x = torch.zeros((self.num_operations, self.num_features_oper), dtype=torch.float)
-
-        precedence_edges = []
-        for job_ops in self.jobs:
-            for i in range(len(job_ops) - 1):
-                precedence_edges.append([job_ops[i], job_ops[i + 1]])
-        if precedence_edges:
-            self.data["operation", "prec", "operation"].edge_index = torch.LongTensor(precedence_edges).T
-            self.data["operation", "prec", "operation"].edge_attr = torch.ones((len(precedence_edges), 5), dtype=torch.float)
+class ActorModel(torch.nn.Module):
+    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat'):
+        super().__init__()
+        _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+        #modelo gnn homogeneo, apenas processa um tipo de no e de aresta
+        if gnn_type == 'gat':
+            self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+        elif gnn_type == 'gin':
+            self.gnn = GINModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
         else:
-            self.data["operation", "prec", "operation"].edge_index = torch.empty((2, 0), dtype=torch.long)
-            self.data["operation", "prec", "operation"].edge_attr = torch.empty((0, 5), dtype=torch.float)
-        
-        self.all_pendings = []
-        for job_ops in self.jobs:
-            pending = []
-            for op_id in reversed(job_ops):
-                op_times = np.array(self.operations[op_id])
-                valid = op_times[np.where(op_times != 0)]
-                mean_t = float(np.mean(valid)) if len(valid) > 0 else 0.0
-                pending.append(mean_t if not pending else mean_t + pending[-1])
-            self.all_pendings.extend(list(reversed(pending)))
+            raise ValueError(f"Unknown gnn_type: {gnn_type!r} (expected 'gat' or 'gin')")
+        #to_hetero converte o modelo homogeneo para um modelo heterogeneo
+        self.gnn = to_hetero(self.gnn, metadata=metadata, aggr='mean')
+        #um score por operação
+        self.lin3 = Linear(-1, 1)
 
-        self.data["operation", "disj", "operation"].edge_index = torch.empty((2, 0), dtype=torch.long)
-        self.data["operation", "disj", "operation"].edge_attr = torch.empty((0, 5), dtype=torch.float)
+    #passa o grafo para o gnn het, embeddings atualizados, e depois processa os embeddings para calcular os scores das ações.
+    def forward(self, data: HeteroData):
+        _dbg(3, "  ActorModel.forward")
+        res = self.gnn(data.x_dict, data.edge_index_dict, data.edge_attr_dict)
+        #score por nó operação - probabilidade de escolher a próxima operação
+        res = self.lin3(res['operation'])
+        _dbg(3, f"    actor logits shape={res.shape}")
+        return res
 
-        for op_id in range(self.num_operations):
-            self.data["operation"].x[op_id, 1] = self.all_pendings[op_id]
-            self.data["operation"].x[op_id, 2] = 0.0
 
-    def _op_features(self, op_id):
-        op_times = [t for t in self.operations[op_id] if t > 0]
-        mean_t = float(np.mean(op_times)) if op_times else 0.0
-        min_t = float(np.min(op_times)) if op_times else 0.0
-        max_t = float(np.max(op_times)) if op_times else 1.0
-        return mean_t, min_t, max_t
+class Policy(nn.Module):
+    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat'):
+        super(Policy, self).__init__()
+        _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type)
+        self.metadata = metadata
+        self.soft = torch.nn.Softmax(dim=0)
 
-    def _select_machine_for_operation(self, op_id):
-        job_id = self.operation_to_job[op_id]
-        earliest_start = float(self.operations_ends[job_id])
+    def forward(self):
+        raise NotImplementedError
 
-        best_machine = None
-        best_proc = None
-        best_end = float("inf")
+    #seleciona uma ação para um único grafo (não em batch) - usado em teste/validação
+    def act(self, state, sample, num):
+        action_probs = self.actor(state).T[0]
+        action_probs[state['operation'].mask] = float("-inf")
+        action_probs = self.soft(action_probs)
 
-        for machine_id, proc_time in enumerate(self.operations[op_id]):
-            if proc_time <= 0:
-                continue
-            start_time = max(float(self.machine_available[machine_id]), earliest_start)
-            end_time = start_time + float(proc_time)
-            if end_time < best_end:
-                best_end = end_time
-                best_machine = machine_id
-                best_proc = float(proc_time)
+        dist = Categorical(action_probs)
 
-        if best_machine is None:
-            raise RuntimeError(f"Operation {op_id} has no eligible machine")
-
-        return best_machine, best_proc, best_end
-
-    def _build_dynamic_disj_edges(self):
-        available_ops = [op_id for op_id in self.current_operations if op_id != -1 and not self.scheduled_mask[op_id]]
-        edges = []
-        edge_attr = []
-
-        for i, src in enumerate(available_ops):
-            src_mean, src_min, src_max = self._op_features(src)
-            for j, dst in enumerate(available_ops):
-                if i == j:
-                    continue
-                dst_mean, dst_min, dst_max = self._op_features(dst)
-                overlap = 0
-                for m_id, t_src in enumerate(self.operations[src]):
-                    if t_src > 0 and self.operations[dst][m_id] > 0:
-                        overlap = 1
-                        break
-                edges.append([src, dst])
-                edge_attr.append([
-                    float(overlap),
-                    src_mean,
-                    dst_mean,
-                    abs(src_min - dst_min),
-                    abs(src_max - dst_max),
-                ])
-
-        if edges:
-            self.state["operation", "disj", "operation"].edge_index = torch.LongTensor(edges).T
-            self.state["operation", "disj", "operation"].edge_attr = torch.tensor(edge_attr, dtype=torch.float)
+        if sample == 0:
+            action = dist.sample()
         else:
-            self.state["operation", "disj", "operation"].edge_index = torch.empty((2, 0), dtype=torch.long)
-            self.state["operation", "disj", "operation"].edge_attr = torch.empty((0, 5), dtype=torch.float)
+            action = torch.argmax(action_probs)
 
-    def reset(self, sel_index=None):
-        idx = sel_index if sel_index is not None else self.current_instance
-        _dbg(1, f"reset() called | instance_index={idx}")
+        action_logprob = dist.log_prob(action)
+        _dbg(2, f"  act() | step={num} | sample_mode={sample} | chosen_op={int(action)} | logprob={float(action_logprob):.4f} | n_valid={int((~state['operation'].mask).sum())}")
 
-        if sel_index is None:
-            self.generate_instance(self.instances[self.current_instance])
-            self.current_instance = (self.current_instance + 1) % len(self.instances)
-        else:
-            self.generate_instance(self.instances[sel_index])
+        return action.detach(), action_logprob.detach()
 
-        self.num_steps = 0
-        self.mk = 0.0
-        self.state: Any = copy.deepcopy(self.data)
+    def act_batch(self, batched_state, greedy_flags=None):
+        logits = self.actor(batched_state).T[0]
+        batch_index = batched_state["operation"].batch
+        mask = batched_state['operation'].mask
 
-        self.current_operations = [self.jobs[job_id][0] for job_id in range(self.num_jobs)]
-        self.operations_ends = [0.0] * self.num_jobs
-        self.machine_available = [0.0] * self.num_machines
-        self.scheduled_mask = [False] * self.num_operations
-        self.selected_machine = [-1] * self.num_operations
+        num_graphs = int(batch_index.max().item()) + 1
+        actions = []
+        logprobs = []
+        entropies = []
+        valid_counts = []
+        for i in range(num_graphs):
+            mask_i = mask[batch_index == i]
+            probs_i = logits[batch_index == i]
+            probs_i[mask_i] = float("-inf")
+            probs_i = self.soft(probs_i)
+            dist = Categorical(probs_i)
+            if greedy_flags is not None and greedy_flags[i]:
+                action_i = torch.argmax(probs_i)
+            else:
+                action_i = dist.sample()
+            actions.append(action_i)
+            logprobs.append(dist.log_prob(action_i))
+            entropies.append(dist.entropy())
+            valid_counts.append(int((~mask_i).sum().item()))
 
-        self.calculate_next_state()
-        self.calculate_mask()
+        return torch.stack(actions), torch.stack(logprobs), torch.stack(entropies), valid_counts
 
-        _dbg(1, f"reset() done | jobs={self.num_jobs} | ops={self.num_operations} | machines={self.num_machines}")
-        return self.state
 
-    def calculate_mask(self):
-        mask = [True] * self.num_operations
-        for op_id in self.current_operations:
-            if op_id != -1 and not self.scheduled_mask[op_id]:
-                mask[op_id] = False
-        self.state["operation"].mask = torch.BoolTensor(mask)
+class BOPO:
+    def __init__(self, lr, env, metadata, hidden_channels=128, num_layers=2, heads=3,
+                 B=16, K=8, use_greedy=True, gnn_type='gat'):
+        _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
 
-    def calculate_next_state(self):
-        self.state["operation"].x[:, 0] = 0
-        for op_id in self.current_operations:
-            if op_id != -1:
-                self.state["operation"].x[op_id, 0] = 1
-        for op_id in range(self.num_operations):
-            self.state["operation"].x[op_id, 1] = self.all_pendings[op_id]
-            self.state["operation"].x[op_id, 2] = 1.0 if self.scheduled_mask[op_id] else 0.0
+        self.env = env
+        self.metadata = metadata
+        self.B = B
+        self.K = K
+        self.use_greedy = use_greedy
 
-        self._build_dynamic_disj_edges()
+        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type).to(device)
+        self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
 
-    def step(self, action):
-        self.num_steps += 1
+    #inferência de uma única trajetória (usada por test_model/run_validation) - mantém a
+    #mesma assinatura do PPO para não obrigar a alterações nos callers.
+    def select_action(self, state, sample, num):
+        with torch.no_grad():
+            state = self.env.normalize_state(state)
+            state = state.to(device)
+            action, _ = self.policy.act(state, sample, num)
+        return action
 
-        if isinstance(action, torch.Tensor):
-            sel_operation = int(action.item())
-        else:
-            sel_operation = int(action)
+    #amostra B trajetorias paralelas da MESMA instância, avançando cada cópia do ambiente
+    #passo a passo mas fazendo UM forward pass do GNN em batch por passo. O gradiente é
+    #mantido ao longo de todo o rollout - a SROLoss usa diretamente estas log-probs.
+    def sample_group(self, instance_index):
+        env_cls = type(self.env)
+        rollout_envs = [env_cls(self.env.instances, self.env.mask_option, self.env.sel_k) for _ in range(self.B)]
+        states = [e.reset(sel_index=instance_index) for e in rollout_envs]
 
-        if sel_operation < 0 or sel_operation >= self.num_operations:
-            raise RuntimeError(f"Invalid action operation id: {sel_operation}")
-        if self.state["operation"].mask[sel_operation]:
-            raise RuntimeError(f"Invalid masked action for operation id: {sel_operation}")
+        active = list(range(self.B))
+        logp_sum: list[torch.Tensor | None] = [None] * self.B
+        logp_count = [0] * self.B
+        rounds = 0
+        all_entropies = []
+        all_valid_counts = []
 
-        sel_job = int(self.operation_to_job[sel_operation])
+        while active:
+            norm_states = [self.env.normalize_state(states[i]).to(device) for i in active]
+            batched = Batch.from_data_list(norm_states)
 
-        prev_makespan = max(self.machine_available) if self.machine_available else 0.0
+            greedy_flags = None
+            if self.use_greedy and 0 in active:
+                greedy_flags = [False] * len(active)
+                greedy_flags[active.index(0)] = True
 
-        sel_machine, proc_time, final_time = self._select_machine_for_operation(sel_operation)
-        self.machine_available[sel_machine] = final_time
-        self.selected_machine[sel_operation] = sel_machine
+            actions, logprobs, entropies, valid_counts = self.policy.act_batch(batched, greedy_flags)
 
-        self.operations_ends[sel_job] = final_time
-        self.scheduled_mask[sel_operation] = True
+            still_active = []
+            for j, i in enumerate(active):
+                lp = logprobs[j]
+                prev = logp_sum[i]
+                logp_sum[i] = lp if prev is None else prev + lp
+                logp_count[i] += 1
+                all_entropies.append(float(entropies[j].item()))
+                all_valid_counts.append(valid_counts[j])
+                next_state, _, done, _ = rollout_envs[i].step(actions[j])
+                states[i] = next_state
+                if not done:
+                    still_active.append(i)
+            active = still_active
+            rounds += 1
 
-        job_ops = self.jobs[sel_job]
-        curr_index = job_ops.index(sel_operation)
-        if curr_index == len(job_ops) - 1:
-            self.current_operations[sel_job] = -1
-        else:
-            next_op_id = job_ops[curr_index + 1]
-            self.current_operations[sel_job] = next_op_id
+        assert all(count > 0 for count in logp_count), "every rollout must take at least one decision step"
+        makespans = torch.tensor([e.mk for e in rollout_envs], dtype=torch.float32, device=device)
+        mean_logp = torch.stack([cast(torch.Tensor, logp_sum[i]) / logp_count[i] for i in range(self.B)])
+        entropy_stats = summarize_action_entropy(all_entropies, all_valid_counts)
+        _dbg(2, f"  sample_group | instance={instance_index} | rounds={rounds} | makespans min/mean/max={float(makespans.min()):.2f}/{float(makespans.mean()):.2f}/{float(makespans.max()):.2f}")
+        return mean_logp, makespans, rounds, entropy_stats
 
-        reward = prev_makespan - max(self.machine_available)
+    #um passo de treino do BOPO: amostra o grupo de B soluções, auto-rotula pares
+    #(melhor vs. K-1 piores) e otimiza a SROLoss (loss de ranking, sem critic/vantagem).
+    def update(self, instance_index):
+        mean_logp, makespans, rounds, entropy_stats = self.sample_group(instance_index)
 
-        done = all(self.scheduled_mask)
-        if done:
-            self.mk = round(max(self.machine_available), 2)
-            _dbg(1, f"Episode done | makespan={self.mk} | steps={self.num_steps}")
-            return self.state, reward, True, {"current_machine": sel_machine}
-
-        self.calculate_next_state()
-        self.calculate_mask()
-
-        total_reward = reward
-        done = False
-        valid_actions = int((~self.state["operation"].mask).sum().item())
-        if valid_actions == 1:
-            self.state, extra_reward, done, _ = self.step(self.sample())
-            total_reward += extra_reward
-
-        return self.state, total_reward, done, {"current_machine": sel_machine}
-
-    def sample(self):
-        valid = [
-            idx
-            for idx in range(len(self.state["operation"].mask))
-            if not self.state["operation"].mask[idx]
+        best_idx, worse_idx = select_pairs(makespans.detach(), self.K)
+        pair_losses = [
+            sro_loss(mean_logp[best_idx], mean_logp[w], float(makespans[best_idx]), float(makespans[w]))
+            for w in worse_idx.tolist()
         ]
-        return random.choice(valid)
+        loss = torch.stack(pair_losses).mean()
 
-    def normalize_state(self, state):
-        state = copy.deepcopy(state)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
-        for i in range(state["operation"].x.shape[1]):
-            values = state["operation"].x[:, i]
-            state["operation"].x[:, i] = (2 * (values - values.min()) / (values.max() - values.min() + 1e-7) - 1).float()
+        loss_val = float(loss.item())
+        best_ms = float(makespans.min().item())
+        _dbg(1, f"BOPO.update() done | instance={instance_index} | loss={loss_val:.6f} | best_makespan={best_ms:.2f} | rounds={rounds}")
+        return loss_val, best_ms, rounds, entropy_stats
 
-        for edge_type in [
-            ("operation", "prec", "operation"),
-            ("operation", "disj", "operation"),
-        ]:
-            if edge_type not in state.edge_types:
+    def save(self, checkpoint_path):
+        torch.save(self.policy.state_dict(), checkpoint_path)
+        _dbg(1, f"BOPO.save() | path={checkpoint_path}")
+
+    def _build_compatible_state_dict(self, state_dict):
+        model_state = self.policy.state_dict()
+        compatible_state = {}
+        unexpected_keys = []
+        shape_mismatch_keys = []
+
+        for key, value in state_dict.items():
+            model_value = model_state.get(key)
+            if model_value is None:
+                unexpected_keys.append(key)
                 continue
-            if state[edge_type].edge_attr.numel() == 0:
+            if isinstance(model_value, (UninitializedParameter, UninitializedBuffer)):
+                compatible_state[key] = value
                 continue
-            attrs = state[edge_type].edge_attr
-            min_vals = attrs.min(dim=0).values
-            max_vals = attrs.max(dim=0).values
-            state[edge_type].edge_attr = (2 * (attrs - min_vals) / (max_vals - min_vals + 1e-7) - 1).float()
+            if model_value.shape != value.shape:
+                shape_mismatch_keys.append((key, tuple(value.shape), tuple(model_value.shape)))
+                continue
+            compatible_state[key] = value
 
-        return state
+        missing_keys = [key for key in model_state.keys() if key not in compatible_state]
+        return compatible_state, missing_keys, unexpected_keys, shape_mismatch_keys
+
+    #compatível com checkpoints antigos do PPO: estes guardavam pesos de actor.* e critic.*;
+    #aqui só existe actor.*, por isso as chaves critic.* ficam em unexpected_keys e são
+    #ignoradas, enquanto os pesos do actor (mesma arquitetura) continuam a carregar normalmente.
+    def load(self, checkpoint_path):
+        try:
+            state_dict = torch.load(
+                checkpoint_path,
+                map_location=lambda storage, loc: storage,
+                weights_only=False,
+            )
+        except TypeError:
+            state_dict = torch.load(checkpoint_path, map_location=lambda storage, loc: storage)
+        if isinstance(state_dict, dict) and "state_dict" in state_dict and isinstance(state_dict["state_dict"], dict):
+            state_dict = state_dict["state_dict"]
+
+        compatible_state, missing_keys, unexpected_keys, shape_mismatch_keys = self._build_compatible_state_dict(state_dict)
+
+        self.policy.load_state_dict(compatible_state, strict=False)
+
+        if missing_keys or unexpected_keys or shape_mismatch_keys:
+            _dbg(
+                1,
+                f"BOPO.load() compat | path={checkpoint_path} | loaded={len(compatible_state)} "
+                f"| missing={len(missing_keys)} | unexpected={len(unexpected_keys)} | shape_mismatch={len(shape_mismatch_keys)}"
+            )
+            if _DBG >= 2:
+                if unexpected_keys:
+                    _dbg(2, f"  unexpected sample: {unexpected_keys[:5]}")
+                if missing_keys:
+                    _dbg(2, f"  missing sample: {missing_keys[:5]}")
+                if shape_mismatch_keys:
+                    mismatch_sample = [
+                        f"{key}: ckpt{src_shape}!=model{dst_shape}"
+                        for key, src_shape, dst_shape in shape_mismatch_keys[:3]
+                    ]
+                    _dbg(2, f"  shape mismatch sample: {mismatch_sample}")
+        _dbg(1, f"BOPO.load() | path={checkpoint_path}")

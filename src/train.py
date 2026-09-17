@@ -11,7 +11,7 @@ import json #para ler ficheiros de configuração e resultados
 # Load PyTorch dynamically so static analysis does not require the optional
 # dependency to be installed in the interpreter used to inspect this module.
 torch = importlib.import_module("torch")
-from datetime import datetime #timestamp para logs
+from datetime import datetime #timestamp  para logs
 import random
 import numpy as np
 import time #tempo de execução
@@ -27,7 +27,7 @@ def _dbg(level, *args, **kwargs):
 def _resolve_representation_modules(representation: str):
     rep = representation.lower().strip()
     rep_map = {
-        "oo": ("src.bopo_oo", "FJSPEnvOO", "src.ppoo_o", "BOPO"),
+        "oo": ("src.envo_o", "FJSPEnvOO", "src.bopo_oo", "BOPO"),
         "om": ("src.envheterogeneosmo", "FJSPEnvMO", "src.bopomo", "BOPO"),
         "ojm": ("src.env", "FJSSPEnv", "src.bopo", "BOPO"),
     }
@@ -58,9 +58,9 @@ def generate_train_instances(train_config):
 
 #o código abaixo é o código original do gerador de instancias, mantido para referência e possível reutilização futura
 def train(max_episodes = 10,
-             new_freq=1, n_cases = 100, mask_option=1, sel_k=1, B=16, K=8, use_greedy=True, lr=0.001, hidden_channels=128, num_layers = 1, heads = 3
+             new_freq=1, n_cases = 100, mask_option=1, sel_k=1, B=64, K=16, use_greedy=True, lr=0.0001, hidden_channels=128, num_layers = 1, heads = 3
          ,j_max = 15, j_min = 5, m_max = 13, m_min = 4, op_max = 9, max_processing = 25,
-         validation_freq=10, validation_size=20, run_name="train_run", representation="oo"):
+         validation_freq=10, validation_size=20, run_name="train_run", representation="oo", gnn_type="gat"):
     #inicialização
     #NOTA: "max_episodes" passou a contar passos de treino do BOPO, não episódios PPO.
     #Cada passo amostra B trajetórias paralelas da MESMA instância e faz UMA atualização
@@ -70,7 +70,7 @@ def train(max_episodes = 10,
     print(f"[TRAIN] Hyperparams | max_steps={max_episodes} | new_freq={new_freq}")
     print(f"[TRAIN]             | n_cases={n_cases} | B={B} | K={K} | use_greedy={use_greedy} | lr={lr}")
     print(f"[TRAIN]             | hidden_channels={hidden_channels} | num_layers={num_layers} | heads={heads}")
-    print(f"[TRAIN] Representation | {representation}")
+    print(f"[TRAIN] Representation | {representation} | GNN | {gnn_type}")
     print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[4,{op_max}] | max_proc={max_processing}")
     print("=" * 60)
     rep_name, EnvClass, BOPOClass = _resolve_representation_modules(representation)
@@ -103,7 +103,7 @@ def train(max_episodes = 10,
     #cria ambiente de treino
     env = EnvClass(instances, mask_option, sel_k)
     #cria agente BOPO (só ator, sem critic - ver src/bopo_utils.py para a SROLoss)
-    bopo_agent = BOPOClass(lr, env, metadata, hidden_channels, num_layers, heads, B, K, use_greedy)
+    bopo_agent = BOPOClass(lr, env, metadata, hidden_channels, num_layers, heads, B, K, use_greedy, gnn_type=gnn_type)
     print(f"[TRAIN] BOPO agent ready. Starting training loop for {max_episodes} step(s)...")
     print("-" * 60)
     validation_history = []
@@ -189,6 +189,7 @@ def train(max_episodes = 10,
                     "num_layers": num_layers,
                     "hidden_channels": hidden_channels,
                     "heads": heads,
+                    "gnn_type": gnn_type,
                     "all_val_results": val_metrics["all_gaps"],
                     "avg_gap": val_metrics["avg_gap"],
                     "std_gap": val_metrics["std_gap"],
@@ -283,7 +284,8 @@ def test_model(model_name, folder, filename, models_file="models/model_params.js
             # differently-configured env produces mismatched GNN layer shapes at load time.
             test_env = ModelEnvClass(test_instances, param["mask_option"], param["sel_k"])
             metadata = test_env.reset().metadata()
-            t_ppo_agent = ModelBOPOClass(0.001, test_env, metadata, param["hidden_channels"], param["num_layers"], param["heads"])
+            t_ppo_agent = ModelBOPOClass(0.001, test_env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],
+                                          gnn_type=param.get("gnn_type", "gat"))
             # preTrained weights directory
             t_ppo_agent.load(os.path.join(models_dir, m))
 

@@ -16,3 +16,4 @@ streamlit
 altair
 pandas
 matplotlib
+networkx

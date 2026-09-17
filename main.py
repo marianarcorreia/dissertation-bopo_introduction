@@ -61,6 +61,13 @@ def parse_args():
         help="[train] Number of BOPO training steps. [optuna] Training steps per trial.",
     )
     parser.add_argument(
+        "--gnn-type",
+        default="gat",
+        choices=["gat", "gin"],
+        help="[train] GNN backbone used by the actor: 'gat' (GATv2Conv, attention-based) or "
+             "'gin' (GINEConv, sum-aggregation with edge features).",
+    )
+    parser.add_argument(
         "--val-data",
         default="gen",
         choices=["our", "gen"],
@@ -117,8 +124,8 @@ def run_train(args):
     multi = len(reps) > 1
     for rep in reps:
         run_name = f"{args.run_name}_{rep}" if multi else args.run_name
-        print(f"[MAIN] Training representation={rep} | run_name={run_name}")
-        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes)
+        print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type}")
+        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type)
 
 
 def run_test(args):
@@ -163,6 +170,8 @@ if __name__ == "__main__":
     print(f"[MAIN] run_name={args.run_name}")
     if args.mode in ("train", "optuna"):
         print(f"[MAIN] representation(s)={_resolve_representations(args.representation)}")
+    if args.mode == "train":
+        print(f"[MAIN] gnn_type={args.gnn_type}")
     print("=" * 60)
 
     _DISPATCH[args.mode](args)

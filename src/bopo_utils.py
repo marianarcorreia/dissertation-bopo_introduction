@@ -1,5 +1,5 @@
 import math
-
+from src.gat import GAT
 import torch
 
 # Shared, representation-agnostic pieces of BOPO (self-rewarding preference optimization).
