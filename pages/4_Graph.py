@@ -109,9 +109,28 @@ def plot_disjunctive_graph(graph, disjunctive_pairs, figsize=(6, 4), show_labels
     return fig
 
 
+BENCHMARK_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "benchmarks")
+
+
+def list_benchmark_files(benchmark_dir: str) -> dict[str, str]:
+    """Maps a display label ("<subfolder>/<file>") to the file's absolute path,
+    for every .fjs file under benchmark_dir's immediate subfolders."""
+    files = {}
+    if not os.path.isdir(benchmark_dir):
+        return files
+    for subfolder in sorted(os.listdir(benchmark_dir)):
+        subfolder_path = os.path.join(benchmark_dir, subfolder)
+        if not os.path.isdir(subfolder_path):
+            continue
+        for fname in sorted(os.listdir(subfolder_path)):
+            if fname.lower().endswith(".fjs"):
+                files[f"{subfolder}/{fname}"] = os.path.join(subfolder_path, fname)
+    return files
+
+
 source = st.radio(
     "Instance source",
-    ["Generate random instance", "Upload a .fjs / benchmark file"],
+    ["Generate random instance", "Pick from benchmark dataset", "Upload a .fjs / benchmark file"],
     horizontal=True,
 )
 
@@ -142,6 +161,17 @@ if source == "Generate random instance":
 
     jobs, operations = st.session_state["graph_instance"]
     instance_name = st.session_state["graph_instance_name"]
+
+elif source == "Pick from benchmark dataset":
+    benchmark_files = list_benchmark_files(BENCHMARK_DIR)
+    if not benchmark_files:
+        st.warning(f"No .fjs files found under {BENCHMARK_DIR}.")
+        st.stop()
+    label = st.selectbox("Benchmark instance", sorted(benchmark_files.keys()))
+    with open(benchmark_files[label], "r", encoding="utf-8") as infile:
+        text = infile.read()
+    jobs, operations, info, _ = get_data(parse(text))
+    instance_name = label
 
 else:
     uploaded = st.file_uploader("Upload a Brandimarte/Taillard-style FJSP text file (.fjs/.txt)")
