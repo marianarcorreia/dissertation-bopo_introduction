@@ -10,7 +10,8 @@ from torch.nn.parameter import UninitializedBuffer, UninitializedParameter
 
 from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy
 from src.gat import GAT
-from src.gin import GINModel
+from src.gine import GINModel
+from src.transformer import TransformerModel
 
 # Controlled by FJSP_DEBUG (same variable as env.py)
 # 1=BOPO lifecycle  2=+forward/action  3=+update internals
@@ -41,8 +42,10 @@ class ActorModel(torch.nn.Module):
             self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
         elif gnn_type == 'gin':
             self.gnn = GINModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+        elif gnn_type == 'transformer':
+            self.gnn = TransformerModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
         else:
-            raise ValueError(f"Unknown gnn_type: {gnn_type!r} (expected 'gat' or 'gin')")
+            raise ValueError(f"Unknown gnn_type: {gnn_type!r} (expected 'gat', 'gin' or 'transformer')")
         #to_hetero converte o modelo homogeneo para um modelo heterogeneo
         self.gnn = to_hetero(self.gnn, metadata=metadata, aggr='mean')
         #um score por aresta
@@ -64,6 +67,7 @@ class Policy(nn.Module):
     def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat'):
         super(Policy, self).__init__()
         _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+        self.gnn_type = gnn_type
         self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type)
         self.metadata = metadata
         self.soft = torch.nn.Softmax(dim=0)

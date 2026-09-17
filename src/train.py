@@ -34,12 +34,12 @@ def _resolve_representation_modules(representation: str):
     if rep not in rep_map:
         raise ValueError(f"Unsupported representation '{representation}'. Use one of: oo, om, ojm")
 
-    env_module_name, env_class_name, ppo_module_name, ppo_class_name = rep_map[rep]
+    env_module_name, env_class_name, bopo_module_name, bopo_class_name = rep_map[rep]
     env_module = importlib.import_module(env_module_name)
-    ppo_module = importlib.import_module(ppo_module_name)
+    bopo_module = importlib.import_module(bopo_module_name)
     env_class = getattr(env_module, env_class_name)
-    ppo_class = getattr(ppo_module, ppo_class_name)
-    return rep, env_class, ppo_class
+    bopo_class = getattr(bopo_module, bopo_class_name)
+    return rep, env_class, bopo_class
 
 #cria pasta para ficheiros se não existirem
 os.makedirs('candidate_models', exist_ok=True)

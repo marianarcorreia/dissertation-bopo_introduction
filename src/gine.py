@@ -11,6 +11,16 @@ def _dbg(level, *args, **kwargs):
         print("[BOPO]", *args, **kwargs)
 
 
+class GINEConvSafe(GINEConv):
+    def forward(self, x, edge_index, edge_attr=None, size=None):
+        if edge_attr is None:
+            assert self.lin is not None, "GINEConvSafe requires edge_dim to be set"
+            num_edges = edge_index.size(1)
+            ref = x[0] if isinstance(x, tuple) else x
+            edge_attr = ref.new_zeros((num_edges, self.lin.in_channels))
+        return super().forward(x, edge_index, edge_attr=edge_attr, size=size)
+
+
 #GIN
 class GINModel(torch.nn.Module):
     def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2):
@@ -30,7 +40,7 @@ class GINModel(torch.nn.Module):
                 nn.ReLU(),
                 nn.Linear(hidden_channels, hidden_channels),
             )
-            conv = GINEConv(mlp, edge_dim=5, train_eps=True) #edge_dim=5 -> features das arestas, projetadas para in_dim dentro do GINEConv
+            conv = GINEConvSafe(mlp, edge_dim=5, train_eps=True) #edge_dim=5 -> features das arestas, projetadas para in_dim dentro do GINEConv
             self.convs.append(conv)
             in_dim = hidden_channels
 

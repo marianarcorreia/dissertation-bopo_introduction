@@ -63,9 +63,10 @@ def parse_args():
     parser.add_argument(
         "--gnn-type",
         default="gat",
-        choices=["gat", "gin"],
-        help="[train] GNN backbone used by the actor: 'gat' (GATv2Conv, attention-based) or "
-             "'gin' (GINEConv, sum-aggregation with edge features).",
+        choices=["gat", "gin", "transformer"],
+        help="[train] GNN backbone used by the actor: 'gat' (GATv2Conv, attention-based), "
+             "'gin' (GINEConv, sum-aggregation with edge features) or 'transformer' "
+             "(TransformerConv, multi-head query/key/value attention with edge features).",
     )
     parser.add_argument(
         "--val-data",
