@@ -53,8 +53,19 @@ class ActorModel(torch.nn.Module):
     def forward(self, data: HeteroData):
         _dbg(3, "  ActorModel.forward")
         res = self.gnn(data.x_dict, data.edge_index_dict, data.edge_attr_dict)
-        #score por nó operação - probabilidade de escolher a próxima operação
-        res = self.lin3(res['operation'])
+        # score por nó operação, a partir do embedding APRENDIDO concatenado com as
+        # features brutas do nó (is_current/pending_work/is_scheduled). bopo.py/bopomo.py
+        # (representações ojm/om) já concatenam edge_attr bruto ao lado do embedding
+        # antes do score final; aqui só existia o embedding, sem nenhum sinal numérico
+        # direto de reserva - o que deixa a qualidade da decisão inteiramente dependente
+        # do quão bem o GNN aprendeu o embedding. Isto expôs mais o oo à backbone GAT
+        # especificamente: medindo a perda de behavior-cloning do warm-start desta
+        # sweep, o GAT reduz a perda muito menos que GIN/transformer nas 3
+        # representações (~7% vs ~48%/~77%), mas só o oo estagna durante o BOPO -
+        # om/ojm com GAT continuam a melhorar porque a sua pontuação por aresta já tinha
+        # esse sinal bruto de reserva.
+        op_feat = torch.cat([res['operation'], data.x_dict['operation']], dim=-1)
+        res = self.lin3(op_feat)
         _dbg(3, f"    actor logits shape={res.shape}")
         return res
 

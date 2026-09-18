@@ -161,25 +161,28 @@ def summarize_action_entropy(entropies, valid_counts):
     if not entropies:
         return {}
 
+    # random_refs = log(n_valid): the entropy of a UNIFORM distribution over the same
+    # number of valid actions - the reference needed to tell whether a given raw entropy
+    # value is "close to uniform" or not (a raw entropy of 2.0 means something different
+    # at n_valid=5 vs n_valid=50).
     random_refs = [math.log(c) if c > 1 else 0.0 for c in valid_counts]
+    # normalized = action_entropy / random_ref: this is THE headline signal for whether
+    # the policy is actually learning anything (1.0 = indistinguishable from uniform
+    # random, 0.0 = fully deterministic) - see the entropy-collapse diagnosis discussed
+    # in conversation.
     normalized = [(e / r) if r > 1e-8 else 1.0 for e, r in zip(entropies, random_refs)]
+    # effective_counts = exp(entropy): "effective number of equally-likely choices" -
+    # kept alongside the normalized ratio above because it's a more intuitive framing
+    # (e.g. "9 effective choices out of 12 valid" reads more directly than "0.92
+    # normalized entropy"), not because it carries different information.
     effective_counts = [math.exp(e) for e in entropies]
-    effective_ratios = [(ec / c) if c > 0 else 0.0 for ec, c in zip(effective_counts, valid_counts)]
-    uncertainty_gaps = [r - e for r, e in zip(random_refs, entropies)]
 
     def mean(values):
         return sum(values) / len(values)
 
-    action_entropy = mean(entropies)
     return {
-        "action_entropy": action_entropy,
+        "action_entropy": mean(entropies),
         "action_entropy_random_ref": mean(random_refs),
         "action_entropy_max_entropy_normalized": mean(normalized),
         "action_entropy_effective_action_count": mean(effective_counts),
-        "action_entropy_effective_action_ratio": mean(effective_ratios),
-        "action_entropy_uncertainty_gap": mean(uncertainty_gaps),
-        # Distribution is already restricted to valid actions (masked logits are -inf
-        # before softmax), so there is no separate symmetry correction to apply here -
-        # this collapses to action_entropy.
-        "action_entropy_symmetry_corrected": action_entropy,
     }

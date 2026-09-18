@@ -1,0 +1,62 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+=== START convergence_check_ojm_gin_fixed @ 15:07:25 ===
+============================================================
+[TRAIN] Training started at: 2026-09-18 15:07:25
+[TRAIN] Hyperparams | max_steps=250 | new_freq=125
+[TRAIN]             | n_cases=25 | B=24 | K=8 | use_greedy=True | lr=0.0005
+[TRAIN]             | warm_start_steps=150
+[TRAIN]             | hidden_channels=128 | num_layers=2 | heads=3
+[TRAIN] Representation | ojm | GNN | gin
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\convergence_check_ojm_gin_fixed
+[TRAIN] Validation config | every=25 steps | instances=30 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 150 step(s)...
+[TRAIN][WARMSTART] step 7/150 | instance=2 | bc_loss=2.2062 | decisions=47
+[TRAIN][WARMSTART] step 14/150 | instance=0 | bc_loss=1.9697 | decisions=52
+[TRAIN][WARMSTART] step 21/150 | instance=6 | bc_loss=1.9298 | decisions=42
+[TRAIN][WARMSTART] step 28/150 | instance=8 | bc_loss=1.8749 | decisions=55
+[TRAIN][WARMSTART] step 35/150 | instance=10 | bc_loss=1.4578 | decisions=44
+[TRAIN][WARMSTART] step 42/150 | instance=15 | bc_loss=1.7823 | decisions=44
+[TRAIN][WARMSTART] step 49/150 | instance=13 | bc_loss=1.4385 | decisions=44
+[TRAIN][WARMSTART] step 56/150 | instance=9 | bc_loss=1.3750 | decisions=42
+[TRAIN][WARMSTART] step 63/150 | instance=6 | bc_loss=1.6950 | decisions=42
+[TRAIN][WARMSTART] step 70/150 | instance=14 | bc_loss=1.7821 | decisions=44
+[TRAIN][WARMSTART] step 77/150 | instance=15 | bc_loss=1.8044 | decisions=44
+[TRAIN][WARMSTART] step 84/150 | instance=14 | bc_loss=1.5858 | decisions=44
+[TRAIN][WARMSTART] step 91/150 | instance=11 | bc_loss=1.8652 | decisions=58
+[TRAIN][WARMSTART] step 98/150 | instance=1 | bc_loss=1.7513 | decisions=50
+[TRAIN][WARMSTART] step 105/150 | instance=18 | bc_loss=1.6290 | decisions=44
+[TRAIN][WARMSTART] step 112/150 | instance=23 | bc_loss=1.6203 | decisions=46
+[TRAIN][WARMSTART] step 119/150 | instance=2 | bc_loss=1.3532 | decisions=47
+[TRAIN][WARMSTART] step 126/150 | instance=5 | bc_loss=1.4891 | decisions=44
+[TRAIN][WARMSTART] step 133/150 | instance=11 | bc_loss=1.5844 | decisions=58
+[TRAIN][WARMSTART] step 140/150 | instance=12 | bc_loss=1.6941 | decisions=47
+[TRAIN][WARMSTART] step 147/150 | instance=11 | bc_loss=1.4581 | decisions=58
+[TRAIN][WARMSTART] step 150/150 | instance=2 | bc_loss=1.2997 | decisions=47
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 250 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/250 | 15:12:26
+[TRAIN] Step 1 | Loss=5.444548 | Best makespan in group=420.00
+[TRAIN] Step 2/250 | 15:12:49
+[TRAIN] Step 2 | Loss=9.617071 | Best makespan in group=530.00
+[TRAIN] Step 3/250 | 15:13:09
+[TRAIN] Step 3 | Loss=-0.000000 | Best makespan in group=442.00
+[TRAIN] Step 4/250 | 15:13:26
+[TRAIN] Step 4 | Loss=-0.000000 | Best makespan in group=406.00
+[TRAIN] Step 5/250 | 15:13:44
+[TRAIN] Step 5 | Loss=15.852576 | Best makespan in group=495.00
+[TRAIN] Step 6/250 | 15:14:10
+[TRAIN] Step 6 | Loss=2.978355 | Best makespan in group=407.00
+[TRAIN] Step 7/250 | 15:14:31
+[TRAIN] Step 7 | Loss=0.018601 | Best makespan in group=458.00
+[TRAIN] Step 8/250 | 15:14:57
+[TRAIN] Step 8 | Loss=0.000000 | Best makespan in group=380.00
+[TRAIN] Step 9/250 | 15:15:15
+[TRAIN] Step 9 | Loss=0.012944 | Best makespan in group=438.00
+[TRAIN] Step 10/250 | 15:15:31
+[TRAIN] Step 10 | Loss=4.223630 | Best makespan in group=490.00
+[TRAIN] Step 11/250 | 15:15:56

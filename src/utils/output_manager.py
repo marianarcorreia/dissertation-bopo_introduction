@@ -158,21 +158,11 @@ class OutputManager:
             return {}
 
         episodes = [row["episode"] for row in episode_metrics]
-        rewards = [row.get("episode_reward", 0.0) for row in episode_metrics]
         makespans = [row.get("makespan", 0.0) for row in episode_metrics]
         durations = [row.get("episode_duration_sec", 0.0) for row in episode_metrics]
         val_avg_gaps = [row.get("validation_avg_gap") for row in episode_metrics]
 
         outputs = {}
-        outputs["reward"] = self._plot_series(
-            episodes,
-            rewards,
-            "Episode Reward Over Training",
-            "Episode",
-            "Reward",
-            "episode_reward_curve.png",
-            color="#66c2a5",
-        )
         outputs["makespan"] = self._plot_series(
             episodes,
             makespans,
@@ -212,7 +202,6 @@ class OutputManager:
 
         episodes = [row["episode"] for row in update_metrics]
         actor_losses = [row.get("actor_loss", 0.0) for row in update_metrics]
-        critic_losses = [row.get("critic_loss", 0.0) for row in update_metrics]
         durations = [row.get("update_duration_sec", 0.0) for row in update_metrics]
 
         outputs = {}
@@ -224,15 +213,6 @@ class OutputManager:
             "Actor Loss",
             "actor_loss_curve.png",
             color="#a6d854",
-        )
-        outputs["critic_loss"] = self._plot_series(
-            episodes,
-            critic_losses,
-            "Critic Loss Over Updates",
-            "Episode",
-            "Critic Loss",
-            "critic_loss_curve.png",
-            color="#ffd92f",
         )
         outputs["update_duration"] = self._plot_series(
             episodes,

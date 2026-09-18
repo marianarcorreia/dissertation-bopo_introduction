@@ -172,8 +172,6 @@ def train(max_episodes = 10,
         update_entry = {
             "episode": step_number,
             "actor_loss": float(loss),
-            "policy_loss": float(loss),  # BOPO não tem critic separado - a actor loss É a policy loss
-            "critic_loss": 0.0,  # BOPO não tem critic
             "update_duration_sec": float(update_duration_sec),
             **entropy_stats,
         }
@@ -244,11 +242,8 @@ def train(max_episodes = 10,
         episode_entry = {
             "episode": step_number,
             "steps": int(rounds),
-            "episode_reward": float(-best_ms),
             "makespan": float(best_ms),
             "actor_loss": float(loss),
-            "policy_loss": float(loss),  # BOPO não tem critic separado - a actor loss É a policy loss
-            "critic_loss": 0.0,
             "update_duration_sec": float(update_duration_sec),
             "validation_avg_gap": validation_avg_gap,
             "validation_std_gap": validation_std_gap,
