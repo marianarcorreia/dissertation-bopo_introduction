@@ -1,0 +1,866 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+=== START convergence_check_ojm_gat @ 09:53:11 ===
+============================================================
+[TRAIN] Training started at: 2026-09-19 09:53:11
+[TRAIN] Hyperparams | max_steps=400 | new_freq=200
+[TRAIN]             | n_cases=30 | B=32 | K=10 | use_greedy=True | lr=0.0005 (decaying to 1.00e-04)
+[TRAIN]             | warm_start_steps=200 | checkpoint_smooth_window=3 | seed=42
+[TRAIN]             | hidden_channels=128 | num_layers=2 | heads=3
+[TRAIN] Representation | ojm | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\convergence_check_ojm_gat
+[TRAIN] Validation config | every=25 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 200 step(s)...
+[TRAIN][WARMSTART] step 10/200 | instance=28 | bc_loss=2.2845 | decisions=45
+[TRAIN][WARMSTART] step 20/200 | instance=17 | bc_loss=2.4953 | decisions=53
+[TRAIN][WARMSTART] step 30/200 | instance=22 | bc_loss=2.2012 | decisions=44
+[TRAIN][WARMSTART] step 40/200 | instance=11 | bc_loss=2.1524 | decisions=42
+[TRAIN][WARMSTART] step 50/200 | instance=10 | bc_loss=2.5805 | decisions=56
+[TRAIN][WARMSTART] step 60/200 | instance=6 | bc_loss=2.3451 | decisions=48
+[TRAIN][WARMSTART] step 70/200 | instance=1 | bc_loss=2.2020 | decisions=43
+[TRAIN][WARMSTART] step 80/200 | instance=25 | bc_loss=2.3979 | decisions=54
+[TRAIN][WARMSTART] step 90/200 | instance=9 | bc_loss=2.0312 | decisions=44
+[TRAIN][WARMSTART] step 100/200 | instance=25 | bc_loss=2.3260 | decisions=54
+[TRAIN][WARMSTART] step 110/200 | instance=9 | bc_loss=1.9842 | decisions=44
+[TRAIN][WARMSTART] step 120/200 | instance=5 | bc_loss=2.2872 | decisions=53
+[TRAIN][WARMSTART] step 130/200 | instance=23 | bc_loss=1.7575 | decisions=42
+[TRAIN][WARMSTART] step 140/200 | instance=1 | bc_loss=2.1479 | decisions=43
+[TRAIN][WARMSTART] step 150/200 | instance=23 | bc_loss=1.7190 | decisions=42
+[TRAIN][WARMSTART] step 160/200 | instance=18 | bc_loss=2.0878 | decisions=45
+[TRAIN][WARMSTART] step 170/200 | instance=25 | bc_loss=2.2206 | decisions=54
+[TRAIN][WARMSTART] step 180/200 | instance=0 | bc_loss=1.8600 | decisions=50
+[TRAIN][WARMSTART] step 190/200 | instance=10 | bc_loss=2.3305 | decisions=56
+[TRAIN][WARMSTART] step 200/200 | instance=21 | bc_loss=1.8403 | decisions=45
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 400 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/400 | 10:07:48
+[TRAIN] Step 1 | Loss=14.649730 | Best makespan in group=603.00
+[TRAIN] Step 2/400 | 10:08:29
+[TRAIN] Step 2 | Loss=13.520167 | Best makespan in group=534.00
+[TRAIN] Step 3/400 | 10:09:32
+[TRAIN] Step 3 | Loss=7.846788 | Best makespan in group=509.00
+[TRAIN] Step 4/400 | 10:10:15
+[TRAIN] Step 4 | Loss=15.104257 | Best makespan in group=598.00
+[TRAIN] Step 5/400 | 10:10:56
+[TRAIN] Step 5 | Loss=4.086447 | Best makespan in group=461.00
+[TRAIN] Step 6/400 | 10:11:45
+[TRAIN] Step 6 | Loss=4.114288 | Best makespan in group=456.00
+[TRAIN] Step 7/400 | 10:12:37
+[TRAIN] Step 7 | Loss=10.044999 | Best makespan in group=492.00
+[TRAIN] Step 8/400 | 10:13:54
+[TRAIN] Step 8 | Loss=12.031653 | Best makespan in group=443.00
+[TRAIN] Step 9/400 | 10:15:02
+[TRAIN] Step 9 | Loss=14.303417 | Best makespan in group=446.00
+[TRAIN] Step 10/400 | 10:16:11
+[TRAIN] Step 10 | Loss=1.301925 | Best makespan in group=542.00
+[TRAIN] Step 11/400 | 10:17:17
+[TRAIN] Step 11 | Loss=4.485949 | Best makespan in group=474.00
+[TRAIN] Step 12/400 | 10:17:59
+[TRAIN] Step 12 | Loss=4.514789 | Best makespan in group=458.00
+[TRAIN] Step 13/400 | 10:18:43
+[TRAIN] Step 13 | Loss=1.771230 | Best makespan in group=587.00
+[TRAIN] Step 14/400 | 10:19:39
+[TRAIN] Step 14 | Loss=7.499097 | Best makespan in group=384.00
+[TRAIN] Step 15/400 | 10:20:36
+[TRAIN] Step 15 | Loss=4.927738 | Best makespan in group=658.00
+[TRAIN] Step 16/400 | 10:21:32
+[TRAIN] Step 16 | Loss=12.810215 | Best makespan in group=454.00
+[TRAIN] Step 17/400 | 10:22:26
+[TRAIN] Step 17 | Loss=2.602414 | Best makespan in group=605.00
+[TRAIN] Step 18/400 | 10:23:08
+[TRAIN] Step 18 | Loss=0.027278 | Best makespan in group=526.00
+[TRAIN] Step 19/400 | 10:23:56
+[TRAIN] Step 19 | Loss=4.386346 | Best makespan in group=520.00
+[TRAIN] Step 20/400 | 10:24:54
+[TRAIN] Step 20 | Loss=0.000746 | Best makespan in group=507.00
+[TRAIN] Step 21/400 | 10:26:02
+[TRAIN] Step 21 | Loss=10.150182 | Best makespan in group=411.00
+[TRAIN] Step 22/400 | 10:27:20
+[TRAIN] Step 22 | Loss=12.478025 | Best makespan in group=537.00
+[TRAIN] Step 23/400 | 10:28:12
+[TRAIN] Step 23 | Loss=5.435721 | Best makespan in group=525.00
+[TRAIN] Step 24/400 | 10:28:51
+[TRAIN] Step 24 | Loss=1.850785 | Best makespan in group=476.00
+[TRAIN] Step 25/400 | 10:29:55
+[TRAIN] Step 25 | Loss=0.001286 | Best makespan in group=408.00
+[TRAIN][VAL][ep 25] avg_gap=0.2421 | std_gap=0.1362 | q80_gap=0.3397 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2421 (raw=0.2421) | saving candidate: 451294074634811.pth
+[TRAIN] Step 26/400 | 10:34:14
+[TRAIN] Step 26 | Loss=13.285891 | Best makespan in group=591.00
+[TRAIN] Step 27/400 | 10:35:05
+[TRAIN] Step 27 | Loss=0.000006 | Best makespan in group=618.00
+[TRAIN] Step 28/400 | 10:35:49
+[TRAIN] Step 28 | Loss=3.534049 | Best makespan in group=556.00
+[TRAIN] Step 29/400 | 10:36:37
+[TRAIN] Step 29 | Loss=3.766812 | Best makespan in group=357.00
+[TRAIN] Step 30/400 | 10:38:04
+[TRAIN] Step 30 | Loss=11.116577 | Best makespan in group=543.00
+[TRAIN] Step 31/400 | 10:38:45
+[TRAIN] Step 31 | Loss=7.134079 | Best makespan in group=485.00
+[TRAIN] Step 32/400 | 10:39:25
+[TRAIN] Step 32 | Loss=-0.000000 | Best makespan in group=358.00
+[TRAIN] Step 33/400 | 10:40:43
+[TRAIN] Step 33 | Loss=1.327973 | Best makespan in group=503.00
+[TRAIN] Step 34/400 | 10:41:24
+[TRAIN] Step 34 | Loss=0.000793 | Best makespan in group=406.00
+[TRAIN] Step 35/400 | 10:42:09
+[TRAIN] Step 35 | Loss=2.146293 | Best makespan in group=486.00
+[TRAIN] Step 36/400 | 10:43:06
+[TRAIN] Step 36 | Loss=1.651612 | Best makespan in group=438.00
+[TRAIN] Step 37/400 | 10:43:47
+[TRAIN] Step 37 | Loss=-0.000000 | Best makespan in group=588.00
+[TRAIN] Step 38/400 | 10:44:36
+[TRAIN] Step 38 | Loss=2.477987 | Best makespan in group=469.00
+[TRAIN] Step 39/400 | 10:45:23
+[TRAIN] Step 39 | Loss=0.904447 | Best makespan in group=536.00
+[TRAIN] Step 40/400 | 10:46:17
+[TRAIN] Step 40 | Loss=0.000721 | Best makespan in group=408.00
+[TRAIN] Step 41/400 | 10:47:45
+[TRAIN] Step 41 | Loss=0.168671 | Best makespan in group=525.00
+[TRAIN] Step 42/400 | 10:48:40
+[TRAIN] Step 42 | Loss=0.000009 | Best makespan in group=599.00
+[TRAIN] Step 43/400 | 10:49:25
+[TRAIN] Step 43 | Loss=-0.000000 | Best makespan in group=526.00
+[TRAIN] Step 44/400 | 10:50:07
+[TRAIN] Step 44 | Loss=0.628000 | Best makespan in group=505.00
+[TRAIN] Step 45/400 | 10:50:48
+[TRAIN] Step 45 | Loss=3.010134 | Best makespan in group=494.00
+[TRAIN] Step 46/400 | 10:51:55
+[TRAIN] Step 46 | Loss=5.434352 | Best makespan in group=408.00
+[TRAIN] Step 47/400 | 10:52:51
+[TRAIN] Step 47 | Loss=2.657598 | Best makespan in group=400.00
+[TRAIN] Step 48/400 | 10:53:44
+[TRAIN] Step 48 | Loss=0.000028 | Best makespan in group=561.00
+[TRAIN] Step 49/400 | 10:54:35
+[TRAIN] Step 49 | Loss=0.000000 | Best makespan in group=430.00
+[TRAIN] Step 50/400 | 10:55:44
+[TRAIN] Step 50 | Loss=0.393985 | Best makespan in group=430.00
+[TRAIN][VAL][ep 50] avg_gap=0.1766 | std_gap=0.0990 | q80_gap=0.2481 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2093 (raw=0.1766) | saving candidate: 754773298652587.pth
+[TRAIN] Step 51/400 | 11:00:22
+[TRAIN] Step 51 | Loss=2.089131 | Best makespan in group=357.00
+[TRAIN] Step 52/400 | 11:01:17
+[TRAIN] Step 52 | Loss=7.853310 | Best makespan in group=479.00
+[TRAIN] Step 53/400 | 11:02:22
+[TRAIN] Step 53 | Loss=0.000000 | Best makespan in group=576.00
+[TRAIN] Step 54/400 | 11:03:03
+[TRAIN] Step 54 | Loss=0.654369 | Best makespan in group=395.00
+[TRAIN] Step 55/400 | 11:04:19
+[TRAIN] Step 55 | Loss=0.004433 | Best makespan in group=489.00
+[TRAIN] Step 56/400 | 11:05:04
+[TRAIN] Step 56 | Loss=3.786121 | Best makespan in group=425.00
+[TRAIN] Step 57/400 | 11:05:48
+[TRAIN] Step 57 | Loss=0.961213 | Best makespan in group=402.00
+[TRAIN] Step 58/400 | 11:06:54
+[TRAIN] Step 58 | Loss=0.000000 | Best makespan in group=446.00
+[TRAIN] Step 59/400 | 11:08:05
+[TRAIN] Step 59 | Loss=0.246199 | Best makespan in group=579.00
+[TRAIN] Step 60/400 | 11:08:56
+[TRAIN] Step 60 | Loss=1.276325 | Best makespan in group=411.00
+[TRAIN] Step 61/400 | 11:09:50
+[TRAIN] Step 61 | Loss=1.289604 | Best makespan in group=447.00
+[TRAIN] Step 62/400 | 11:10:54
+[TRAIN] Step 62 | Loss=-0.000000 | Best makespan in group=389.00
+[TRAIN] Step 63/400 | 11:11:58
+[TRAIN] Step 63 | Loss=0.000010 | Best makespan in group=507.00
+[TRAIN] Step 64/400 | 11:12:40
+[TRAIN] Step 64 | Loss=4.955233 | Best makespan in group=466.00
+[TRAIN] Step 65/400 | 11:13:24
+[TRAIN] Step 65 | Loss=2.356064 | Best makespan in group=412.00
+[TRAIN] Step 66/400 | 11:14:36
+[TRAIN] Step 66 | Loss=2.722924 | Best makespan in group=402.00
+[TRAIN] Step 67/400 | 11:15:32
+[TRAIN] Step 67 | Loss=-0.000000 | Best makespan in group=386.00
+[TRAIN] Step 68/400 | 11:16:27
+[TRAIN] Step 68 | Loss=4.817442 | Best makespan in group=456.00
+[TRAIN] Step 69/400 | 11:17:51
+[TRAIN] Step 69 | Loss=-0.000000 | Best makespan in group=384.00
+[TRAIN] Step 70/400 | 11:18:40
+[TRAIN] Step 70 | Loss=7.546060 | Best makespan in group=606.00
+[TRAIN] Step 71/400 | 11:19:32
+[TRAIN] Step 71 | Loss=1.480446 | Best makespan in group=502.00
+[TRAIN] Step 72/400 | 11:20:12
+[TRAIN] Step 72 | Loss=5.612622 | Best makespan in group=494.00
+[TRAIN] Step 73/400 | 11:21:11
+[TRAIN] Step 73 | Loss=0.249711 | Best makespan in group=401.00
+[TRAIN] Step 74/400 | 11:21:58
+[TRAIN] Step 74 | Loss=9.446730 | Best makespan in group=532.00
+[TRAIN] Step 75/400 | 11:22:44
+[TRAIN] Step 75 | Loss=2.322274 | Best makespan in group=360.00
+[TRAIN][VAL][ep 75] avg_gap=0.1669 | std_gap=0.1013 | q80_gap=0.2254 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1952 (raw=0.1669) | saving candidate: 377073177464142.pth
+[TRAIN] Step 76/400 | 11:27:26
+[TRAIN] Step 76 | Loss=4.779922 | Best makespan in group=527.00
+[TRAIN] Step 77/400 | 11:28:17
+[TRAIN] Step 77 | Loss=0.000079 | Best makespan in group=515.00
+[TRAIN] Step 78/400 | 11:29:03
+[TRAIN] Step 78 | Loss=0.007444 | Best makespan in group=549.00
+[TRAIN] Step 79/400 | 11:29:41
+[TRAIN] Step 79 | Loss=-0.000000 | Best makespan in group=593.00
+[TRAIN] Step 80/400 | 11:30:34
+[TRAIN] Step 80 | Loss=0.000134 | Best makespan in group=563.00
+[TRAIN] Step 81/400 | 11:31:18
+[TRAIN] Step 81 | Loss=10.014205 | Best makespan in group=570.00
+[TRAIN] Step 82/400 | 11:32:08
+[TRAIN] Step 82 | Loss=0.000072 | Best makespan in group=489.00
+[TRAIN] Step 83/400 | 11:33:13
+[TRAIN] Step 83 | Loss=0.037568 | Best makespan in group=449.00
+[TRAIN] Step 84/400 | 11:33:52
+[TRAIN] Step 84 | Loss=0.695633 | Best makespan in group=429.00
+[TRAIN] Step 85/400 | 11:34:38
+[TRAIN] Step 85 | Loss=2.439240 | Best makespan in group=504.00
+[TRAIN] Step 86/400 | 11:35:41
+[TRAIN] Step 86 | Loss=0.021342 | Best makespan in group=440.00
+[TRAIN] Step 87/400 | 11:36:49
+[TRAIN] Step 87 | Loss=0.000002 | Best makespan in group=423.00
+[TRAIN] Step 88/400 | 11:38:23
+[TRAIN] Step 88 | Loss=0.000165 | Best makespan in group=355.00
+[TRAIN] Step 89/400 | 11:39:17
+[TRAIN] Step 89 | Loss=0.000000 | Best makespan in group=443.00
+[TRAIN] Step 90/400 | 11:40:06
+[TRAIN] Step 90 | Loss=0.000095 | Best makespan in group=594.00
+[TRAIN] Step 91/400 | 11:40:50
+[TRAIN] Step 91 | Loss=3.241467 | Best makespan in group=472.00
+[TRAIN] Step 92/400 | 11:41:29
+[TRAIN] Step 92 | Loss=0.000337 | Best makespan in group=587.00
+[TRAIN] Step 93/400 | 11:42:10
+[TRAIN] Step 93 | Loss=0.997999 | Best makespan in group=481.00
+[TRAIN] Step 94/400 | 11:42:50
+[TRAIN] Step 94 | Loss=0.000000 | Best makespan in group=528.00
+[TRAIN] Step 95/400 | 11:43:33
+[TRAIN] Step 95 | Loss=0.000082 | Best makespan in group=473.00
+[TRAIN] Step 96/400 | 11:44:25
+[TRAIN] Step 96 | Loss=0.000019 | Best makespan in group=450.00
+[TRAIN] Step 97/400 | 11:45:09
+[TRAIN] Step 97 | Loss=-0.000000 | Best makespan in group=394.00
+[TRAIN] Step 98/400 | 11:46:27
+[TRAIN] Step 98 | Loss=0.000000 | Best makespan in group=426.00
+[TRAIN] Step 99/400 | 11:47:10
+[TRAIN] Step 99 | Loss=0.000000 | Best makespan in group=361.00
+[TRAIN] Step 100/400 | 11:47:57
+[TRAIN] Step 100 | Loss=-0.000000 | Best makespan in group=545.00
+[TRAIN][VAL][ep 100] avg_gap=0.1624 | std_gap=0.1008 | q80_gap=0.2444 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1687 (raw=0.1624) | saving candidate: 40465333695291.pth
+[TRAIN] Step 101/400 | 11:52:06
+[TRAIN] Step 101 | Loss=5.240520 | Best makespan in group=424.00
+[TRAIN] Step 102/400 | 11:53:03
+[TRAIN] Step 102 | Loss=3.781085 | Best makespan in group=383.00
+[TRAIN] Step 103/400 | 11:53:56
+[TRAIN] Step 103 | Loss=8.997744 | Best makespan in group=560.00
+[TRAIN] Step 104/400 | 11:54:49
+[TRAIN] Step 104 | Loss=2.414825 | Best makespan in group=477.00
+[TRAIN] Step 105/400 | 11:55:55
+[TRAIN] Step 105 | Loss=0.000072 | Best makespan in group=436.00
+[TRAIN] Step 106/400 | 11:57:00
+[TRAIN] Step 106 | Loss=2.403449 | Best makespan in group=487.00
+[TRAIN] Step 107/400 | 11:57:42
+[TRAIN] Step 107 | Loss=10.998363 | Best makespan in group=574.00
+[TRAIN] Step 108/400 | 11:58:31
+[TRAIN] Step 108 | Loss=0.715990 | Best makespan in group=621.00
+[TRAIN] Step 109/400 | 11:59:17
+[TRAIN] Step 109 | Loss=1.943481 | Best makespan in group=418.00
+[TRAIN] Step 110/400 | 12:00:29
+[TRAIN] Step 110 | Loss=2.164245 | Best makespan in group=401.00
+[TRAIN] Step 111/400 | 12:01:26
+[TRAIN] Step 111 | Loss=-0.000000 | Best makespan in group=397.00
+[TRAIN] Step 112/400 | 12:02:36
+[TRAIN] Step 112 | Loss=0.515364 | Best makespan in group=503.00
+[TRAIN] Step 113/400 | 12:03:39
+[TRAIN] Step 113 | Loss=0.032896 | Best makespan in group=410.00
+[TRAIN] Step 114/400 | 12:04:34
+[TRAIN] Step 114 | Loss=-0.000000 | Best makespan in group=582.00
+[TRAIN] Step 115/400 | 12:05:30
+[TRAIN] Step 115 | Loss=0.000000 | Best makespan in group=335.00
+[TRAIN] Step 116/400 | 12:06:53
+[TRAIN] Step 116 | Loss=1.231440 | Best makespan in group=447.00
+[TRAIN] Step 117/400 | 12:07:58
+[TRAIN] Step 117 | Loss=-0.000000 | Best makespan in group=431.00
+[TRAIN] Step 118/400 | 12:09:04
+[TRAIN] Step 118 | Loss=2.732413 | Best makespan in group=541.00
+[TRAIN] Step 119/400 | 12:09:56
+[TRAIN] Step 119 | Loss=0.000001 | Best makespan in group=444.00
+[TRAIN] Step 120/400 | 12:10:38
+[TRAIN] Step 120 | Loss=2.242398 | Best makespan in group=456.00
+[TRAIN] Step 121/400 | 12:11:38
+[TRAIN] Step 121 | Loss=3.519166 | Best makespan in group=496.00
+[TRAIN] Step 122/400 | 12:12:18
+[TRAIN] Step 122 | Loss=-0.000000 | Best makespan in group=412.00
+[TRAIN] Step 123/400 | 12:13:11
+[TRAIN] Step 123 | Loss=-0.000000 | Best makespan in group=377.00
+[TRAIN] Step 124/400 | 12:14:20
+[TRAIN] Step 124 | Loss=0.735499 | Best makespan in group=359.00
+[TRAIN] Step 125/400 | 12:15:45
+[TRAIN] Step 125 | Loss=1.955293 | Best makespan in group=415.00
+[TRAIN][VAL][ep 125] avg_gap=0.1682 | std_gap=0.0925 | q80_gap=0.2604 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1658 (raw=0.1682) | saving candidate: 275956690326174.pth
+[TRAIN] Step 126/400 | 12:19:29
+[TRAIN] Step 126 | Loss=2.244426 | Best makespan in group=382.00
+[TRAIN] Step 127/400 | 12:20:17
+[TRAIN] Step 127 | Loss=0.000587 | Best makespan in group=491.00
+[TRAIN] Step 128/400 | 12:21:14
+[TRAIN] Step 128 | Loss=0.375645 | Best makespan in group=397.00
+[TRAIN] Step 129/400 | 12:22:02
+[TRAIN] Step 129 | Loss=0.000176 | Best makespan in group=474.00
+[TRAIN] Step 130/400 | 12:22:38
+[TRAIN] Step 130 | Loss=0.000330 | Best makespan in group=614.00
+[TRAIN] Step 131/400 | 12:23:25
+[TRAIN] Step 131 | Loss=1.512773 | Best makespan in group=467.00
+[TRAIN] Step 132/400 | 12:24:00
+[TRAIN] Step 132 | Loss=-0.000000 | Best makespan in group=548.00
+[TRAIN] Step 133/400 | 12:24:41
+[TRAIN] Step 133 | Loss=0.291807 | Best makespan in group=443.00
+[TRAIN] Step 134/400 | 12:25:40
+[TRAIN] Step 134 | Loss=1.740020 | Best makespan in group=450.00
+[TRAIN] Step 135/400 | 12:26:29
+[TRAIN] Step 135 | Loss=5.282549 | Best makespan in group=577.00
+[TRAIN] Step 136/400 | 12:27:07
+[TRAIN] Step 136 | Loss=-0.000000 | Best makespan in group=496.00
+[TRAIN] Step 137/400 | 12:27:53
+[TRAIN] Step 137 | Loss=-0.000000 | Best makespan in group=457.00
+[TRAIN] Step 138/400 | 12:28:40
+[TRAIN] Step 138 | Loss=-0.000000 | Best makespan in group=485.00
+[TRAIN] Step 139/400 | 12:29:10
+[TRAIN] Step 139 | Loss=0.000001 | Best makespan in group=566.00
+[TRAIN] Step 140/400 | 12:29:47
+[TRAIN] Step 140 | Loss=4.617977 | Best makespan in group=457.00
+[TRAIN] Step 141/400 | 12:30:42
+[TRAIN] Step 141 | Loss=0.000001 | Best makespan in group=647.00
+[TRAIN] Step 142/400 | 12:31:15
+[TRAIN] Step 142 | Loss=0.000007 | Best makespan in group=555.00
+[TRAIN] Step 143/400 | 12:31:47
+[TRAIN] Step 143 | Loss=0.000001 | Best makespan in group=505.00
+[TRAIN] Step 144/400 | 12:32:18
+[TRAIN] Step 144 | Loss=0.412193 | Best makespan in group=440.00
+[TRAIN] Step 145/400 | 12:32:49
+[TRAIN] Step 145 | Loss=0.000002 | Best makespan in group=586.00
+[TRAIN] Step 146/400 | 12:33:23
+[TRAIN] Step 146 | Loss=1.252132 | Best makespan in group=424.00
+[TRAIN] Step 147/400 | 12:34:11
+[TRAIN] Step 147 | Loss=1.597359 | Best makespan in group=511.00
+[TRAIN] Step 148/400 | 12:34:47
+[TRAIN] Step 148 | Loss=0.000016 | Best makespan in group=361.00
+[TRAIN] Step 149/400 | 12:35:26
+[TRAIN] Step 149 | Loss=0.000004 | Best makespan in group=354.00
+[TRAIN] Step 150/400 | 12:36:00
+[TRAIN] Step 150 | Loss=0.000008 | Best makespan in group=439.00
+[TRAIN][VAL][ep 150] avg_gap=0.1796 | std_gap=0.1073 | q80_gap=0.2467 | n=40
+[TRAIN] Step 151/400 | 12:38:45
+[TRAIN] Step 151 | Loss=0.000000 | Best makespan in group=415.00
+[TRAIN] Step 152/400 | 12:39:34
+[TRAIN] Step 152 | Loss=0.000001 | Best makespan in group=600.00
+[TRAIN] Step 153/400 | 12:40:12
+[TRAIN] Step 153 | Loss=2.089878 | Best makespan in group=504.00
+[TRAIN] Step 154/400 | 12:41:01
+[TRAIN] Step 154 | Loss=-0.000000 | Best makespan in group=392.00
+[TRAIN] Step 155/400 | 12:41:46
+[TRAIN] Step 155 | Loss=-0.000000 | Best makespan in group=400.00
+[TRAIN] Step 156/400 | 12:42:53
+[TRAIN] Step 156 | Loss=0.000149 | Best makespan in group=428.00
+[TRAIN] Step 157/400 | 12:43:26
+[TRAIN] Step 157 | Loss=1.174643 | Best makespan in group=405.00
+[TRAIN] Step 158/400 | 12:44:22
+[TRAIN] Step 158 | Loss=-0.000000 | Best makespan in group=541.00
+[TRAIN] Step 159/400 | 12:44:54
+[TRAIN] Step 159 | Loss=0.241768 | Best makespan in group=397.00
+[TRAIN] Step 160/400 | 12:45:33
+[TRAIN] Step 160 | Loss=0.000002 | Best makespan in group=432.00
+[TRAIN] Step 161/400 | 12:46:22
+[TRAIN] Step 161 | Loss=-0.000000 | Best makespan in group=490.00
+[TRAIN] Step 162/400 | 12:47:10
+[TRAIN] Step 162 | Loss=0.000056 | Best makespan in group=462.00
+[TRAIN] Step 163/400 | 12:47:44
+[TRAIN] Step 163 | Loss=-0.000000 | Best makespan in group=355.00
+[TRAIN] Step 164/400 | 12:48:45
+[TRAIN] Step 164 | Loss=0.000005 | Best makespan in group=374.00
+[TRAIN] Step 165/400 | 12:49:26
+[TRAIN] Step 165 | Loss=0.076700 | Best makespan in group=602.00
+[TRAIN] Step 166/400 | 12:50:04
+[TRAIN] Step 166 | Loss=0.000274 | Best makespan in group=612.00
+[TRAIN] Step 167/400 | 12:50:36
+[TRAIN] Step 167 | Loss=0.267677 | Best makespan in group=511.00
+[TRAIN] Step 168/400 | 12:51:07
+[TRAIN] Step 168 | Loss=0.296012 | Best makespan in group=483.00
+[TRAIN] Step 169/400 | 12:51:43
+[TRAIN] Step 169 | Loss=0.000046 | Best makespan in group=468.00
+[TRAIN] Step 170/400 | 12:52:11
+[TRAIN] Step 170 | Loss=0.000944 | Best makespan in group=434.00
+[TRAIN] Step 171/400 | 12:52:42
+[TRAIN] Step 171 | Loss=-0.000000 | Best makespan in group=332.00
+[TRAIN] Step 172/400 | 12:53:14
+[TRAIN] Step 172 | Loss=0.000006 | Best makespan in group=477.00
+[TRAIN] Step 173/400 | 12:53:43
+[TRAIN] Step 173 | Loss=0.000000 | Best makespan in group=596.00
+[TRAIN] Step 174/400 | 12:54:19
+[TRAIN] Step 174 | Loss=0.000001 | Best makespan in group=610.00
+[TRAIN] Step 175/400 | 12:54:55
+[TRAIN] Step 175 | Loss=0.953322 | Best makespan in group=426.00
+[TRAIN][VAL][ep 175] avg_gap=0.1728 | std_gap=0.1053 | q80_gap=0.2517 | n=40
+[TRAIN] Step 176/400 | 12:57:41
+[TRAIN] Step 176 | Loss=0.000046 | Best makespan in group=496.00
+[TRAIN] Step 177/400 | 12:58:24
+[TRAIN] Step 177 | Loss=0.021562 | Best makespan in group=522.00
+[TRAIN] Step 178/400 | 12:58:57
+[TRAIN] Step 178 | Loss=2.132393 | Best makespan in group=402.00
+[TRAIN] Step 179/400 | 12:59:32
+[TRAIN] Step 179 | Loss=1.038986 | Best makespan in group=414.00
+[TRAIN] Step 180/400 | 13:00:19
+[TRAIN] Step 180 | Loss=0.000832 | Best makespan in group=538.00
+[TRAIN] Step 181/400 | 13:00:44
+[TRAIN] Step 181 | Loss=-0.000000 | Best makespan in group=431.00
+[TRAIN] Step 182/400 | 13:01:18
+[TRAIN] Step 182 | Loss=10.297599 | Best makespan in group=488.00
+[TRAIN] Step 183/400 | 13:02:01
+[TRAIN] Step 183 | Loss=0.000000 | Best makespan in group=621.00
+[TRAIN] Step 184/400 | 13:02:37
+[TRAIN] Step 184 | Loss=0.029172 | Best makespan in group=448.00
+[TRAIN] Step 185/400 | 13:03:25
+[TRAIN] Step 185 | Loss=3.868687 | Best makespan in group=503.00
+[TRAIN] Step 186/400 | 13:03:52
+[TRAIN] Step 186 | Loss=-0.000000 | Best makespan in group=534.00
+[TRAIN] Step 187/400 | 13:04:23
+[TRAIN] Step 187 | Loss=0.000010 | Best makespan in group=490.00
+[TRAIN] Step 188/400 | 13:04:48
+[TRAIN] Step 188 | Loss=0.000044 | Best makespan in group=438.00
+[TRAIN] Step 189/400 | 13:05:25
+[TRAIN] Step 189 | Loss=2.150025 | Best makespan in group=480.00
+[TRAIN] Step 190/400 | 13:05:49
+[TRAIN] Step 190 | Loss=2.311669 | Best makespan in group=557.00
+[TRAIN] Step 191/400 | 13:06:22
+[TRAIN] Step 191 | Loss=0.000080 | Best makespan in group=589.00
+[TRAIN] Step 192/400 | 13:06:54
+[TRAIN] Step 192 | Loss=2.457341 | Best makespan in group=607.00
+[TRAIN] Step 193/400 | 13:07:28
+[TRAIN] Step 193 | Loss=2.530135 | Best makespan in group=341.00
+[TRAIN] Step 194/400 | 13:08:18
+[TRAIN] Step 194 | Loss=0.134219 | Best makespan in group=435.00
+[TRAIN] Step 195/400 | 13:09:03
+[TRAIN] Step 195 | Loss=0.000000 | Best makespan in group=551.00
+[TRAIN] Step 196/400 | 13:09:29
+[TRAIN] Step 196 | Loss=0.000044 | Best makespan in group=379.00
+[TRAIN] Step 197/400 | 13:10:02
+[TRAIN] Step 197 | Loss=0.643321 | Best makespan in group=400.00
+[TRAIN] Step 198/400 | 13:10:37
+[TRAIN] Step 198 | Loss=0.000740 | Best makespan in group=607.00
+[TRAIN] Step 199/400 | 13:11:03
+[TRAIN] Step 199 | Loss=0.694026 | Best makespan in group=427.00
+[TRAIN] Step 200/400 | 13:11:32
+[TRAIN] Step 200 | Loss=0.000048 | Best makespan in group=432.00
+[TRAIN] Refreshing training instances (step 200)...
+[TRAIN][VAL][ep 200] avg_gap=0.1745 | std_gap=0.0999 | q80_gap=0.2420 | n=40
+[TRAIN] Step 201/400 | 13:14:08
+[TRAIN] Step 201 | Loss=0.283197 | Best makespan in group=541.00
+[TRAIN] Step 202/400 | 13:14:48
+[TRAIN] Step 202 | Loss=5.861768 | Best makespan in group=516.00
+[TRAIN] Step 203/400 | 13:15:14
+[TRAIN] Step 203 | Loss=0.024187 | Best makespan in group=401.00
+[TRAIN] Step 204/400 | 13:15:58
+[TRAIN] Step 204 | Loss=2.105743 | Best makespan in group=522.00
+[TRAIN] Step 205/400 | 13:16:40
+[TRAIN] Step 205 | Loss=0.000047 | Best makespan in group=547.00
+[TRAIN] Step 206/400 | 13:17:23
+[TRAIN] Step 206 | Loss=0.001024 | Best makespan in group=439.00
+[TRAIN] Step 207/400 | 13:18:09
+[TRAIN] Step 207 | Loss=0.000003 | Best makespan in group=371.00
+[TRAIN] Step 208/400 | 13:18:46
+[TRAIN] Step 208 | Loss=-0.000000 | Best makespan in group=368.00
+[TRAIN] Step 209/400 | 13:19:16
+[TRAIN] Step 209 | Loss=0.335399 | Best makespan in group=432.00
+[TRAIN] Step 210/400 | 13:19:48
+[TRAIN] Step 210 | Loss=0.000002 | Best makespan in group=359.00
+[TRAIN] Step 211/400 | 13:20:33
+[TRAIN] Step 211 | Loss=0.000024 | Best makespan in group=573.00
+[TRAIN] Step 212/400 | 13:20:58
+[TRAIN] Step 212 | Loss=2.950966 | Best makespan in group=477.00
+[TRAIN] Step 213/400 | 13:21:25
+[TRAIN] Step 213 | Loss=0.038177 | Best makespan in group=415.00
+[TRAIN] Step 214/400 | 13:22:08
+[TRAIN] Step 214 | Loss=3.101515 | Best makespan in group=410.00
+[TRAIN] Step 215/400 | 13:22:41
+[TRAIN] Step 215 | Loss=0.000261 | Best makespan in group=487.00
+[TRAIN] Step 216/400 | 13:23:20
+[TRAIN] Step 216 | Loss=1.109622 | Best makespan in group=409.00
+[TRAIN] Step 217/400 | 13:23:54
+[TRAIN] Step 217 | Loss=0.000235 | Best makespan in group=471.00
+[TRAIN] Step 218/400 | 13:24:18
+[TRAIN] Step 218 | Loss=2.651927 | Best makespan in group=450.00
+[TRAIN] Step 219/400 | 13:24:41
+[TRAIN] Step 219 | Loss=0.000187 | Best makespan in group=395.00
+[TRAIN] Step 220/400 | 13:25:10
+[TRAIN] Step 220 | Loss=0.000085 | Best makespan in group=384.00
+[TRAIN] Step 221/400 | 13:25:48
+[TRAIN] Step 221 | Loss=4.442953 | Best makespan in group=445.00
+[TRAIN] Step 222/400 | 13:26:16
+[TRAIN] Step 222 | Loss=0.000064 | Best makespan in group=493.00
+[TRAIN] Step 223/400 | 13:26:47
+[TRAIN] Step 223 | Loss=0.000009 | Best makespan in group=574.00
+[TRAIN] Step 224/400 | 13:27:22
+[TRAIN] Step 224 | Loss=0.194798 | Best makespan in group=440.00
+[TRAIN] Step 225/400 | 13:27:55
+[TRAIN] Step 225 | Loss=0.000014 | Best makespan in group=532.00
+[TRAIN][VAL][ep 225] avg_gap=0.1948 | std_gap=0.1131 | q80_gap=0.2971 | n=40
+[TRAIN] Step 226/400 | 13:30:06
+[TRAIN] Step 226 | Loss=0.843625 | Best makespan in group=488.00
+[TRAIN] Step 227/400 | 13:30:35
+[TRAIN] Step 227 | Loss=0.646375 | Best makespan in group=358.00
+[TRAIN] Step 228/400 | 13:31:06
+[TRAIN] Step 228 | Loss=0.000072 | Best makespan in group=368.00
+[TRAIN] Step 229/400 | 13:31:31
+[TRAIN] Step 229 | Loss=0.000228 | Best makespan in group=452.00
+[TRAIN] Step 230/400 | 13:32:09
+[TRAIN] Step 230 | Loss=0.000001 | Best makespan in group=520.00
+[TRAIN] Step 231/400 | 13:32:42
+[TRAIN] Step 231 | Loss=0.001640 | Best makespan in group=480.00
+[TRAIN] Step 232/400 | 13:33:12
+[TRAIN] Step 232 | Loss=3.034557 | Best makespan in group=466.00
+[TRAIN] Step 233/400 | 13:33:41
+[TRAIN] Step 233 | Loss=1.068256 | Best makespan in group=493.00
+[TRAIN] Step 234/400 | 13:34:17
+[TRAIN] Step 234 | Loss=0.000058 | Best makespan in group=368.00
+[TRAIN] Step 235/400 | 13:34:43
+[TRAIN] Step 235 | Loss=6.670454 | Best makespan in group=437.00
+[TRAIN] Step 236/400 | 13:35:06
+[TRAIN] Step 236 | Loss=0.043485 | Best makespan in group=427.00
+[TRAIN] Step 237/400 | 13:35:34
+[TRAIN] Step 237 | Loss=0.000052 | Best makespan in group=374.00
+[TRAIN] Step 238/400 | 13:35:58
+[TRAIN] Step 238 | Loss=0.150202 | Best makespan in group=440.00
+[TRAIN] Step 239/400 | 13:36:22
+[TRAIN] Step 239 | Loss=1.239498 | Best makespan in group=391.00
+[TRAIN] Step 240/400 | 13:37:05
+[TRAIN] Step 240 | Loss=1.108952 | Best makespan in group=557.00
+[TRAIN] Step 241/400 | 13:37:45
+[TRAIN] Step 241 | Loss=0.959671 | Best makespan in group=348.00
+[TRAIN] Step 242/400 | 13:38:26
+[TRAIN] Step 242 | Loss=0.608407 | Best makespan in group=452.00
+[TRAIN] Step 243/400 | 13:39:02
+[TRAIN] Step 243 | Loss=0.000013 | Best makespan in group=375.00
+[TRAIN] Step 244/400 | 13:39:35
+[TRAIN] Step 244 | Loss=0.000013 | Best makespan in group=469.00
+[TRAIN] Step 245/400 | 13:40:11
+[TRAIN] Step 245 | Loss=1.147386 | Best makespan in group=559.00
+[TRAIN] Step 246/400 | 13:40:37
+[TRAIN] Step 246 | Loss=0.000054 | Best makespan in group=458.00
+[TRAIN] Step 247/400 | 13:41:14
+[TRAIN] Step 247 | Loss=0.001159 | Best makespan in group=430.00
+[TRAIN] Step 248/400 | 13:41:57
+[TRAIN] Step 248 | Loss=0.689123 | Best makespan in group=524.00
+[TRAIN] Step 249/400 | 13:42:36
+[TRAIN] Step 249 | Loss=0.189221 | Best makespan in group=416.00
+[TRAIN] Step 250/400 | 13:43:13
+[TRAIN] Step 250 | Loss=0.003990 | Best makespan in group=519.00
+[TRAIN][VAL][ep 250] avg_gap=0.1675 | std_gap=0.0945 | q80_gap=0.2514 | n=40
+[TRAIN] Step 251/400 | 13:45:25
+[TRAIN] Step 251 | Loss=1.061020 | Best makespan in group=603.00
+[TRAIN] Step 252/400 | 13:46:01
+[TRAIN] Step 252 | Loss=1.846416 | Best makespan in group=389.00
+[TRAIN] Step 253/400 | 13:46:31
+[TRAIN] Step 253 | Loss=0.000014 | Best makespan in group=461.00
+[TRAIN] Step 254/400 | 13:47:01
+[TRAIN] Step 254 | Loss=0.000004 | Best makespan in group=401.00
+[TRAIN] Step 255/400 | 13:47:41
+[TRAIN] Step 255 | Loss=0.000068 | Best makespan in group=361.00
+[TRAIN] Step 256/400 | 13:48:12
+[TRAIN] Step 256 | Loss=1.160732 | Best makespan in group=432.00
+[TRAIN] Step 257/400 | 13:48:38
+[TRAIN] Step 257 | Loss=0.000001 | Best makespan in group=437.00
+[TRAIN] Step 258/400 | 13:49:12
+[TRAIN] Step 258 | Loss=1.064041 | Best makespan in group=390.00
+[TRAIN] Step 259/400 | 13:49:44
+[TRAIN] Step 259 | Loss=0.924178 | Best makespan in group=425.00
+[TRAIN] Step 260/400 | 13:50:20
+[TRAIN] Step 260 | Loss=0.000016 | Best makespan in group=532.00
+[TRAIN] Step 261/400 | 13:50:53
+[TRAIN] Step 261 | Loss=0.000158 | Best makespan in group=472.00
+[TRAIN] Step 262/400 | 13:51:21
+[TRAIN] Step 262 | Loss=2.589828 | Best makespan in group=401.00
+[TRAIN] Step 263/400 | 13:51:42
+[TRAIN] Step 263 | Loss=0.007852 | Best makespan in group=425.00
+[TRAIN] Step 264/400 | 13:52:08
+[TRAIN] Step 264 | Loss=3.667756 | Best makespan in group=522.00
+[TRAIN] Step 265/400 | 13:52:42
+[TRAIN] Step 265 | Loss=0.000000 | Best makespan in group=537.00
+[TRAIN] Step 266/400 | 13:53:14
+[TRAIN] Step 266 | Loss=0.000940 | Best makespan in group=538.00
+[TRAIN] Step 267/400 | 13:53:37
+[TRAIN] Step 267 | Loss=0.000001 | Best makespan in group=463.00
+[TRAIN] Step 268/400 | 13:54:12
+[TRAIN] Step 268 | Loss=0.001470 | Best makespan in group=374.00
+[TRAIN] Step 269/400 | 13:54:35
+[TRAIN] Step 269 | Loss=1.643259 | Best makespan in group=354.00
+[TRAIN] Step 270/400 | 13:55:15
+[TRAIN] Step 270 | Loss=1.264356 | Best makespan in group=391.00
+[TRAIN] Step 271/400 | 13:55:54
+[TRAIN] Step 271 | Loss=0.377849 | Best makespan in group=439.00
+[TRAIN] Step 272/400 | 13:56:24
+[TRAIN] Step 272 | Loss=0.000197 | Best makespan in group=529.00
+[TRAIN] Step 273/400 | 13:56:59
+[TRAIN] Step 273 | Loss=0.000500 | Best makespan in group=485.00
+[TRAIN] Step 274/400 | 13:57:27
+[TRAIN] Step 274 | Loss=0.000113 | Best makespan in group=374.00
+[TRAIN] Step 275/400 | 13:57:57
+[TRAIN] Step 275 | Loss=0.000130 | Best makespan in group=419.00
+[TRAIN][VAL][ep 275] avg_gap=0.1760 | std_gap=0.0960 | q80_gap=0.2498 | n=40
+[TRAIN] Step 276/400 | 14:00:05
+[TRAIN] Step 276 | Loss=0.000002 | Best makespan in group=502.00
+[TRAIN] Step 277/400 | 14:00:38
+[TRAIN] Step 277 | Loss=0.009784 | Best makespan in group=435.00
+[TRAIN] Step 278/400 | 14:01:14
+[TRAIN] Step 278 | Loss=2.167901 | Best makespan in group=421.00
+[TRAIN] Step 279/400 | 14:01:51
+[TRAIN] Step 279 | Loss=-0.000000 | Best makespan in group=396.00
+[TRAIN] Step 280/400 | 14:02:18
+[TRAIN] Step 280 | Loss=0.000001 | Best makespan in group=482.00
+[TRAIN] Step 281/400 | 14:02:52
+[TRAIN] Step 281 | Loss=0.000007 | Best makespan in group=507.00
+[TRAIN] Step 282/400 | 14:03:26
+[TRAIN] Step 282 | Loss=0.000276 | Best makespan in group=392.00
+[TRAIN] Step 283/400 | 14:03:53
+[TRAIN] Step 283 | Loss=0.234421 | Best makespan in group=399.00
+[TRAIN] Step 284/400 | 14:04:22
+[TRAIN] Step 284 | Loss=0.000129 | Best makespan in group=375.00
+[TRAIN] Step 285/400 | 14:04:55
+[TRAIN] Step 285 | Loss=0.000013 | Best makespan in group=466.00
+[TRAIN] Step 286/400 | 14:05:30
+[TRAIN] Step 286 | Loss=6.596973 | Best makespan in group=431.00
+[TRAIN] Step 287/400 | 14:05:54
+[TRAIN] Step 287 | Loss=0.219507 | Best makespan in group=557.00
+[TRAIN] Step 288/400 | 14:06:17
+[TRAIN] Step 288 | Loss=0.792147 | Best makespan in group=391.00
+[TRAIN] Step 289/400 | 14:06:52
+[TRAIN] Step 289 | Loss=0.000240 | Best makespan in group=371.00
+[TRAIN] Step 290/400 | 14:07:16
+[TRAIN] Step 290 | Loss=0.000021 | Best makespan in group=495.00
+[TRAIN] Step 291/400 | 14:07:38
+[TRAIN] Step 291 | Loss=0.000092 | Best makespan in group=522.00
+[TRAIN] Step 292/400 | 14:08:12
+[TRAIN] Step 292 | Loss=0.000253 | Best makespan in group=462.00
+[TRAIN] Step 293/400 | 14:08:40
+[TRAIN] Step 293 | Loss=1.761207 | Best makespan in group=442.00
+[TRAIN] Step 294/400 | 14:09:11
+[TRAIN] Step 294 | Loss=0.000172 | Best makespan in group=457.00
+[TRAIN] Step 295/400 | 14:09:44
+[TRAIN] Step 295 | Loss=1.728201 | Best makespan in group=369.00
+[TRAIN] Step 296/400 | 14:10:22
+[TRAIN] Step 296 | Loss=0.000071 | Best makespan in group=392.00
+[TRAIN] Step 297/400 | 14:10:58
+[TRAIN] Step 297 | Loss=0.255342 | Best makespan in group=519.00
+[TRAIN] Step 298/400 | 14:11:32
+[TRAIN] Step 298 | Loss=0.035292 | Best makespan in group=446.00
+[TRAIN] Step 299/400 | 14:12:09
+[TRAIN] Step 299 | Loss=1.490818 | Best makespan in group=370.00
+[TRAIN] Step 300/400 | 14:12:38
+[TRAIN] Step 300 | Loss=0.798855 | Best makespan in group=506.00
+[TRAIN][VAL][ep 300] avg_gap=0.1710 | std_gap=0.0878 | q80_gap=0.2282 | n=40
+[TRAIN] Step 301/400 | 14:14:20
+[TRAIN] Step 301 | Loss=0.000009 | Best makespan in group=495.00
+[TRAIN] Step 302/400 | 14:14:49
+[TRAIN] Step 302 | Loss=0.356386 | Best makespan in group=394.00
+[TRAIN] Step 303/400 | 14:15:16
+[TRAIN] Step 303 | Loss=2.064295 | Best makespan in group=402.00
+[TRAIN] Step 304/400 | 14:15:34
+[TRAIN] Step 304 | Loss=0.301313 | Best makespan in group=530.00
+[TRAIN] Step 305/400 | 14:16:02
+[TRAIN] Step 305 | Loss=0.645856 | Best makespan in group=479.00
+[TRAIN] Step 306/400 | 14:16:21
+[TRAIN] Step 306 | Loss=0.000092 | Best makespan in group=469.00
+[TRAIN] Step 307/400 | 14:16:51
+[TRAIN] Step 307 | Loss=0.276759 | Best makespan in group=411.00
+[TRAIN] Step 308/400 | 14:17:19
+[TRAIN] Step 308 | Loss=0.000167 | Best makespan in group=417.00
+[TRAIN] Step 309/400 | 14:17:42
+[TRAIN] Step 309 | Loss=0.797902 | Best makespan in group=353.00
+[TRAIN] Step 310/400 | 14:18:16
+[TRAIN] Step 310 | Loss=0.000152 | Best makespan in group=514.00
+[TRAIN] Step 311/400 | 14:18:46
+[TRAIN] Step 311 | Loss=0.009514 | Best makespan in group=456.00
+[TRAIN] Step 312/400 | 14:19:19
+[TRAIN] Step 312 | Loss=1.029974 | Best makespan in group=592.00
+[TRAIN] Step 313/400 | 14:19:40
+[TRAIN] Step 313 | Loss=0.002803 | Best makespan in group=396.00
+[TRAIN] Step 314/400 | 14:20:03
+[TRAIN] Step 314 | Loss=0.000031 | Best makespan in group=371.00
+[TRAIN] Step 315/400 | 14:20:26
+[TRAIN] Step 315 | Loss=0.636465 | Best makespan in group=449.00
+[TRAIN] Step 316/400 | 14:20:50
+[TRAIN] Step 316 | Loss=0.003317 | Best makespan in group=367.00
+[TRAIN] Step 317/400 | 14:21:17
+[TRAIN] Step 317 | Loss=0.000020 | Best makespan in group=388.00
+[TRAIN] Step 318/400 | 14:21:54
+[TRAIN] Step 318 | Loss=0.016798 | Best makespan in group=389.00
+[TRAIN] Step 319/400 | 14:22:14
+[TRAIN] Step 319 | Loss=0.000002 | Best makespan in group=390.00
+[TRAIN] Step 320/400 | 14:22:36
+[TRAIN] Step 320 | Loss=0.000016 | Best makespan in group=481.00
+[TRAIN] Step 321/400 | 14:23:00
+[TRAIN] Step 321 | Loss=1.503567 | Best makespan in group=392.00
+[TRAIN] Step 322/400 | 14:23:17
+[TRAIN] Step 322 | Loss=0.620258 | Best makespan in group=542.00
+[TRAIN] Step 323/400 | 14:23:44
+[TRAIN] Step 323 | Loss=0.000162 | Best makespan in group=409.00
+[TRAIN] Step 324/400 | 14:24:15
+[TRAIN] Step 324 | Loss=0.000376 | Best makespan in group=417.00
+[TRAIN] Step 325/400 | 14:24:37
+[TRAIN] Step 325 | Loss=0.000001 | Best makespan in group=474.00
+[TRAIN][VAL][ep 325] avg_gap=0.1742 | std_gap=0.0871 | q80_gap=0.2610 | n=40
+[TRAIN] Step 326/400 | 14:26:18
+[TRAIN] Step 326 | Loss=1.173918 | Best makespan in group=414.00
+[TRAIN] Step 327/400 | 14:26:43
+[TRAIN] Step 327 | Loss=0.000867 | Best makespan in group=367.00
+[TRAIN] Step 328/400 | 14:27:08
+[TRAIN] Step 328 | Loss=0.202436 | Best makespan in group=569.00
+[TRAIN] Step 329/400 | 14:27:28
+[TRAIN] Step 329 | Loss=0.000382 | Best makespan in group=481.00
+[TRAIN] Step 330/400 | 14:27:52
+[TRAIN] Step 330 | Loss=0.000117 | Best makespan in group=442.00
+[TRAIN] Step 331/400 | 14:28:22
+[TRAIN] Step 331 | Loss=0.045856 | Best makespan in group=434.00
+[TRAIN] Step 332/400 | 14:28:44
+[TRAIN] Step 332 | Loss=0.000001 | Best makespan in group=420.00
+[TRAIN] Step 333/400 | 14:29:14
+[TRAIN] Step 333 | Loss=0.000010 | Best makespan in group=409.00
+[TRAIN] Step 334/400 | 14:29:41
+[TRAIN] Step 334 | Loss=0.000015 | Best makespan in group=493.00
+[TRAIN] Step 335/400 | 14:30:09
+[TRAIN] Step 335 | Loss=1.461669 | Best makespan in group=392.00
+[TRAIN] Step 336/400 | 14:30:32
+[TRAIN] Step 336 | Loss=0.417684 | Best makespan in group=373.00
+[TRAIN] Step 337/400 | 14:31:06
+[TRAIN] Step 337 | Loss=0.000937 | Best makespan in group=394.00
+[TRAIN] Step 338/400 | 14:31:26
+[TRAIN] Step 338 | Loss=-0.000000 | Best makespan in group=528.00
+[TRAIN] Step 339/400 | 14:31:53
+[TRAIN] Step 339 | Loss=0.001041 | Best makespan in group=481.00
+[TRAIN] Step 340/400 | 14:32:12
+[TRAIN] Step 340 | Loss=0.000107 | Best makespan in group=396.00
+[TRAIN] Step 341/400 | 14:32:33
+[TRAIN] Step 341 | Loss=2.521704 | Best makespan in group=535.00
+[TRAIN] Step 342/400 | 14:32:53
+[TRAIN] Step 342 | Loss=0.000195 | Best makespan in group=479.00
+[TRAIN] Step 343/400 | 14:33:22
+[TRAIN] Step 343 | Loss=0.000070 | Best makespan in group=422.00
+[TRAIN] Step 344/400 | 14:33:49
+[TRAIN] Step 344 | Loss=0.000191 | Best makespan in group=383.00
+[TRAIN] Step 345/400 | 14:34:15
+[TRAIN] Step 345 | Loss=0.000014 | Best makespan in group=341.00
+[TRAIN] Step 346/400 | 14:34:35
+[TRAIN] Step 346 | Loss=2.843533 | Best makespan in group=363.00
+[TRAIN] Step 347/400 | 14:35:07
+[TRAIN] Step 347 | Loss=0.000002 | Best makespan in group=486.00
+[TRAIN] Step 348/400 | 14:35:33
+[TRAIN] Step 348 | Loss=0.000820 | Best makespan in group=499.00
+[TRAIN] Step 349/400 | 14:35:57
+[TRAIN] Step 349 | Loss=0.000411 | Best makespan in group=441.00
+[TRAIN] Step 350/400 | 14:36:24
+[TRAIN] Step 350 | Loss=0.000117 | Best makespan in group=412.00
+[TRAIN][VAL][ep 350] avg_gap=0.1719 | std_gap=0.0919 | q80_gap=0.2464 | n=40
+[TRAIN] Step 351/400 | 14:38:15
+[TRAIN] Step 351 | Loss=0.019281 | Best makespan in group=542.00
+[TRAIN] Step 352/400 | 14:38:34
+[TRAIN] Step 352 | Loss=0.484969 | Best makespan in group=517.00
+[TRAIN] Step 353/400 | 14:39:02
+[TRAIN] Step 353 | Loss=0.000008 | Best makespan in group=317.00
+[TRAIN] Step 354/400 | 14:39:34
+[TRAIN] Step 354 | Loss=0.000956 | Best makespan in group=406.00
+[TRAIN] Step 355/400 | 14:39:59
+[TRAIN] Step 355 | Loss=0.000675 | Best makespan in group=396.00
+[TRAIN] Step 356/400 | 14:40:21
+[TRAIN] Step 356 | Loss=0.012378 | Best makespan in group=434.00
+[TRAIN] Step 357/400 | 14:40:50
+[TRAIN] Step 357 | Loss=5.027815 | Best makespan in group=379.00
+[TRAIN] Step 358/400 | 14:41:11
+[TRAIN] Step 358 | Loss=0.001096 | Best makespan in group=431.00
+[TRAIN] Step 359/400 | 14:41:38
+[TRAIN] Step 359 | Loss=0.002030 | Best makespan in group=526.00
+[TRAIN] Step 360/400 | 14:42:07
+[TRAIN] Step 360 | Loss=0.000153 | Best makespan in group=417.00
+[TRAIN] Step 361/400 | 14:42:28
+[TRAIN] Step 361 | Loss=0.307983 | Best makespan in group=517.00
+[TRAIN] Step 362/400 | 14:42:51
+[TRAIN] Step 362 | Loss=0.000044 | Best makespan in group=390.00
+[TRAIN] Step 363/400 | 14:43:14
+[TRAIN] Step 363 | Loss=0.031852 | Best makespan in group=368.00
+[TRAIN] Step 364/400 | 14:43:40
+[TRAIN] Step 364 | Loss=1.773658 | Best makespan in group=483.00
+[TRAIN] Step 365/400 | 14:43:58
+[TRAIN] Step 365 | Loss=0.000343 | Best makespan in group=341.00
+[TRAIN] Step 366/400 | 14:44:19
+[TRAIN] Step 366 | Loss=1.130475 | Best makespan in group=456.00
+[TRAIN] Step 367/400 | 14:44:38
+[TRAIN] Step 367 | Loss=0.000026 | Best makespan in group=560.00
+[TRAIN] Step 368/400 | 14:45:05
+[TRAIN] Step 368 | Loss=0.000014 | Best makespan in group=474.00
+[TRAIN] Step 369/400 | 14:45:31
+[TRAIN] Step 369 | Loss=0.000004 | Best makespan in group=422.00
+[TRAIN] Step 370/400 | 14:46:00
+[TRAIN] Step 370 | Loss=0.974731 | Best makespan in group=450.00
+[TRAIN] Step 371/400 | 14:46:30
+[TRAIN] Step 371 | Loss=1.492235 | Best makespan in group=517.00
+[TRAIN] Step 372/400 | 14:46:56
+[TRAIN] Step 372 | Loss=0.000049 | Best makespan in group=400.00
+[TRAIN] Step 373/400 | 14:47:26
+[TRAIN] Step 373 | Loss=0.000012 | Best makespan in group=503.00
+[TRAIN] Step 374/400 | 14:47:54
+[TRAIN] Step 374 | Loss=2.982209 | Best makespan in group=433.00
+[TRAIN] Step 375/400 | 14:48:16
+[TRAIN] Step 375 | Loss=0.000000 | Best makespan in group=369.00
+[TRAIN][VAL][ep 375] avg_gap=0.1736 | std_gap=0.1061 | q80_gap=0.2367 | n=40
+[TRAIN] Step 376/400 | 14:49:55
+[TRAIN] Step 376 | Loss=1.128304 | Best makespan in group=386.00
+[TRAIN] Step 377/400 | 14:50:14
+[TRAIN] Step 377 | Loss=0.000053 | Best makespan in group=374.00
+[TRAIN] Step 378/400 | 14:50:42
+[TRAIN] Step 378 | Loss=0.000124 | Best makespan in group=412.00
+[TRAIN] Step 379/400 | 14:51:15
+[TRAIN] Step 379 | Loss=0.000003 | Best makespan in group=492.00
+[TRAIN] Step 380/400 | 14:51:39
+[TRAIN] Step 380 | Loss=1.565077 | Best makespan in group=395.00
+[TRAIN] Step 381/400 | 14:52:11
+[TRAIN] Step 381 | Loss=0.663882 | Best makespan in group=400.00
+[TRAIN] Step 382/400 | 14:52:33
+[TRAIN] Step 382 | Loss=0.000002 | Best makespan in group=479.00
+[TRAIN] Step 383/400 | 14:53:01
+[TRAIN] Step 383 | Loss=2.084935 | Best makespan in group=535.00
+[TRAIN] Step 384/400 | 14:53:20
+[TRAIN] Step 384 | Loss=0.000072 | Best makespan in group=492.00
+[TRAIN] Step 385/400 | 14:53:44
+[TRAIN] Step 385 | Loss=0.710660 | Best makespan in group=522.00
+[TRAIN] Step 386/400 | 14:54:11
+[TRAIN] Step 386 | Loss=0.000253 | Best makespan in group=374.00
+[TRAIN] Step 387/400 | 14:54:38
+[TRAIN] Step 387 | Loss=0.000018 | Best makespan in group=346.00
+[TRAIN] Step 388/400 | 14:55:03
+[TRAIN] Step 388 | Loss=1.157847 | Best makespan in group=385.00
+[TRAIN] Step 389/400 | 14:55:36
+[TRAIN] Step 389 | Loss=0.087033 | Best makespan in group=576.00
+[TRAIN] Step 390/400 | 14:55:56
+[TRAIN] Step 390 | Loss=0.400380 | Best makespan in group=382.00
+[TRAIN] Step 391/400 | 14:56:16
+[TRAIN] Step 391 | Loss=0.000012 | Best makespan in group=437.00
+[TRAIN] Step 392/400 | 14:56:35
+[TRAIN] Step 392 | Loss=0.000021 | Best makespan in group=395.00
+[TRAIN] Step 393/400 | 14:57:05
+[TRAIN] Step 393 | Loss=0.001254 | Best makespan in group=472.00
+[TRAIN] Step 394/400 | 14:57:34
+[TRAIN] Step 394 | Loss=4.603882 | Best makespan in group=395.00
+[TRAIN] Step 395/400 | 14:57:52
+[TRAIN] Step 395 | Loss=0.000014 | Best makespan in group=325.00
+[TRAIN] Step 396/400 | 14:58:25
+[TRAIN] Step 396 | Loss=0.000001 | Best makespan in group=503.00
+[TRAIN] Step 397/400 | 14:58:52
+[TRAIN] Step 397 | Loss=0.000012 | Best makespan in group=412.00
+[TRAIN] Step 398/400 | 14:59:24
+[TRAIN] Step 398 | Loss=0.000001 | Best makespan in group=369.00
+[TRAIN] Step 399/400 | 14:59:51
+[TRAIN] Step 399 | Loss=0.000179 | Best makespan in group=372.00
+[TRAIN] Step 400/400 | 15:00:12
+[TRAIN] Step 400 | Loss=0.000015 | Best makespan in group=416.00
+[TRAIN] Refreshing training instances (step 400)...
+[TRAIN][VAL][ep 400] avg_gap=0.1809 | std_gap=0.1019 | q80_gap=0.2645 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/275956690326174.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1881 | std_gap=0.1020 | q80_gap=0.2662 | n=40
+[TRAIN][15:02:58] Training ended. Validation history and plots updated.
+=== DONE convergence_check_ojm_gat in 18586.9s ===

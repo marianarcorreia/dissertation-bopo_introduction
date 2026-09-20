@@ -1,3 +1,4 @@
+import math
 import os
 import shutil
 import sys
@@ -83,7 +84,31 @@ def train(max_episodes = 10,
          # its own samples, so a near-uniform initial policy barely learns anything from
          # the pairwise preference loss (see the module docstring). 0 disables it and
          # matches the old behavior exactly.
-         warm_start_steps=200):
+         warm_start_steps=200,
+         # Cosine-decays the optimizer's lr from `lr` down to `lr * lr_min_ratio` over the
+         # BOPO phase (not applied during warm-start). Motivated by the oo/gin lr=5e-4 vs
+         # lr=2e-4 ablation: the higher lr moves faster early but gets noisier late in
+         # training (checkpoint-to-checkpoint std nearly 2x higher), while the lower lr is
+         # calmer but slower to start. Decaying gets both instead of forcing one fixed
+         # trade-off per representation/backbone.
+         lr_min_ratio=0.2,
+         # Selects the checkpoint to save/report by a moving average of the last
+         # checkpoint_smooth_window validation avg_gaps, not the single best one. A single
+         # checkpoint's avg_gap on only validation_size instances is noisy (see the oo/gin
+         # lr ablation and ojm/gat's val/test gap in conversation - both were artifacts of
+         # this): requiring a SUSTAINED good streak before saving means the reported model
+         # is one that's reliably good, not one that got lucky once.
+         checkpoint_smooth_window=3,
+         # Reproducibility: if set, seeds random/numpy/torch before anything else runs, so
+         # a given (seed, hyperparameters) pair always trains the same instances in the
+         # same order. None (default) matches the old unseeded behavior.
+         seed=None):
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
     #inicialização
     #NOTA: "max_episodes" passou a contar passos de treino do BOPO, não episódios PPO.
     #Cada passo amostra B trajetórias paralelas da MESMA instância e faz UMA atualização
@@ -91,8 +116,8 @@ def train(max_episodes = 10,
     print("=" * 60)
     print("[TRAIN] Training started at:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print(f"[TRAIN] Hyperparams | max_steps={max_episodes} | new_freq={new_freq}")
-    print(f"[TRAIN]             | n_cases={n_cases} | B={B} | K={K} | use_greedy={use_greedy} | lr={lr}")
-    print(f"[TRAIN]             | warm_start_steps={warm_start_steps}")
+    print(f"[TRAIN]             | n_cases={n_cases} | B={B} | K={K} | use_greedy={use_greedy} | lr={lr} (decaying to {lr*lr_min_ratio:.2e})")
+    print(f"[TRAIN]             | warm_start_steps={warm_start_steps} | checkpoint_smooth_window={checkpoint_smooth_window} | seed={seed}")
     print(f"[TRAIN]             | hidden_channels={hidden_channels} | num_layers={num_layers} | heads={heads}")
     print(f"[TRAIN] Representation | {representation} | GNN | {gnn_type}")
     print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[5,{op_max}] | max_proc={max_processing}")
@@ -144,10 +169,11 @@ def train(max_episodes = 10,
     validation_history = []
     episode_metrics = []
     update_metrics = []
-    best_avg_gap = float('inf')
+    best_avg_gap = float('inf')  # tracks the SMOOTHED avg_gap (see checkpoint_smooth_window)
     best_q80_gap = float('inf')
     best_difference = 0.0
     best_model_path = None
+    validation_gap_window: list = []
     step_number = 1
     #ordem (baralhada) das instâncias de treino dentro de cada "epoch" sobre o pool atual
     instance_order = []
@@ -157,6 +183,14 @@ def train(max_episodes = 10,
         if step_number > max_episodes:
             break
         print(f"[TRAIN] Step {step_number}/{max_episodes} | {datetime.now().strftime('%H:%M:%S')}")
+
+        # Cosine-decay the optimizer's lr over the BOPO phase (warm-start already ran at
+        # the full, undecayed lr).
+        progress = 0.0 if max_episodes <= 1 else (step_number - 1) / (max_episodes - 1)
+        cosine = 0.5 * (1 + math.cos(math.pi * progress))
+        current_lr = lr * (lr_min_ratio + (1 - lr_min_ratio) * cosine)
+        for param_group in bopo_agent.optimizer.param_groups:
+            param_group['lr'] = current_lr
 
         if not instance_order:
             instance_order = list(range(len(env.instances)))
@@ -172,6 +206,7 @@ def train(max_episodes = 10,
         update_entry = {
             "episode": step_number,
             "actor_loss": float(loss),
+            "lr": float(current_lr),
             "update_duration_sec": float(update_duration_sec),
             **entropy_stats,
         }
@@ -194,9 +229,20 @@ def train(max_episodes = 10,
             validation_std_gap = float(val_metrics["std_gap"])
             validation_q80_gap = float(val_metrics["q80_gap"])
             best_q80_gap = min(best_q80_gap, validation_q80_gap)
+
+            # Moving average over the last checkpoint_smooth_window validation checkpoints
+            # (including this one) - the actual criterion for "improved"/saved below, so a
+            # single lucky checkpoint on only validation_size instances can't get crowned
+            # "best" on its own; it has to be part of a sustained good streak.
+            validation_gap_window.append(validation_avg_gap)
+            if len(validation_gap_window) > checkpoint_smooth_window:
+                validation_gap_window.pop(0)
+            smoothed_avg_gap = sum(validation_gap_window) / len(validation_gap_window)
+
             history_entry = {
                 "episode": step_number,
                 "avg_gap": validation_avg_gap,
+                "smoothed_avg_gap": smoothed_avg_gap,
                 "std_gap": validation_std_gap,
                 "q80_gap": validation_q80_gap,
                 "all_gaps": val_metrics["all_gaps"],
@@ -205,13 +251,13 @@ def train(max_episodes = 10,
             validation_history = output_manager.append_validation_history(validation_history, history_entry)
             output_manager.plot_validation_gap(validation_history)
 
-            if val_metrics["avg_gap"] < best_avg_gap:
-                improvement = 0.0 if np.isinf(best_avg_gap) else best_avg_gap - val_metrics["avg_gap"]
+            if smoothed_avg_gap < best_avg_gap:
+                improvement = 0.0 if np.isinf(best_avg_gap) else best_avg_gap - smoothed_avg_gap
                 best_difference = max(best_difference, float(improvement))
-                best_avg_gap = val_metrics["avg_gap"]
+                best_avg_gap = smoothed_avg_gap
 
                 name = str(int(random.uniform(10**10, 10**15)))
-                print(f"[TRAIN] Validation improved | avg_gap={best_avg_gap:.4f} | saving candidate: {name}.pth")
+                print(f"[TRAIN] Validation improved | smoothed_avg_gap={best_avg_gap:.4f} (raw={validation_avg_gap:.4f}) | saving candidate: {name}.pth")
                 with open('candidate_models/model_params.json', 'r') as infile:
                     model_params = json.load(infile)
 
@@ -226,6 +272,7 @@ def train(max_episodes = 10,
                     "gnn_type": gnn_type,
                     "all_val_results": val_metrics["all_gaps"],
                     "avg_gap": val_metrics["avg_gap"],
+                    "smoothed_avg_gap": smoothed_avg_gap,
                     "std_gap": val_metrics["std_gap"],
                     "q80_gap": val_metrics["q80_gap"],
                     "validation_instances": [v["name"] for v in validation_set],
