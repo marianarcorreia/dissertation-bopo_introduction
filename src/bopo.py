@@ -1,13 +1,17 @@
+from typing import List, Optional, cast
 import torch
 import torch.nn as nn
-from torch_geometric.nn import GATv2Conv, Linear, to_hetero #camadas do GNN
+from torch_geometric.nn import Linear, to_hetero #camadas do GNN
 from torch_geometric.data import HeteroData, Batch
 from torch.distributions import Categorical #dist. de probab. para ações
 import random
 import os
 from torch.nn.parameter import UninitializedBuffer, UninitializedParameter
 
-from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy
+from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy, compute_actor_grad_norm
+from src.gat import GAT
+from src.gine import GINModel
+from src.transformer import TransformerModel
 
 # Controlled by FJSP_DEBUG (same variable as env.py)
 # 1=BOPO lifecycle  2=+forward/action  3=+update internals
@@ -26,41 +30,23 @@ if(torch.cuda.is_available()) and random.random()<1:
 else:
     _dbg(1, "Device set to: cpu")
 
-#GAT
-class GAT(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2):
-        super().__init__()
-        self.lin1 = Linear(-1, 8) #camada linear inicial, -1 porque significa que se infere automaticamente o tamanho de entrada, e 8 apenas pq dava.
-        self.s = torch.nn.Softmax(dim=0) #softmax para as atenções
-        self.tanh = nn.Tanh() #função de ativação
-        self.num_layers = num_layers
-
-        self.convs = torch.nn.ModuleList()
-        for _ in range(num_layers):
-            conv = GATv2Conv(-1, hidden_channels, add_self_loops=False, edge_dim=5, heads = heads) #edge_dim são as features das arestas, os self loops estão desativados porque estes já estão explicitos no grafo
-            self.convs.append(conv)
-
-    def forward(self, x, edge_index, edge_attr_dict):
-        _dbg(3, f"  GAT.forward | x.shape={x.shape}")
-        x = self.lin1(x) #features projetadas para a dimensão 8
-        x = self.tanh(x) #função de ativação - introduz não linearidade e mantem valores entre -1 e 1
-        for conv in self.convs:
-            x = conv(x, edge_index, edge_attr_dict)
-        #ativação final - após todas as camadas de conv. Embeding adequados para serem usados pelo ator.
-        x = self.tanh(x)
-        _dbg(3, f"  GAT.forward done | out.shape={x.shape}")
-        return x
-
 #BOPO não tem critic: o único modelo treinado é o ator, que atribui um score a cada aresta
 #maquina->job candidata. Sem baseline/valor de estado, porque a loss do BOPO (SROLoss)
 #compara diretamente a log-likelihood de trajetórias completas, em vez de usar uma vantagem.
 class ActorModel(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3):
+    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat'):
         super().__init__()
-        _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads}")
-        #modelo gat homegeneo, apenas processa um tipo de no e de aresta
-        self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
-        #to_hetero converte o modelo GAT para um modelo heterogeneo
+        _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+        #modelo gnn homogeneo, apenas processa um tipo de no e de aresta
+        if gnn_type == 'gat':
+            self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+        elif gnn_type == 'gin':
+            self.gnn = GINModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+        elif gnn_type == 'transformer':
+            self.gnn = TransformerModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+        else:
+            raise ValueError(f"Unknown gnn_type: {gnn_type!r} (expected 'gat', 'gin' or 'transformer')")
+        #to_hetero converte o modelo homogeneo para um modelo heterogeneo
         self.gnn = to_hetero(self.gnn, metadata=metadata, aggr='mean')
         #um score por aresta
         self.lin3 = Linear(-1, 1)
@@ -78,28 +64,35 @@ class ActorModel(torch.nn.Module):
 
 
 class Policy(nn.Module):
-    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3):
+    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat'):
         super(Policy, self).__init__()
-        _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads}")
-        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads)
+        _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+        self.gnn_type = gnn_type
+        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type)
         self.metadata = metadata
         self.soft = torch.nn.Softmax(dim=0)
 
     def forward(self):
         raise NotImplementedError
 
-    #seleciona uma ação para um único grafo (não em batch) - usado em teste/validação
-    def act(self, state, sample, num):
+    #distribuição de ações mascarada para um único grafo (não em batch), com gradiente -
+    #usada por act() (amostragem) e pela fase de warm-start (behavior cloning, ver
+    #src/bopo_utils.py:run_behavior_cloning) que ajusta a política a uma ação especialista
+    #por cross-entropy antes do BOPO propriamente dito começar.
+    def action_distribution(self, state):
         action_probs = self.actor(state).T[0]
         action_probs[state[('machine','exec','job')].mask] = float("-inf")
         action_probs = self.soft(action_probs)
+        return Categorical(action_probs)
 
-        dist = Categorical(action_probs)
+    #seleciona uma ação para um único grafo (não em batch) - usado em teste/validação
+    def act(self, state, sample, num):
+        dist = self.action_distribution(state)
 
         if sample == 0:
             action = dist.sample()
         else:
-            action = torch.argmax(action_probs)
+            action = torch.argmax(dist.probs)
 
         action_logprob = dist.log_prob(action)
         _dbg(2, f"  act() | step={num} | sample_mode={sample} | chosen_edge={int(action)} | logprob={float(action_logprob):.4f} | n_valid={int((~state[('machine','exec','job')].mask).sum())}")
@@ -140,8 +133,8 @@ class Policy(nn.Module):
 
 class BOPO:
     def __init__(self, lr, env, metadata, hidden_channels=128, num_layers=2, heads=3,
-                 B=16, K=8, use_greedy=True):
-        _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads}")
+                 B=16, K=8, use_greedy=True, gnn_type='gat'):
+        _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
 
         self.env = env
         self.metadata = metadata
@@ -149,7 +142,7 @@ class BOPO:
         self.K = K
         self.use_greedy = use_greedy
 
-        self.policy = Policy(metadata, hidden_channels, num_layers, heads).to(device)
+        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type).to(device)
         self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
 
     #inferência de uma única trajetória (usada por test_model/run_validation) - mantém a
@@ -170,7 +163,9 @@ class BOPO:
         states = [e.reset(sel_index=instance_index) for e in rollout_envs]
 
         active = list(range(self.B))
-        logp_sum = [None] * self.B
+        # Keep the accumulated log-probabilities typed as optional tensors until
+        # each rollout has taken its first action.
+        logp_sum: List[Optional[torch.Tensor]] = [None] * self.B
         logp_count = [0] * self.B
         rounds = 0
         all_entropies = []
@@ -190,7 +185,8 @@ class BOPO:
             still_active = []
             for j, i in enumerate(active):
                 lp = logprobs[j]
-                logp_sum[i] = lp if logp_sum[i] is None else logp_sum[i] + lp
+                prev = logp_sum[i]
+                logp_sum[i] = lp if prev is None else prev + lp
                 logp_count[i] += 1
                 all_entropies.append(float(entropies[j].item()))
                 all_valid_counts.append(valid_counts[j])
@@ -203,25 +199,31 @@ class BOPO:
 
         assert all(count > 0 for count in logp_count), "every rollout must take at least one decision step"
         makespans = torch.tensor([e.mk for e in rollout_envs], dtype=torch.float32, device=device)
-        mean_logp = torch.stack([logp_sum[i] / logp_count[i] for i in range(self.B)])
+        # Total trajectory log-likelihood, NOT averaged by decision count: different
+        # rollouts of the same instance can take a different number of policy decisions
+        # (auto-forced single-valid-action steps aren't counted), so dividing by
+        # logp_count made "better" trajectories with fewer decisions artificially
+        # comparable in scale to "worse" ones with more - diluting the preference signal.
+        logp_total = torch.stack([cast(torch.Tensor, logp_sum[i]) for i in range(self.B)])
         entropy_stats = summarize_action_entropy(all_entropies, all_valid_counts)
         _dbg(2, f"  sample_group | instance={instance_index} | rounds={rounds} | makespans min/mean/max={float(makespans.min()):.2f}/{float(makespans.mean()):.2f}/{float(makespans.max()):.2f}")
-        return mean_logp, makespans, rounds, entropy_stats
+        return logp_total, makespans, rounds, entropy_stats
 
     #um passo de treino do BOPO: amostra o grupo de B soluções, auto-rotula pares
     #(melhor vs. K-1 piores) e otimiza a SROLoss (loss de ranking, sem critic/vantagem).
     def update(self, instance_index):
-        mean_logp, makespans, rounds, entropy_stats = self.sample_group(instance_index)
+        logp_total, makespans, rounds, entropy_stats = self.sample_group(instance_index)
 
         best_idx, worse_idx = select_pairs(makespans.detach(), self.K)
         pair_losses = [
-            sro_loss(mean_logp[best_idx], mean_logp[w], float(makespans[best_idx]), float(makespans[w]))
+            sro_loss(logp_total[best_idx], logp_total[w], float(makespans[best_idx]), float(makespans[w]))
             for w in worse_idx.tolist()
         ]
         loss = torch.stack(pair_losses).mean()
 
         self.optimizer.zero_grad()
         loss.backward()
+        entropy_stats["actor_grad_norm"] = compute_actor_grad_norm(self.policy.actor)
         self.optimizer.step()
 
         loss_val = float(loss.item())

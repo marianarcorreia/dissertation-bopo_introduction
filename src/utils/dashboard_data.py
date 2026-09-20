@@ -3,7 +3,7 @@
 import glob
 import json
 import os
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import numpy as np
 import pandas as pd
@@ -107,6 +107,7 @@ def list_all_runs() -> list[dict]:
             "has_test_scores": bool(_test_score_files(path)),
             "representation": None,
             "summary": {},
+            "gnn_type": None,
             "last_modified": os.path.getmtime(path),
         }
         summary_path = os.path.join(path, "run_summary.json")
@@ -135,6 +136,7 @@ def list_all_runs() -> list[dict]:
             "has_test_scores": True,
             "representation": None,
             "summary": {"files": loose_files},
+            "gnn_type": None,
             "last_modified": max(mtimes),
         })
 
@@ -174,17 +176,17 @@ def _load_json(path: str) -> list | dict:
 
 @_cache_data(show_spinner=False, ttl=5)
 def load_episode_metrics(run_path: str) -> list[dict]:
-    return _load_json(os.path.join(run_path, "episode_metrics.json"))
+    return cast(list[dict], _load_json(os.path.join(run_path, "episode_metrics.json")))
 
 
 @_cache_data(show_spinner=False, ttl=5)
 def load_validation_history(run_path: str) -> list[dict]:
-    return _load_json(os.path.join(run_path, "validation_history.json"))
+    return cast(list[dict], _load_json(os.path.join(run_path, "validation_history.json")))
 
 
 @_cache_data(show_spinner=False, ttl=5)
 def load_update_metrics(run_path: str) -> list[dict]:
-    return _load_json(os.path.join(run_path, "update_metrics.json"))
+    return cast(list[dict], _load_json(os.path.join(run_path, "update_metrics.json")))
 
 
 @_cache_data(show_spinner=False, ttl=5)

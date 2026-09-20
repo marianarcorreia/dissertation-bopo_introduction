@@ -61,13 +61,13 @@ def parse_args():
         help="[train] Number of BOPO training steps. [optuna] Training steps per trial.",
     )
     parser.add_argument(
-        "--val-data",
-        default="gen",
-        choices=["our", "gen"],
-        help="[train] Validation data source (reserved: src.train.train() currently always "
-             "builds its validation set from val/instances + val/solutions).",
+        "--gnn-type",
+        default="gat",
+        choices=["gat", "gin", "transformer"],
+        help="[train] GNN backbone used by the actor: 'gat' (GATv2Conv, attention-based), "
+             "'gin' (GINEConv, sum-aggregation with edge features) or 'transformer' "
+             "(TransformerConv, multi-head query/key/value attention with edge features).",
     )
-
     test_group = parser.add_argument_group("test mode")
     test_group.add_argument("--models-file", default="models/model_params.json",
                              help="[test] Path to model_params.json.")
@@ -89,9 +89,13 @@ def parse_args():
     optuna_group.add_argument("--validation-freq", type=int, default=10,
                                help="[optuna] Validation frequency in episodes.")
     optuna_group.add_argument("--validation-size", type=int, default=30,
-                               help="[optuna] Validation sample size when --valdata=our.")
-    optuna_group.add_argument("--valdata", choices=["fixed", "our", "gen"], default="fixed",
-                               help="[optuna] Validation dataset strategy.")
+                               help="[optuna] Size of EACH split (validation and test) the first "
+                                    "time they're generated; ignored afterwards so every trial "
+                                    "stays comparable (see --rebuild-validation-set).")
+    optuna_group.add_argument("--rebuild-validation-set", action="store_true",
+                               help="[optuna] Force-regenerate the fixed validation/test split "
+                                    "at --validation-size. Only do this deliberately - it makes "
+                                    "prior runs/trials incomparable to ones made after a rebuild.")
     optuna_group.add_argument("--sampler-seed", type=int, default=42,
                                help="[optuna] Seed for the Optuna TPE sampler.")
     optuna_group.add_argument("--storage", default=None,
@@ -117,8 +121,8 @@ def run_train(args):
     multi = len(reps) > 1
     for rep in reps:
         run_name = f"{args.run_name}_{rep}" if multi else args.run_name
-        print(f"[MAIN] Training representation={rep} | run_name={run_name}")
-        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes)
+        print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type}")
+        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type)
 
 
 def run_test(args):
@@ -142,7 +146,7 @@ def run_optuna(args):
         max_episodes=args.max_episodes,
         validation_freq=args.validation_freq,
         validation_size=args.validation_size,
-        valdata=args.valdata,
+        rebuild_validation_set=args.rebuild_validation_set,
         sampler_seed=args.sampler_seed,
         storage=args.storage,
         timeout=args.timeout,
@@ -163,6 +167,8 @@ if __name__ == "__main__":
     print(f"[MAIN] run_name={args.run_name}")
     if args.mode in ("train", "optuna"):
         print(f"[MAIN] representation(s)={_resolve_representations(args.representation)}")
+    if args.mode == "train":
+        print(f"[MAIN] gnn_type={args.gnn_type}")
     print("=" * 60)
 
     _DISPATCH[args.mode](args)

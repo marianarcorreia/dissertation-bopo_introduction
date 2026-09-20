@@ -37,16 +37,16 @@ def shared_training_run_selector(
     # "default value but also set via Session State" warning on every rerun.
     if SHARED_TRAINING_REPRESENTATION_KEY in st.session_state:
         st.session_state[SHARED_TRAINING_REPRESENTATION_KEY] = [
-            r for r in st.session_state[SHARED_TRAINING_REPRESENTATION_KEY] if r in representations
+            r
+            for r in st.session_state[SHARED_TRAINING_REPRESENTATION_KEY]
+            if r in representations
         ]
-        rep_kwargs = {}
     else:
-        rep_kwargs = {"default": representations}
+        st.session_state[SHARED_TRAINING_REPRESENTATION_KEY] = representations.copy()
     selected_reps = st.sidebar.multiselect(
         "Representation",
         representations,
         key=SHARED_TRAINING_REPRESENTATION_KEY,
-        **rep_kwargs,
     )
 
     available_names = [

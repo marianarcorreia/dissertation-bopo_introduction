@@ -97,6 +97,9 @@ for r in all_runs:
         "name": r["name"],
         "type": r["type"],
         "representation": r["representation"],
+        "episode_count": summary.get("episodes_completed"),
+        "best_validation_episode": summary.get("best_validation_episode"),
+        "gnn_type": r.get("gnn_type"),
         "best_validation_avg_gap": summary.get("best_validation_avg_gap"),
         "episodes_completed": summary.get("episodes_completed"),
         "total_runtime_sec": summary.get("total_runtime_sec"),
@@ -208,3 +211,4 @@ st.divider()
 st.page_link("pages/1_Training_Metrics.py", label="→ Training metrics deep dive", icon="📈")
 st.page_link("pages/2_Benchmark_and_Test_Results.py", label="→ Benchmark / test results", icon="🧪")
 st.page_link("pages/3_Optuna_Trials.py", label="→ Optuna trial comparison", icon="🔬")
+st.page_link("pages/4_Graph.py", label="→ Disjunctive graph viewer", icon="🕸️")

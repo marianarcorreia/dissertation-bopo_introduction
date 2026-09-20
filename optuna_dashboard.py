@@ -16,6 +16,7 @@ from typing import Any
 import altair as alt
 import pandas as pd
 import streamlit as st
+from streamlit.errors import StreamlitAPIException
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -213,7 +214,7 @@ def load_study_data(study_dir_str: str) -> tuple[pd.DataFrame, pd.DataFrame]:
 def main() -> None:
     try:
         st.set_page_config(page_title="Optuna Trial Comparison", layout="wide", page_icon="🔬")
-    except st.errors.StreamlitAPIException:
+    except StreamlitAPIException:
         pass  # already set by the caller (e.g. when embedded as a dashboard page)
     register_theme()
     st.title("Optuna Study Trial Comparison")

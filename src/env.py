@@ -1,5 +1,4 @@
-#import necessary libraries and modules for the environment. 
-import copy #used for creating deep copies of the state to avoid unintended modifications   
+#import necessary libraries and modules for the environment.
 import importlib
 gym = importlib.import_module("gymnasium") #ambiente de rl
 import numpy as np #mathematical operations and array manipulations
@@ -151,7 +150,7 @@ class FJSSPEnv(gym.Env):
         #reinica para estado inicial
         self.num_steps = 0
         self.change_machine = 0
-        self.state: Any = copy.deepcopy(self.data)
+        self.state: Any = self.data.clone()
 
         self.job_start_machines = torch.empty((self.num_jobs,self.num_machines)) #o instante que apartir dai o job j começa na máquina m
         self.current_job_proc = torch.zeros((self.num_jobs,self.num_machines)) #o tempo de processamento
@@ -195,32 +194,50 @@ class FJSSPEnv(gym.Env):
             mask_matrix = self.job_start_machines
         else:
             mask_matrix = self.job_start_machines + self.current_job_proc
-        
-        smallest = torch.unique(torch.topk(torch.flatten(mask_matrix), k = self.sel_k, largest = False, dim = 0).values) #encontra os sel_k menores, mais promissores
-        min_jobs = torch.tensor([], dtype=torch.long)
-        min_machines = torch.tensor([], dtype=torch.long)
 
-        for s in smallest: #encontra que jobs e máquinas correspondem a esses menores valores, ou seja, quais são os candidatos mais promissores para serem escalonados a seguir com base no critério selecionado. Ele percorre os valores únicos dos menores tempos encontrados e utiliza a função nonzero para obter as posições (índices) no mask_matrix onde esses valores ocorrem. Os índices das máquinas e dos jobs correspondentes a esses valores são então concatenados em min_machines e min_jobs, respectivamente, para formar uma lista de candidatos válidos para a próxima ação.
-            mj , mm = (mask_matrix == s).nonzero(as_tuple=True)
-            min_machines = torch.concat([min_machines, mm])
-            min_jobs = torch.concat([min_jobs, mj])
+        # Keep the sel_k best candidate machines PER JOB, not the sel_k best (job,machine)
+        # pairs globally across the whole matrix. A global top-k collapses to a single
+        # deterministic action once other jobs finish (or whenever sel_k is small, e.g.
+        # the default sel_k=1), leaving the policy nothing to actually decide. Doing the
+        # top-k per row instead keeps every job that still has a pending operation with
+        # up to sel_k real candidates, and is done via one vectorized gather - no python
+        # loop over (job, machine) pairs or edge_index comparisons.
+        SENTINEL = 10000.0
+        k = max(1, int(self.sel_k))
+        valid = mask_matrix < SENTINEL
+        ranked = torch.where(valid, mask_matrix, torch.full_like(mask_matrix, float("inf")))
+        keep = torch.zeros_like(valid)
+        for j in range(ranked.shape[0]):
+            n_valid = int(valid[j].sum().item())
+            if n_valid == 0:
+                continue
+            _, top_idx = torch.topk(ranked[j], k=min(k, n_valid), largest=False)
+            keep[j, top_idx] = True
 
-        #cada par sel, encontra se o índice da aresta correspondente no grafo de dados 
-        pairs = torch.stack([min_machines, min_jobs]).T
-        indexes = []
-        for p in pairs:
-            aux =self.state['machine', 'exec', 'job'].edge_index.T == p
-            aux = np.logical_and(aux[:,0], aux[:,1])
-            indexes = indexes + [i for i, val in enumerate(aux) if val==1] 
+        edge_index = self.state['machine', 'exec', 'job'].edge_index
+        machine_idx, job_idx = edge_index[0], edge_index[1]
+        mask = ~keep[job_idx, machine_idx]
 
-        #cria mascara final, true-açao bloqueada, false-açao válida.
-        res = [True]*self.state['machine', 'exec', 'job'].edge_index.shape[1]
-        for i in indexes:
-            res[i] = False
-        
-        self.state['machine', 'exec', 'job'].mask = torch.BoolTensor(res)
-        _dbg(2, f"    calculate_mask() done | total_edges={len(res)} | unmasked={res.count(False)} | masked={res.count(True)}")
-    
+        self.state['machine', 'exec', 'job'].mask = mask
+        # Kept for expert_action() below (BOPO's warm-start behavior-cloning phase),
+        # so the same earliest-completion-time criterion used to build the mask doubles
+        # as the teacher's priority rule - no separate heuristic to keep in sync.
+        self._last_mask_matrix = mask_matrix
+        _dbg(2, f"    calculate_mask() done | total_edges={mask.numel()} | unmasked={int((~mask).sum())} | masked={int(mask.sum())}")
+
+    def expert_action(self):
+        """Earliest-completion-time dispatch rule: among the currently unmasked
+        (machine, job) candidates, pick the one with the smallest priority value under
+        the same criterion used to build the action mask (self._last_mask_matrix from
+        calculate_mask()). Used as the teacher for BOPO's warm-start behavior-cloning
+        phase (src/bopo_utils.py:run_behavior_cloning)."""
+        edge_index = self.state['machine', 'exec', 'job'].edge_index
+        machine_idx, job_idx = edge_index[0], edge_index[1]
+        values = self._last_mask_matrix[job_idx, machine_idx].clone()
+        mask = self.state['machine', 'exec', 'job'].mask
+        values[mask] = float("inf")
+        return int(torch.argmin(values).item())
+
     def calculate_next_state(self):
         #atualiza a ft 2 das maq. - tempo livre relativo ao mínimo
         self.state["machine"].x[:,2] = self.state["machine"].x[:,0] - torch.min(self.state["machine"].x[:,0])
@@ -361,15 +378,17 @@ class FJSSPEnv(gym.Env):
     
     #normaliza as features dos nós e arestas para o intervalo [-1, 1]. Isso é feito para cada tipo de nó (job, operation, machine) e para as arestas entre operações e máquinas. A normalização é realizada usando a fórmula (2*(x - min)/(max - min + 1e-7) - 1), onde x é o valor da feature, min é o valor mínimo da feature no conjunto de dados, max é o valor máximo da feature no conjunto de dados, e 1e-7 é um pequeno valor adicionado para evitar divisão por zero. Essa normalização ajuda a estabilizar o treinamento do agente de aprendizado por reforço, garantindo que as features estejam em uma escala consistente.
     def normalize_state(self, state):
-        state = copy.deepcopy(state)
-        for i in range(state["job"].x.shape[1]):
-            state["job"].x[:,i] = (2*(state["job"].x[:,i] - state["job"].x[:,i].min())/(state["job"].x[:,i].max() - state["job"].x[:,i].min() + 1e-7 )-1).float()
-        
-        for i in range(state["operation"].x.shape[1]):
-            state["operation"].x[:,i] = (2*(state["operation"].x[:,i] - state["operation"].x[:,i].min())/(state["operation"].x[:,i].max() - state["operation"].x[:,i].min() + 1e-7 )-1).float()
-        
-        for i in range(state["machine"].x.shape[1]):
-            state["machine"].x[:,i] = (2*(state["machine"].x[:,i] - state["machine"].x[:,i].min())/(state["machine"].x[:,i].max() - state["machine"].x[:,i].min() + 1e-7 )-1).float()
+        # .clone() (PyG's per-tensor clone) instead of copy.deepcopy(): normalize_state()
+        # is called every decision round for every active rollout in BOPO's sample_group,
+        # and generic deepcopy's recursive python traversal of the whole HeteroData object
+        # graph was ~4x slower than cloning the stored tensors directly - a major chunk of
+        # BOPO's per-update wall-clock time.
+        state = state.clone()
+        for node_type in ("job", "operation", "machine"):
+            x = state[node_type].x
+            mins = x.min(dim=0, keepdim=True).values
+            maxs = x.max(dim=0, keepdim=True).values
+            state[node_type].x = (2 * (x - mins) / (maxs - mins + 1e-7) - 1).float()
 
         state[('operation', 'exec', 'machine')].edge_attr = (2*(state[('operation', 'exec', 'machine')].edge_attr -  state[('operation', 'exec', 'machine')].edge_attr.min())/(state[('operation', 'exec', 'machine')].edge_attr.max() - state[('operation', 'exec', 'machine')].edge_attr.min() + 1e-7 )-1).float()
         state[('machine', 'exec', 'operation')].edge_attr = (2*(state[('machine', 'exec', 'operation')].edge_attr -  state[('machine', 'exec', 'operation')].edge_attr.min())/(state[('machine', 'exec', 'operation')].edge_attr.max() - state['machine', 'exec', 'operation'].edge_attr.min() + 1e-7 )-1).float()

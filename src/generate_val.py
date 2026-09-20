@@ -17,10 +17,10 @@ def generate_val(n_cases):
 
     val_config = {
         "n_cases": n_cases,
-        "range_jobs": (5, 15),
-        "range_machines": (4, 13),
-        "range_op_per_job": (4, 9),
-        "max_processing": 25
+        "range_jobs": (8, 10),
+        "range_machines": (5, 10),
+        "range_op_per_job": (5, 6),
+        "max_processing": 100
     }
     print(f"[VAL] Config: {val_config}")
 
