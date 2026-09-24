@@ -1,0 +1,72 @@
+============================================================
+[TRAIN] Training started at: 2026-09-24 11:35:10
+[TRAIN] Hyperparams | max_steps=400 | new_freq=200
+[TRAIN]             | n_cases=30 | B=32 | K=10 | use_greedy=True | lr=0.0005 (decaying to 1.00e-04)
+[TRAIN]             | warm_start_steps=200 | checkpoint_smooth_window=3 | seed=42
+[TRAIN]             | hidden_channels=128 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | transformer
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\ablation_ojm_transformer_layers3_selk2
+[TRAIN] Validation config | every=25 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 200 step(s)...
+[TRAIN][WARMSTART] step 10/200 | instance=28 | bc_loss=1.5172 | decisions=45
+[TRAIN][WARMSTART] step 20/200 | instance=17 | bc_loss=1.8082 | decisions=53
+[TRAIN][WARMSTART] step 30/200 | instance=22 | bc_loss=1.6391 | decisions=44
+[TRAIN][WARMSTART] step 40/200 | instance=11 | bc_loss=1.4374 | decisions=42
+[TRAIN][WARMSTART] step 50/200 | instance=10 | bc_loss=1.6663 | decisions=56
+[TRAIN][WARMSTART] step 60/200 | instance=6 | bc_loss=1.5322 | decisions=48
+[TRAIN][WARMSTART] step 70/200 | instance=1 | bc_loss=1.3894 | decisions=43
+[TRAIN][WARMSTART] step 80/200 | instance=25 | bc_loss=1.6012 | decisions=54
+[TRAIN][WARMSTART] step 90/200 | instance=9 | bc_loss=1.3187 | decisions=44
+[TRAIN][WARMSTART] step 100/200 | instance=25 | bc_loss=1.6149 | decisions=54
+[TRAIN][WARMSTART] step 110/200 | instance=9 | bc_loss=1.2420 | decisions=44
+[TRAIN][WARMSTART] step 120/200 | instance=5 | bc_loss=1.3991 | decisions=53
+[TRAIN][WARMSTART] step 130/200 | instance=23 | bc_loss=0.9843 | decisions=42
+[TRAIN][WARMSTART] step 140/200 | instance=1 | bc_loss=1.3592 | decisions=43
+[TRAIN][WARMSTART] step 150/200 | instance=23 | bc_loss=0.8812 | decisions=42
+[TRAIN][WARMSTART] step 160/200 | instance=18 | bc_loss=1.2977 | decisions=45
+[TRAIN][WARMSTART] step 170/200 | instance=25 | bc_loss=1.6184 | decisions=54
+[TRAIN][WARMSTART] step 180/200 | instance=0 | bc_loss=1.2314 | decisions=50
+[TRAIN][WARMSTART] step 190/200 | instance=10 | bc_loss=1.3992 | decisions=56
+[TRAIN][WARMSTART] step 200/200 | instance=21 | bc_loss=1.0814 | decisions=45
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 400 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/400 | 11:50:57
+[TRAIN] Step 1 | Loss=6.294271 | Best makespan in group=594.00
+[TRAIN] Step 2/400 | 11:51:28
+[TRAIN] Step 2 | Loss=1.648164 | Best makespan in group=512.00
+[TRAIN] Step 3/400 | 11:52:32
+[TRAIN] Step 3 | Loss=0.165801 | Best makespan in group=443.00
+[TRAIN] Step 4/400 | 11:52:56
+[TRAIN] Step 4 | Loss=5.769408 | Best makespan in group=491.00
+[TRAIN] Step 5/400 | 11:53:17
+[TRAIN] Step 5 | Loss=0.000000 | Best makespan in group=368.00
+[TRAIN] Step 6/400 | 11:53:43
+[TRAIN] Step 6 | Loss=3.449981 | Best makespan in group=387.00
+[TRAIN] Step 7/400 | 11:54:13
+[TRAIN] Step 7 | Loss=8.902431 | Best makespan in group=422.00
+[TRAIN] Step 8/400 | 11:54:57
+[TRAIN] Step 8 | Loss=-0.000000 | Best makespan in group=368.00
+[TRAIN] Step 9/400 | 11:55:34
+[TRAIN] Step 9 | Loss=0.096838 | Best makespan in group=401.00
+[TRAIN] Step 10/400 | 11:56:11
+[TRAIN] Step 10 | Loss=4.147141 | Best makespan in group=426.00
+[TRAIN] Step 11/400 | 11:56:44
+[TRAIN] Step 11 | Loss=-0.000000 | Best makespan in group=412.00
+[TRAIN] Step 12/400 | 11:57:05
+[TRAIN] Step 12 | Loss=0.003650 | Best makespan in group=416.00
+[TRAIN] Step 13/400 | 11:57:27
+[TRAIN] Step 13 | Loss=2.613705 | Best makespan in group=532.00
+[TRAIN] Step 14/400 | 11:57:54
+[TRAIN] Step 14 | Loss=5.391789 | Best makespan in group=348.00
+[TRAIN] Step 15/400 | 11:58:24
+[TRAIN] Step 15 | Loss=0.000314 | Best makespan in group=549.00
+[TRAIN] Step 16/400 | 11:58:51
+[TRAIN] Step 16 | Loss=0.381781 | Best makespan in group=383.00
+[TRAIN] Step 17/400 | 11:59:18
+[TRAIN] Step 17 | Loss=0.008893 | Best makespan in group=569.00
+[TRAIN] Step 18/400 | 11:59:38

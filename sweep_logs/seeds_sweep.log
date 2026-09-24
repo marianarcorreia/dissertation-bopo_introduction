@@ -2,3 +2,6 @@
 [SWEEP 09-24 08:58:58] [1/27] start seeds_oo_gin_L2_s42
 [SWEEP 09-24 10:21:18] [1/27] done seeds_oo_gin_L2_s42 in 1.4h
 [SWEEP 09-24 10:21:18] [2/27] start seeds_oo_gat_L2_s42
+[CHAIN 09-24 11:11:02] sweep paused; waiting for in-flight seeds_oo_gat_L2_s42 (PID 17312) to finish
+[CHAIN 09-24 11:33:34] seeds_oo_gat_L2_s42 process exited
+[CHAIN 09-24 11:33:34] start ablation_ojm_transformer_layers3_selk2
