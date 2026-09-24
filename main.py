@@ -152,6 +152,7 @@ def run_optuna(args):
         timeout=args.timeout,
         smoke=args.smoke,
         representations=reps,
+        gnn_type=args.gnn_type,
     )
     param_cli.run_tuning(optuna_args)
 
@@ -167,7 +168,7 @@ if __name__ == "__main__":
     print(f"[MAIN] run_name={args.run_name}")
     if args.mode in ("train", "optuna"):
         print(f"[MAIN] representation(s)={_resolve_representations(args.representation)}")
-    if args.mode == "train":
+    if args.mode in ("train", "optuna"):
         print(f"[MAIN] gnn_type={args.gnn_type}")
     print("=" * 60)
 

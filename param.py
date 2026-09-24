@@ -91,6 +91,8 @@ def parse_args() -> argparse.Namespace:
                         help="Quick end-to-end test mode with minimal workload.")
     parser.add_argument("--representations", nargs="+", default=["oo", "om", "ojm"],
                         help="Representations to tune, any of: oo, om, ojm (default: all three).")
+    parser.add_argument("--gnn-type", default="gat", choices=["gat", "gin", "transformer"],
+                        help="GNN backbone used by the actor for every trial (default: gat).")
     parser.add_argument("--no-dashboard", action="store_true",
                         help="Do not auto-launch/open the results dashboard when tuning finishes.")
     return parser.parse_args()
@@ -246,8 +248,12 @@ def last_val_q80(run_name: str) -> float:
 
 def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
     rep_upper = rep.upper()
-    study_name = f"fjsp_tuning_{rep}"
-    study_folder = f"optuna_{rep}_{int(time.time())}"  # one folder per study, shared by all trials
+    gnn_type = getattr(args, "gnn_type", "gat")
+    # "gat" keeps the bare (legacy) study name so existing gat studies/trials
+    # stay resumable with no migration; gin/transformer get their own studies.
+    gnn_suffix = "" if gnn_type == "gat" else f"_{gnn_type}"
+    study_name = f"fjsp_tuning_{rep}{gnn_suffix}"
+    study_folder = f"optuna_{rep}_{gnn_type}_{int(time.time())}"  # one folder per study, shared by all trials
     sampler = optuna.samplers.TPESampler(seed=args.sampler_seed)
 
     if args.storage is None:
@@ -271,7 +277,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
         run_name = f"{study_folder}/trial_{trial.number}"
 
         print(
-            f"[PARAM][{rep_upper}] Trial {trial.number} | "
+            f"[PARAM][{rep_upper}] Trial {trial.number} | gnn_type={gnn_type} | "
             f"episodes={effective_max_episodes} | lr={sampled['lr']:.2e} | "
             f"hidden={sampled['hidden_channels']} | layers={sampled['num_layers']} | "
             f"heads={sampled['heads']} | K={sampled['K']} | use_greedy={sampled['use_greedy']} | "
@@ -306,6 +312,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
             validation_size  = effective_val_size,
             run_name         = run_name,
             representation   = rep,
+            gnn_type         = gnn_type,
         )
 
         q80 = last_val_q80(run_name)
@@ -317,6 +324,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
             summary = {}
 
         trial.set_user_attr("run_name",        run_name)
+        trial.set_user_attr("gnn_type",        gnn_type)
         trial.set_user_attr("run_dir",         summary.get("run_dir", ""))
         trial.set_user_attr("best_difference", summary.get("best_difference"))
         trial.set_user_attr("total_runtime_sec", summary.get("total_runtime_sec"))
@@ -324,7 +332,8 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
         return q80
 
     print(
-        f"[PARAM] Starting Optuna study for {rep_upper} | trials={effective_trials} | "
+        f"[PARAM] Starting Optuna study for {rep_upper} | gnn_type={gnn_type} | "
+        f"study_name={study_name} | trials={effective_trials} | "
         f"max_episodes={effective_max_episodes} | "
         f"objective=min(last_val_gap_Q80)"
     )
@@ -337,6 +346,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
 
     best = {
         "representation":       rep,
+        "gnn_type":             gnn_type,
         "study_name":           study_name,
         "objective":            "last_val_gap_Q80",
         "critical_params":      tuned_params,

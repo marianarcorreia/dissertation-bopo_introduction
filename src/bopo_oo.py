@@ -9,7 +9,7 @@ import random
 import os
 from torch.nn.parameter import UninitializedBuffer, UninitializedParameter
 
-from src.bopo_utils import select_pairs, sro_loss, summarize_action_entropy, compute_actor_grad_norm
+from src.bopo_utils import bopo_group_loss, summarize_action_entropy, compute_actor_grad_norm
 from src.gat import GAT
 from src.gine import GINModel
 from src.transformer import TransformerModel
@@ -135,14 +135,19 @@ class Policy(nn.Module):
 
 class BOPO:
     def __init__(self, lr, env, metadata, hidden_channels=128, num_layers=2, heads=3,
-                 B=16, K=8, use_greedy=True, gnn_type='gat'):
-        _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
+                 B=16, K=8, use_greedy=True, gnn_type='gat',
+                 logp_norm='mean', exclude_greedy_from_loss=True):
+        _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type} | logp_norm={logp_norm} | exclude_greedy_from_loss={exclude_greedy_from_loss}")
 
         self.env = env
         self.metadata = metadata
         self.B = B
         self.K = K
         self.use_greedy = use_greedy
+        if logp_norm not in ("mean", "sum"):
+            raise ValueError(f"logp_norm must be 'mean' or 'sum', got {logp_norm!r}")
+        self.logp_norm = logp_norm
+        self.exclude_greedy_from_loss = exclude_greedy_from_loss
 
         self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type).to(device)
         self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
@@ -199,12 +204,15 @@ class BOPO:
 
         assert all(count > 0 for count in logp_count), "every rollout must take at least one decision step"
         makespans = torch.tensor([e.mk for e in rollout_envs], dtype=torch.float32, device=device)
-        # Total trajectory log-likelihood, NOT averaged by decision count: different
-        # rollouts of the same instance can take a different number of policy decisions
-        # (auto-forced single-valid-action steps aren't counted), so dividing by
-        # logp_count made "better" trajectories with fewer decisions artificially
-        # comparable in scale to "worse" ones with more - diluting the preference signal.
+        # Trajectory log-likelihood, summed over decisions and then (logp_norm="mean", the
+        # default) divided by each rollout's own decision count. The raw sum spans ~45
+        # decisions, so best-vs-worst differences quickly exceed what the SRO sigmoid can
+        # use: on the ojm sweep 60-80% of transformer updates had loss < 1e-3 and a median
+        # actor grad norm of ~1e-6..1e-3. The per-decision mean keeps the margin in the
+        # sigmoid's useful range; logp_norm="sum" restores the previous behavior.
         logp_total = torch.stack([cast(torch.Tensor, logp_sum[i]) for i in range(self.B)])
+        if self.logp_norm == "mean":
+            logp_total = logp_total / torch.tensor(logp_count, dtype=logp_total.dtype, device=logp_total.device)
         entropy_stats = summarize_action_entropy(all_entropies, all_valid_counts)
         _dbg(2, f"  sample_group | instance={instance_index} | rounds={rounds} | makespans min/mean/max={float(makespans.min()):.2f}/{float(makespans.mean()):.2f}/{float(makespans.max()):.2f}")
         return logp_total, makespans, rounds, entropy_stats
@@ -214,12 +222,10 @@ class BOPO:
     def update(self, instance_index):
         logp_total, makespans, rounds, entropy_stats = self.sample_group(instance_index)
 
-        best_idx, worse_idx = select_pairs(makespans.detach(), self.K)
-        pair_losses = [
-            sro_loss(logp_total[best_idx], logp_total[w], float(makespans[best_idx]), float(makespans[w]))
-            for w in worse_idx.tolist()
-        ]
-        loss = torch.stack(pair_losses).mean()
+        # rollout 0 is the greedy one whenever use_greedy (see sample_group)
+        greedy_idx = 0 if self.use_greedy else None
+        loss, loss_stats = bopo_group_loss(logp_total, makespans, self.K, greedy_idx, self.exclude_greedy_from_loss)
+        entropy_stats.update(loss_stats)
 
         self.optimizer.zero_grad()
         loss.backward()

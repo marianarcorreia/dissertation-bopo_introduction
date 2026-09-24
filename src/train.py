@@ -102,7 +102,14 @@ def train(max_episodes = 10,
          # Reproducibility: if set, seeds random/numpy/torch before anything else runs, so
          # a given (seed, hyperparameters) pair always trains the same instances in the
          # same order. None (default) matches the old unseeded behavior.
-         seed=None):
+         seed=None,
+         # BOPO loss options (src/bopo_utils.py:bopo_group_loss). "mean" compares
+         # per-decision mean log-likelihoods instead of whole-trajectory sums, and
+         # exclude_greedy_from_loss keeps the greedy rollout out of the preference pairs -
+         # together they stop the SRO loss from saturating to ~0 (no gradient) on most
+         # updates. logp_norm="sum", exclude_greedy_from_loss=False reproduces every run
+         # made before this option existed.
+         logp_norm="mean", exclude_greedy_from_loss=True):
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
@@ -119,6 +126,7 @@ def train(max_episodes = 10,
     print(f"[TRAIN]             | n_cases={n_cases} | B={B} | K={K} | use_greedy={use_greedy} | lr={lr} (decaying to {lr*lr_min_ratio:.2e})")
     print(f"[TRAIN]             | warm_start_steps={warm_start_steps} | checkpoint_smooth_window={checkpoint_smooth_window} | seed={seed}")
     print(f"[TRAIN]             | hidden_channels={hidden_channels} | num_layers={num_layers} | heads={heads}")
+    print(f"[TRAIN]             | logp_norm={logp_norm} | exclude_greedy_from_loss={exclude_greedy_from_loss}")
     print(f"[TRAIN] Representation | {representation} | GNN | {gnn_type}")
     print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[5,{op_max}] | max_proc={max_processing}")
     print("=" * 60)
@@ -152,7 +160,8 @@ def train(max_episodes = 10,
     #cria ambiente de treino
     env = EnvClass(instances, mask_option, sel_k)
     #cria agente BOPO (só ator, sem critic - ver src/bopo_utils.py para a SROLoss)
-    bopo_agent = BOPOClass(lr, env, metadata, hidden_channels, num_layers, heads, B, K, use_greedy, gnn_type=gnn_type)
+    bopo_agent = BOPOClass(lr, env, metadata, hidden_channels, num_layers, heads, B, K, use_greedy, gnn_type=gnn_type,
+                           logp_norm=logp_norm, exclude_greedy_from_loss=exclude_greedy_from_loss)
 
     if warm_start_steps > 0:
         print(f"[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | {warm_start_steps} step(s)...")
@@ -344,6 +353,13 @@ def train(max_episodes = 10,
     summary = {
         "run_name": run_name,
         "representation": rep_name,
+        "gnn_type": gnn_type,
+        "num_layers": int(num_layers),
+        "mask_option": int(mask_option),
+        "sel_k": int(sel_k),
+        "seed": seed,
+        "logp_norm": logp_norm,
+        "exclude_greedy_from_loss": bool(exclude_greedy_from_loss),
         "run_dir": output_manager.run_dir,
         "max_episodes": int(max_episodes),
         "episodes_completed": int(len(episode_metrics)),

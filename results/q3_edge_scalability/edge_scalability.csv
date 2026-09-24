@@ -1,0 +1,7 @@
+representation,size,n_instances,n_ops_total,n_machines,edges_at_start_mean,edges_at_half_mean,edges_at_end_mean,mean_step_time_ms,episode_length_mean
+oo,small (6J x 5M),5,31,5,56.8,56.8,28.8,1.3259474683280454,31.6
+oo,medium (10J x 8M),5,56,8,135.2,135.2,47.2,0.29184833948584865,54.2
+om,small (6J x 5M),5,33,5,209.2,131.0,42.2,2.15351962026057,31.6
+om,medium (10J x 8M),5,57,8,474.6,291.6,102.8,2.3017284091069583,52.8
+ojm,small (6J x 5M),5,32,5,406.6,234.6,69.6,5.713852531641085,31.6
+ojm,medium (10J x 8M),5,54,8,907.6,519.0,123.4,6.313962977099381,52.4

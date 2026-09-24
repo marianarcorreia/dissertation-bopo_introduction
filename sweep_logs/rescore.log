@@ -1,0 +1,29 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+[RESCORE] 21 run(s) matched ['convergence_check_*', 'ablation_*', 'reseed_*', 'seeds_*']
+[RESCORE] ECT heuristic ojm: val=0.3945 test=0.4226
+[RESCORE] ablation_ojm_gat_layers3                 val=0.1292 (reported raw 0.1292) | test=0.1296 (reported 0.1296) | reproduces=True
+[RESCORE] ablation_ojm_gin_layers3                 val=0.1092 (reported raw 0.1092) | test=0.1202 (reported 0.1202) | reproduces=True
+[RESCORE] ablation_ojm_transformer_layers3         val=0.0888 (reported raw 0.0888) | test=0.0944 (reported 0.0944) | reproduces=True
+[RESCORE] ECT heuristic ojm: val=0.3945 test=0.4226
+[RESCORE] convergence_check_ojm_gat                val=0.1682 (reported raw 0.1682) | test=0.1881 (reported 0.1881) | reproduces=True
+[RESCORE] convergence_check_ojm_gin                val=0.1297 (reported raw 0.1297) | test=0.1233 (reported 0.1233) | reproduces=True
+[RESCORE] convergence_check_ojm_gin_fixed          val=0.1598 (reported raw 0.1645) | test=0.1793 (reported 0.1779) | reproduces=False
+[RESCORE] convergence_check_ojm_transformer        val=0.1168 (reported raw 0.1168) | test=0.1252 (reported 0.1252) | reproduces=True
+[RESCORE] ECT heuristic om: val=0.3945 test=0.4226
+[RESCORE] convergence_check_om_gat                 val=0.1325 (reported raw 0.1325) | test=0.1432 (reported 0.1432) | reproduces=True
+[RESCORE] convergence_check_om_gin                 val=0.1266 (reported raw 0.1266) | test=0.1430 (reported 0.1430) | reproduces=True
+[RESCORE] convergence_check_om_gin_fixed           val=0.1692 (reported raw 0.1582) | test=0.1630 (reported 0.1706) | reproduces=False
+[RESCORE] convergence_check_om_transformer         val=0.1337 (reported raw 0.1337) | test=0.1521 (reported 0.1521) | reproduces=True
+[RESCORE] ECT heuristic oo: val=0.1094 test=0.1136
+[RESCORE] convergence_check_oo_gat                 val=0.1418 (reported raw 0.1418) | test=0.1436 (reported 0.1436) | reproduces=True
+[RESCORE] convergence_check_oo_gat_fixed           val=0.1230 (reported raw 0.1201) | test=0.1270 (reported 0.1263) | reproduces=False
+[RESCORE] convergence_check_oo_gin                 val=0.1459 (reported raw 0.1459) | test=0.1386 (reported 0.1386) | reproduces=True
+[RESCORE] convergence_check_oo_gin_fixed           val=0.1284 (reported raw 0.1186) | test=0.1329 (reported 0.1366) | reproduces=False
+[RESCORE] convergence_check_oo_gin_lowlr           val=0.1404 (reported raw 0.1264) | test=0.1400 (reported 0.1528) | reproduces=False
+[RESCORE] convergence_check_oo_transformer         val=0.1006 (reported raw 0.1006) | test=0.1073 (reported 0.1073) | reproduces=True
+[RESCORE] reseed_ojm_gat_s43                       val=0.0969 (reported raw 0.0969) | test=0.1039 (reported 0.1039) | reproduces=True
+[RESCORE] reseed_ojm_gat_s44                       val=0.1068 (reported raw 0.1068) | test=0.1058 (reported 0.1058) | reproduces=True
+[RESCORE] reseed_oo_gin_s43                        val=0.1432 (reported raw 0.1432) | test=0.1363 (reported 0.1363) | reproduces=True
+[RESCORE] reseed_oo_gin_s44                        val=0.1310 (reported raw 0.1310) | test=0.1228 (reported 0.1228) | reproduces=True
+[RESCORE] wrote results\rescore/rescore_summary.csv

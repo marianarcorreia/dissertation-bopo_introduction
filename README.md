@@ -464,5 +464,150 @@ The presentation should deliver:
 4. Value loss comparison: critic MSE curves for R1–R3
 5. Constraint extensibility table: qualitative assessment of G1 vs G2 for SDST and workers
 6. One slide of open questions from Q1–Q6, without answers
-#   d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n  
- 
+
+---
+
+## 7. Results — Final 9-Combination Sweep (2026-09-19)
+
+This section reports the outcome of training all 3×3 combinations of representation
+(G^disj / G^OM / G^OJM, referred to below by their code names `oo`/`om`/`ojm`) and GNN
+backbone (GIN, GAT, Transformer) to 400 episodes each, with validation performed every
+25 episodes on the fixed 40-instance validation set and a final evaluation on the
+held-out 40-instance test set. Raw run data lives in
+`results/convergence_check_<rep>_<backbone>/`; the analysis in this section is
+reproduced by [`compare_final9.py`](compare_final9.py), which writes
+`results/comparison_final9/convergence_summary.csv` and the four figures referenced
+below.
+
+### 7.1 Convergence verdict
+
+A run is called **converged** here if all three hold:
+- **Flat late-phase trend**: the linear-regression slope of the smoothed validation
+  gap over the last 5 checkpoints (episodes 300–400) is below 0.02 gap-points per
+  100 episodes.
+- **Bounded late-phase fluctuation**: the relative range (max−min)/mean of those same
+  5 checkpoints is below 30% — generous given each checkpoint averages only 30–40
+  validation instances.
+- **No validation overfitting**: the held-out test gap does not exceed the best
+  validation gap by more than 6 percentage points.
+
+| Representation | Backbone | Best val. gap | Final val. gap | Test gap (±std) | Gen. gap | Converged |
+|---|---|---|---|---|---|---|
+| Disjunctive (oo) | GIN | 0.159 | 0.190 | 0.139 ± 0.070 | −0.020 | Yes |
+| Disjunctive (oo) | GAT | 0.142 | 0.146 | 0.144 ± 0.072 | +0.002 | Yes |
+| Disjunctive (oo) | Transformer | 0.101 | 0.119 | **0.107 ± 0.056** | +0.007 | Yes |
+| Hetero O-M (om) | GIN | 0.136 | 0.147 | 0.143 ± 0.053 | +0.007 | Yes |
+| Hetero O-M (om) | GAT | 0.135 | 0.144 | 0.143 ± 0.077 | +0.008 | Yes |
+| Hetero O-M (om) | Transformer | 0.140 | 0.134 | 0.152 ± 0.063 | +0.012 | Yes |
+| Hetero O-J-M (ojm) | GIN | 0.132 | 0.130 | 0.123 ± 0.046 | −0.009 | Yes |
+| Hetero O-J-M (ojm) | GAT | 0.166 | 0.181 | 0.188 ± 0.102 | +0.022 | Yes |
+| Hetero O-J-M (ojm) | Transformer | 0.118 | 0.113 | 0.125 ± 0.051 | +0.007 | Yes |
+
+**All 9 combinations meet the convergence criterion** — every learning curve
+(Fig. 1) is flat well before episode 200, and the generalization gap (test gap minus
+best validation gap) is within ±2.2 percentage points for every combination, meaning
+none of the 9 models are overfit to the validation set. This is the evidence that the
+models are learning rather than memorizing or drifting: `oo`/GIN is the only run
+whose *final* checkpoint (episode 400) drifted noticeably above its *best* checkpoint
+(0.190 vs. 0.159), but its test gap (0.139) tracks the *best* checkpoint, not the
+final one, confirming the drift is late-training noise around a converged optimum
+rather than divergence.
+
+Best overall combination on held-out test: **Disjunctive representation + Transformer**
+(test gap 0.107), followed by `ojm`/GIN (0.123) and `ojm`/Transformer (0.125). Weakest:
+`ojm`/GAT (0.188).
+
+### 7.2 Evidence toward the research questions (Q1–Q5, README §4)
+
+**Q1 (explicit conflict → faster early learning)** — Partial support. At the first
+validation checkpoint (episode 25), `oo`/Transformer and `oo`/GAT already sit at
+0.101 and 0.161 gap respectively — the two lowest starting points of all 9 runs — while
+`om` averages ~0.25 and `ojm` ~0.18 at the same point. `oo`/GIN is the exception: it
+starts at 0.476 (the single worst starting point of the sweep) before collapsing to
+0.146 by episode 100, suggesting the disjunctive graph's dense, dynamically-pruned
+topology (README §1.1) interacts with GIN's isotropic aggregation less favorably than
+with GAT/Transformer's attention-weighted aggregation early in training.
+
+**Q2 (job node → better value estimation)** — Not evaluated here: this run's
+`episode_metrics.json` logs `actor_loss` but not a separate critic/value loss, so a
+direct value-loss comparison across representations is not available from these
+sweeps. Revisit if the training loop is extended to log critic MSE separately.
+
+**Q3 (density → wall-clock scalability)** — Measured directly with
+[`edge_scalability_probe.py`](edge_scalability_probe.py) (read-only: drives each
+representation's own `expert_action()` dispatch heuristic through 5 fresh instances
+per size, no trained weights or training loop involved; results in
+`results/q3_edge_scalability/`). **This contradicts the density ranking assumed in
+§1**: at reset, `oo` has *fewer* total edges (57 small / 135 medium) than `om` (209 /
+475) or `ojm` (407 / 908) — the reverse of the O(|O|²) vs. linear intuition in §1.1–1.3.
+All three thin out roughly linearly (not quadratically) as operations get scheduled.
+Mean per-step wall time follows the same ordering as edge count (`oo` fastest at
+0.3–1.3ms/step, `ojm` slowest at 5.7–6.3ms/step), so the *computational* cost argument
+for `ojm` being the most expensive representation still holds — it's specifically the
+"disjunctive graph is the dense one" claim that doesn't hold at these instance sizes.
+Likely explanation: `sel_k=1` masking (README §5.1, `calculate_mask()`) keeps each
+job's disjunctive/action edges pruned to its single best candidate, while `om`/`ojm`'s
+extra node types (M-M, J-J lateral edges, O→J conjunctive edges) add more edge types
+whose counts stack up regardless of masking. Worth re-deriving §1's density claims
+against this measurement, or checking whether `sel_k>1` changes the ranking, before
+stating the O(|O|²) claim as a property of the representation itself in the final
+dissertation.
+
+**Q4 (compact action space → faster entropy convergence)** — Not confirmed. Policy
+entropy (Fig. 4, normalized) rises from a low/varied starting point to a common
+plateau of ~0.90–0.95 within the first 100–150 episodes for all 9 combinations,
+regardless of representation. `ojm`'s theoretically smaller action space does not
+produce a visibly faster or lower entropy trajectory than `oo` or `om` here — all
+three converge to a similar stochastic regime rather than any one collapsing faster.
+
+**Q5 (oo's dynamic topology → higher variance)** — Weak support, backbone-dependent
+rather than universal. `oo`/GIN shows the largest early-training swing (0.476 → 0.146
+in 75 episodes) and the highest late-phase relative fluctuation among `oo` runs
+(8.6%), consistent with the instability hypothesis — but `oo`/GAT and `oo`/Transformer
+are among the *most* stable runs in the whole sweep (late-phase fluctuation 1.8% and
+4.4%). This suggests instability from `oo`'s dynamic arc removal is not intrinsic to
+the representation, but is most exposed when paired with GIN's aggregation.
+
+**Limitation**: each of the 9 combinations was trained with a single seed, so none of
+the above is backed by a cross-seed significance test (the paired t-test on LCS values
+proposed in §6.3 needs multiple seeds per combination to run). Treat §7.2 as
+directional evidence, not confirmed effects.
+
+### 7.3 Figures
+
+1. `results/comparison_final9/plots/fig1_learning_curves.png` — validation gap vs.
+   episode, one panel per representation, one line per backbone (smoothed; shaded band
+   = raw − smoothed). Shows all 9 curves flattening before episode 200.
+2. `results/comparison_final9/plots/fig2_test_gap_bars.png` — held-out test gap by
+   representation × backbone.
+3. `results/comparison_final9/plots/fig3_actor_loss.png` — actor loss (log scale,
+   10-episode rolling mean) per combination. GAT stays in a tighter band (~0.3–2)
+   throughout; GIN and Transformer show occasional deep dips. Correction: this is
+   **not** a PPO clipped-surrogate loss — `src/bopo.py` confirms training uses BOPO's
+   pairwise ranking loss (`sro_loss`) over `B` sampled rollouts per instance (best vs.
+   `K-1` worst by makespan), with no critic/value network at all. The near-zero dips
+   are the ranking loss going slack when the group's best-vs-worst ordering is already
+   easy, not a PPO artifact; they don't coincide with validation-gap instability in
+   Fig. 1.
+   **Update (2026-09-24):** "going slack" turned out to be the norm rather than the
+   exception: on the ojm runs the loss was < 1e-3 on 60–80% of updates for Transformer
+   and on 79% for 2-layer GIN, with median actor grad norms of ~1e-6–1e-3, so most
+   updates carried no learning signal. Cause: whole-trajectory log-prob sums (~45
+   decisions) push the SRO sigmoid into saturation, and the greedy rollout — the
+   policy's most likely trajectory by construction — is often the best one. The loss
+   now uses per-decision mean log-probs and keeps the greedy rollout out of the pairs
+   (`src/bopo_utils.py:bopo_group_loss`; `logp_norm="sum", exclude_greedy_from_loss=False`
+   restores the old behavior). Results from before this change use the old loss.
+   Also note the mask was not uniform across sweeps: the v2 `convergence_check_om_*` /
+   `convergence_check_ojm_*` runs used `sel_k=2`, while `convergence_check_oo_*`, the ojm
+   depth ablation (`ablation_ojm_*_layers3`) and the reseeds used `sel_k=1` - so the 2- vs
+   3-layer ojm comparison and cross-representation comparisons above mix two action
+   spaces. The multi-seed sweep (`run_seed_sweep.py`, `results/seeds_*`) uses `sel_k=1`
+   and the new loss throughout; `rescore_checkpoints.py` re-scores every run with its own
+   `sel_k`.
+4. `results/comparison_final9/plots/fig4_action_entropy.png` — normalized action
+   entropy per combination, confirming no premature entropy collapse in any of the 9
+   runs. There is no entropy bonus/temperature term in the BOPO loss, so this plateau
+   is emergent, not tuned.
+5. `results/q3_edge_scalability/edge_scalability.png` — edge count vs. episode
+   progress, by representation and instance size (§7.2, Q3).

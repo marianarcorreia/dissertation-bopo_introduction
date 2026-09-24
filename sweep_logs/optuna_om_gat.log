@@ -1,0 +1,105 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-09-23 17:48:26
+[MAIN] mode=optuna
+[MAIN] run_name=train_run
+[MAIN] representation(s)=['om']
+[MAIN] gnn_type=gat
+============================================================
+======================================================================
+[PARAM] Hyperparameter tuning runner (Optuna)
+[PARAM] Representations : ['OM']
+[PARAM] Trials          : 3
+[PARAM] Max episodes    : 100
+[PARAM] Objective       : min(last_val_gap_Q80)
+[PARAM] Storage         : sqlite:///optuna.db
+======================================================================
+[I 2026-09-23 17:48:28,101] Using an existing study with `study_name='fjsp_tuning_om'` instead of creating a new one.
+[PARAM] Starting Optuna study for OM | gnn_type=gat | study_name=fjsp_tuning_om | trials=3 | max_episodes=100 | objective=min(last_val_gap_Q80)
+[PARAM] Critical params (OM): ['lr', 'hidden_channels', 'batch_size', 'num_layers', 'heads', 'n_cases', 'new_freq', 'K', 'use_greedy', 'mask_option', 'sel_k']
+[PARAM][OM] Trial 4 | gnn_type=gat | episodes=100 | lr=7.97e-04 | hidden=256 | layers=1 | heads=4 | K=8 | use_greedy=True | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-23 17:48:28
+[TRAIN] Hyperparams | max_steps=100 | new_freq=10
+[TRAIN]             | n_cases=40 | B=128 | K=8 | use_greedy=True | lr=0.0007965261308120511 (decaying to 1.59e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=1 | heads=4
+[TRAIN] Representation | om | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_om_gat_1790182107\trial_4
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=39 | bc_loss=2.5614 | decisions=47
+[TRAIN][WARMSTART] step 10/100 | instance=35 | bc_loss=2.3013 | decisions=44
+[TRAIN][WARMSTART] step 15/100 | instance=0 | bc_loss=2.4080 | decisions=48
+[TRAIN][WARMSTART] step 20/100 | instance=23 | bc_loss=2.2489 | decisions=56
+[TRAIN][WARMSTART] step 25/100 | instance=33 | bc_loss=2.5110 | decisions=49
+[TRAIN][WARMSTART] step 30/100 | instance=0 | bc_loss=2.3043 | decisions=48
+[TRAIN][WARMSTART] step 35/100 | instance=12 | bc_loss=2.2090 | decisions=49
+[TRAIN][WARMSTART] step 40/100 | instance=13 | bc_loss=2.0948 | decisions=39
+[TRAIN][WARMSTART] step 45/100 | instance=20 | bc_loss=2.3987 | decisions=49
+[TRAIN][WARMSTART] step 50/100 | instance=26 | bc_loss=2.2123 | decisions=54
+[TRAIN][WARMSTART] step 55/100 | instance=3 | bc_loss=2.2709 | decisions=52
+[TRAIN][WARMSTART] step 60/100 | instance=4 | bc_loss=1.8940 | decisions=56
+[TRAIN][WARMSTART] step 65/100 | instance=36 | bc_loss=2.3392 | decisions=55
+[TRAIN][WARMSTART] step 70/100 | instance=12 | bc_loss=1.9760 | decisions=49
+[TRAIN][WARMSTART] step 75/100 | instance=5 | bc_loss=2.1975 | decisions=54
+[TRAIN][WARMSTART] step 80/100 | instance=32 | bc_loss=1.8355 | decisions=44
+[TRAIN][WARMSTART] step 85/100 | instance=28 | bc_loss=2.0157 | decisions=48
+[TRAIN][WARMSTART] step 90/100 | instance=12 | bc_loss=1.8693 | decisions=49
+[TRAIN][WARMSTART] step 95/100 | instance=17 | bc_loss=2.0678 | decisions=50
+[TRAIN][WARMSTART] step 100/100 | instance=8 | bc_loss=2.0136 | decisions=47
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 17:51:43
+[TRAIN] Step 1 | Loss=16.118095 | Best makespan in group=395.00
+[TRAIN] Step 2/100 | 17:53:40
+[TRAIN] Step 2 | Loss=14.066878 | Best makespan in group=526.00
+[TRAIN] Step 3/100 | 17:57:03
+[TRAIN] Step 3 | Loss=0.000307 | Best makespan in group=374.00
+[TRAIN] Step 4/100 | 17:58:59
+[TRAIN] Step 4 | Loss=7.125814 | Best makespan in group=361.00
+[TRAIN] Step 5/100 | 18:02:04
+[TRAIN] Step 5 | Loss=4.640041 | Best makespan in group=429.00
+[TRAIN] Step 6/100 | 18:05:13
+[TRAIN] Step 6 | Loss=0.444278 | Best makespan in group=500.00
+[TRAIN] Step 7/100 | 18:07:10
+[TRAIN] Step 7 | Loss=16.089634 | Best makespan in group=424.00
+[TRAIN] Step 8/100 | 18:08:59
+[TRAIN] Step 8 | Loss=6.075698 | Best makespan in group=401.00
+[TRAIN] Step 9/100 | 18:12:08
+[TRAIN] Step 9 | Loss=1.968366 | Best makespan in group=476.00
+[TRAIN] Step 10/100 | 18:14:43
+[TRAIN] Step 10 | Loss=7.386366 | Best makespan in group=530.00
+[TRAIN] Refreshing training instances (step 10)...
+[TRAIN] Step 11/100 | 18:16:59
+[TRAIN] Step 11 | Loss=13.848763 | Best makespan in group=383.00
+[TRAIN] Step 12/100 | 18:18:58
+[TRAIN] Step 12 | Loss=0.006298 | Best makespan in group=455.00
+[TRAIN] Step 13/100 | 18:22:06
+[TRAIN] Step 13 | Loss=1.020506 | Best makespan in group=443.00
+[TRAIN] Step 14/100 | 18:24:55
+[TRAIN] Step 14 | Loss=2.408901 | Best makespan in group=525.00
+[TRAIN] Step 15/100 | 18:27:46
+[TRAIN] Step 15 | Loss=11.693122 | Best makespan in group=622.00
+[TRAIN][VAL][ep 15] avg_gap=0.3612 | std_gap=0.1313 | q80_gap=0.4577 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.3612 (raw=0.3612) | saving candidate: 513460629291889.pth
+[TRAIN] Step 16/100 | 18:30:35
+[TRAIN] Step 16 | Loss=6.554524 | Best makespan in group=474.00
+[TRAIN] Step 17/100 | 18:31:53
+[TRAIN] Step 17 | Loss=0.247002 | Best makespan in group=360.00
+[TRAIN] Step 18/100 | 18:34:06
+[TRAIN] Step 18 | Loss=11.500540 | Best makespan in group=412.00
+[TRAIN] Step 19/100 | 18:36:52
+[TRAIN] Step 19 | Loss=8.271529 | Best makespan in group=544.00
+[TRAIN] Step 20/100 | 18:39:29
+[TRAIN] Step 20 | Loss=2.132906 | Best makespan in group=407.00
+[TRAIN] Refreshing training instances (step 20)...
+[TRAIN] Step 21/100 | 18:41:48
+[TRAIN] Step 21 | Loss=0.009319 | Best makespan in group=418.00
+[TRAIN] Step 22/100 | 18:43:16

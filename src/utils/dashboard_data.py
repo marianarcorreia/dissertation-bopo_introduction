@@ -118,6 +118,7 @@ def list_all_runs() -> list[dict]:
                 except json.JSONDecodeError:
                     pass
             run["representation"] = run["summary"].get("representation")
+            run["gnn_type"] = run["summary"].get("gnn_type")
         if run_type == "optuna_study":
             run["summary"] = {
                 "trial_count": sum(

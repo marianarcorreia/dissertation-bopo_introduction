@@ -1,0 +1,2589 @@
+D:\Dissertaзгo\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-09-22 03:13:59
+[MAIN] mode=optuna
+[MAIN] run_name=train_run
+[MAIN] representation(s)=['oo', 'om', 'ojm']
+============================================================
+======================================================================
+[PARAM] Hyperparameter tuning runner (Optuna)
+[PARAM] Representations : ['OO', 'OM', 'OJM']
+[PARAM] Trials          : 10
+[PARAM] Max episodes    : 100
+[PARAM] Objective       : min(last_val_gap_Q80)
+[PARAM] Storage         : sqlite:///optuna.db
+======================================================================
+[I 2026-09-22 03:14:03,211] A new study created in RDB with name: fjsp_tuning_oo
+[PARAM] Starting Optuna study for OO | trials=10 | max_episodes=100 | objective=min(last_val_gap_Q80)
+[PARAM] Critical params (OO): ['lr', 'hidden_channels', 'batch_size', 'num_layers', 'heads', 'n_cases', 'new_freq', 'K', 'use_greedy']
+[PARAM][OO] Trial 0 | episodes=100 | lr=7.97e-04 | hidden=256 | layers=1 | heads=4 | K=8 | use_greedy=True | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 03:14:03
+[TRAIN] Hyperparams | max_steps=100 | new_freq=10
+[TRAIN]             | n_cases=40 | B=128 | K=8 | use_greedy=True | lr=0.0007965261308120511 (decaying to 1.59e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=1 | heads=4
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_0
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=15 | bc_loss=2.1555 | decisions=57
+[TRAIN][WARMSTART] step 10/100 | instance=36 | bc_loss=2.0632 | decisions=52
+[TRAIN][WARMSTART] step 15/100 | instance=8 | bc_loss=2.1749 | decisions=54
+[TRAIN][WARMSTART] step 20/100 | instance=7 | bc_loss=2.0237 | decisions=48
+[TRAIN][WARMSTART] step 25/100 | instance=19 | bc_loss=2.0433 | decisions=49
+[TRAIN][WARMSTART] step 30/100 | instance=18 | bc_loss=2.1432 | decisions=55
+[TRAIN][WARMSTART] step 35/100 | instance=13 | bc_loss=2.1155 | decisions=53
+[TRAIN][WARMSTART] step 40/100 | instance=11 | bc_loss=1.8885 | decisions=43
+[TRAIN][WARMSTART] step 45/100 | instance=35 | bc_loss=1.8482 | decisions=42
+[TRAIN][WARMSTART] step 50/100 | instance=31 | bc_loss=2.0417 | decisions=52
+[TRAIN][WARMSTART] step 55/100 | instance=21 | bc_loss=1.9255 | decisions=46
+[TRAIN][WARMSTART] step 60/100 | instance=12 | bc_loss=1.9071 | decisions=46
+[TRAIN][WARMSTART] step 65/100 | instance=20 | bc_loss=1.9708 | decisions=52
+[TRAIN][WARMSTART] step 70/100 | instance=4 | bc_loss=1.8836 | decisions=53
+[TRAIN][WARMSTART] step 75/100 | instance=28 | bc_loss=1.9977 | decisions=56
+[TRAIN][WARMSTART] step 80/100 | instance=16 | bc_loss=1.8026 | decisions=50
+[TRAIN][WARMSTART] step 85/100 | instance=32 | bc_loss=1.7225 | decisions=42
+[TRAIN][WARMSTART] step 90/100 | instance=28 | bc_loss=1.9401 | decisions=56
+[TRAIN][WARMSTART] step 95/100 | instance=11 | bc_loss=1.7012 | decisions=43
+[TRAIN][WARMSTART] step 100/100 | instance=36 | bc_loss=1.9016 | decisions=52
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 03:14:33
+[TRAIN] Step 1 | Loss=0.271935 | Best makespan in group=491.00
+[TRAIN] Step 2/100 | 03:14:54
+[TRAIN] Step 2 | Loss=0.005068 | Best makespan in group=325.00
+[TRAIN] Step 3/100 | 03:15:16
+[TRAIN] Step 3 | Loss=6.274711 | Best makespan in group=409.00
+[TRAIN] Step 4/100 | 03:15:54
+[TRAIN] Step 4 | Loss=3.838667 | Best makespan in group=416.00
+[TRAIN] Step 5/100 | 03:16:28
+[TRAIN] Step 5 | Loss=1.763803 | Best makespan in group=502.00
+[TRAIN] Step 6/100 | 03:17:01
+[TRAIN] Step 6 | Loss=5.626874 | Best makespan in group=391.00
+[TRAIN] Step 7/100 | 03:17:38
+[TRAIN] Step 7 | Loss=5.615727 | Best makespan in group=338.00
+[TRAIN] Step 8/100 | 03:18:01
+[TRAIN] Step 8 | Loss=0.901317 | Best makespan in group=454.00
+[TRAIN] Step 9/100 | 03:18:32
+[TRAIN] Step 9 | Loss=1.510352 | Best makespan in group=428.00
+[TRAIN] Step 10/100 | 03:19:05
+[TRAIN] Step 10 | Loss=4.028328 | Best makespan in group=312.00
+[TRAIN] Refreshing training instances (step 10)...
+[TRAIN] Step 11/100 | 03:19:28
+[TRAIN] Step 11 | Loss=3.782645 | Best makespan in group=279.00
+[TRAIN] Step 12/100 | 03:19:52
+[TRAIN] Step 12 | Loss=1.406151 | Best makespan in group=479.00
+[TRAIN] Step 13/100 | 03:20:23
+[TRAIN] Step 13 | Loss=0.343622 | Best makespan in group=324.00
+[TRAIN] Step 14/100 | 03:20:51
+[TRAIN] Step 14 | Loss=0.776761 | Best makespan in group=346.00
+[TRAIN] Step 15/100 | 03:21:22
+[TRAIN] Step 15 | Loss=0.137866 | Best makespan in group=409.00
+[TRAIN][VAL][ep 15] avg_gap=0.1477 | std_gap=0.0722 | q80_gap=0.1996 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1477 (raw=0.1477) | saving candidate: 71484100031851.pth
+[TRAIN] Step 16/100 | 03:22:10
+[TRAIN] Step 16 | Loss=0.074296 | Best makespan in group=474.00
+[TRAIN] Step 17/100 | 03:22:38
+[TRAIN] Step 17 | Loss=0.563479 | Best makespan in group=380.00
+[TRAIN] Step 18/100 | 03:23:13
+[TRAIN] Step 18 | Loss=1.336527 | Best makespan in group=330.00
+[TRAIN] Step 19/100 | 03:23:40
+[TRAIN] Step 19 | Loss=0.065584 | Best makespan in group=425.00
+[TRAIN] Step 20/100 | 03:24:03
+[TRAIN] Step 20 | Loss=1.378758 | Best makespan in group=384.00
+[TRAIN] Refreshing training instances (step 20)...
+[TRAIN] Step 21/100 | 03:24:25
+[TRAIN] Step 21 | Loss=3.216619 | Best makespan in group=334.00
+[TRAIN] Step 22/100 | 03:25:02
+[TRAIN] Step 22 | Loss=2.025774 | Best makespan in group=459.00
+[TRAIN] Step 23/100 | 03:25:33
+[TRAIN] Step 23 | Loss=5.362360 | Best makespan in group=414.00
+[TRAIN] Step 24/100 | 03:26:03
+[TRAIN] Step 24 | Loss=1.789135 | Best makespan in group=400.00
+[TRAIN] Step 25/100 | 03:26:41
+[TRAIN] Step 25 | Loss=1.461268 | Best makespan in group=586.00
+[TRAIN] Step 26/100 | 03:27:17
+[TRAIN] Step 26 | Loss=0.682808 | Best makespan in group=335.00
+[TRAIN] Step 27/100 | 03:27:47
+[TRAIN] Step 27 | Loss=3.887010 | Best makespan in group=362.00
+[TRAIN] Step 28/100 | 03:28:14
+[TRAIN] Step 28 | Loss=3.094829 | Best makespan in group=386.00
+[TRAIN] Step 29/100 | 03:28:39
+[TRAIN] Step 29 | Loss=2.908947 | Best makespan in group=336.00
+[TRAIN] Step 30/100 | 03:29:01
+[TRAIN] Step 30 | Loss=0.000312 | Best makespan in group=424.00
+[TRAIN] Refreshing training instances (step 30)...
+[TRAIN][VAL][ep 30] avg_gap=0.1300 | std_gap=0.0654 | q80_gap=0.1848 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1388 (raw=0.1300) | saving candidate: 94491205613357.pth
+[TRAIN] Step 31/100 | 03:29:48
+[TRAIN] Step 31 | Loss=3.076396 | Best makespan in group=351.00
+[TRAIN] Step 32/100 | 03:30:23
+[TRAIN] Step 32 | Loss=0.001800 | Best makespan in group=335.00
+[TRAIN] Step 33/100 | 03:31:00
+[TRAIN] Step 33 | Loss=0.039190 | Best makespan in group=313.00
+[TRAIN] Step 34/100 | 03:31:23
+[TRAIN] Step 34 | Loss=0.110731 | Best makespan in group=321.00
+[TRAIN] Step 35/100 | 03:31:50
+[TRAIN] Step 35 | Loss=0.245730 | Best makespan in group=324.00
+[TRAIN] Step 36/100 | 03:32:13
+[TRAIN] Step 36 | Loss=1.353635 | Best makespan in group=450.00
+[TRAIN] Step 37/100 | 03:32:38
+[TRAIN] Step 37 | Loss=3.647316 | Best makespan in group=406.00
+[TRAIN] Step 38/100 | 03:33:06
+[TRAIN] Step 38 | Loss=3.826791 | Best makespan in group=372.00
+[TRAIN] Step 39/100 | 03:33:29
+[TRAIN] Step 39 | Loss=0.000004 | Best makespan in group=655.00
+[TRAIN] Step 40/100 | 03:33:59
+[TRAIN] Step 40 | Loss=0.000017 | Best makespan in group=470.00
+[TRAIN] Refreshing training instances (step 40)...
+[TRAIN] Step 41/100 | 03:34:28
+[TRAIN] Step 41 | Loss=7.102172 | Best makespan in group=362.00
+[TRAIN] Step 42/100 | 03:35:06
+[TRAIN] Step 42 | Loss=5.767787 | Best makespan in group=476.00
+[TRAIN] Step 43/100 | 03:35:42
+[TRAIN] Step 43 | Loss=1.366986 | Best makespan in group=354.00
+[TRAIN] Step 44/100 | 03:36:06
+[TRAIN] Step 44 | Loss=2.080459 | Best makespan in group=447.00
+[TRAIN] Step 45/100 | 03:36:31
+[TRAIN] Step 45 | Loss=0.000340 | Best makespan in group=548.00
+[TRAIN][VAL][ep 45] avg_gap=0.1352 | std_gap=0.0709 | q80_gap=0.2041 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1376 (raw=0.1352) | saving candidate: 303276165531232.pth
+[TRAIN] Step 46/100 | 03:37:17
+[TRAIN] Step 46 | Loss=1.733475 | Best makespan in group=376.00
+[TRAIN] Step 47/100 | 03:37:39
+[TRAIN] Step 47 | Loss=0.000018 | Best makespan in group=503.00
+[TRAIN] Step 48/100 | 03:38:14
+[TRAIN] Step 48 | Loss=0.000002 | Best makespan in group=527.00
+[TRAIN] Step 49/100 | 03:38:52
+[TRAIN] Step 49 | Loss=0.725205 | Best makespan in group=344.00
+[TRAIN] Step 50/100 | 03:39:15
+[TRAIN] Step 50 | Loss=0.000013 | Best makespan in group=426.00
+[TRAIN] Refreshing training instances (step 50)...
+[TRAIN] Step 51/100 | 03:39:45
+[TRAIN] Step 51 | Loss=0.173885 | Best makespan in group=596.00
+[TRAIN] Step 52/100 | 03:40:20
+[TRAIN] Step 52 | Loss=1.417922 | Best makespan in group=550.00
+[TRAIN] Step 53/100 | 03:40:49
+[TRAIN] Step 53 | Loss=5.874893 | Best makespan in group=288.00
+[TRAIN] Step 54/100 | 03:41:11
+[TRAIN] Step 54 | Loss=2.538418 | Best makespan in group=339.00
+[TRAIN] Step 55/100 | 03:41:47
+[TRAIN] Step 55 | Loss=0.409021 | Best makespan in group=339.00
+[TRAIN] Step 56/100 | 03:42:09
+[TRAIN] Step 56 | Loss=0.000002 | Best makespan in group=416.00
+[TRAIN] Step 57/100 | 03:42:44
+[TRAIN] Step 57 | Loss=0.287986 | Best makespan in group=434.00
+[TRAIN] Step 58/100 | 03:43:20
+[TRAIN] Step 58 | Loss=0.000080 | Best makespan in group=486.00
+[TRAIN] Step 59/100 | 03:43:44
+[TRAIN] Step 59 | Loss=4.482343 | Best makespan in group=465.00
+[TRAIN] Step 60/100 | 03:44:12
+[TRAIN] Step 60 | Loss=2.079024 | Best makespan in group=342.00
+[TRAIN] Refreshing training instances (step 60)...
+[TRAIN][VAL][ep 60] avg_gap=0.1280 | std_gap=0.0659 | q80_gap=0.1846 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1311 (raw=0.1280) | saving candidate: 445752171909992.pth
+[TRAIN] Step 61/100 | 03:44:46
+[TRAIN] Step 61 | Loss=1.058654 | Best makespan in group=574.00
+[TRAIN] Step 62/100 | 03:45:20
+[TRAIN] Step 62 | Loss=4.055154 | Best makespan in group=408.00
+[TRAIN] Step 63/100 | 03:45:58
+[TRAIN] Step 63 | Loss=0.030397 | Best makespan in group=357.00
+[TRAIN] Step 64/100 | 03:46:20
+[TRAIN] Step 64 | Loss=0.648237 | Best makespan in group=549.00
+[TRAIN] Step 65/100 | 03:46:45
+[TRAIN] Step 65 | Loss=2.353903 | Best makespan in group=358.00
+[TRAIN] Step 66/100 | 03:47:08
+[TRAIN] Step 66 | Loss=3.379690 | Best makespan in group=432.00
+[TRAIN] Step 67/100 | 03:47:39
+[TRAIN] Step 67 | Loss=2.322779 | Best makespan in group=406.00
+[TRAIN] Step 68/100 | 03:48:03
+[TRAIN] Step 68 | Loss=5.237424 | Best makespan in group=378.00
+[TRAIN] Step 69/100 | 03:48:36
+[TRAIN] Step 69 | Loss=0.264298 | Best makespan in group=311.00
+[TRAIN] Step 70/100 | 03:49:11
+[TRAIN] Step 70 | Loss=5.181524 | Best makespan in group=486.00
+[TRAIN] Refreshing training instances (step 70)...
+[TRAIN] Step 71/100 | 03:49:33
+[TRAIN] Step 71 | Loss=6.164920 | Best makespan in group=331.00
+[TRAIN] Step 72/100 | 03:50:01
+[TRAIN] Step 72 | Loss=0.775402 | Best makespan in group=471.00
+[TRAIN] Step 73/100 | 03:50:30
+[TRAIN] Step 73 | Loss=7.419667 | Best makespan in group=328.00
+[TRAIN] Step 74/100 | 03:51:03
+[TRAIN] Step 74 | Loss=0.716551 | Best makespan in group=631.00
+[TRAIN] Step 75/100 | 03:51:38
+[TRAIN] Step 75 | Loss=0.000040 | Best makespan in group=365.00
+[TRAIN][VAL][ep 75] avg_gap=0.1314 | std_gap=0.0674 | q80_gap=0.2069 | n=40
+[TRAIN] Step 76/100 | 03:52:14
+[TRAIN] Step 76 | Loss=1.470294 | Best makespan in group=409.00
+[TRAIN] Step 77/100 | 03:52:52
+[TRAIN] Step 77 | Loss=1.021265 | Best makespan in group=446.00
+[TRAIN] Step 78/100 | 03:53:21
+[TRAIN] Step 78 | Loss=0.624983 | Best makespan in group=352.00
+[TRAIN] Step 79/100 | 03:53:49
+[TRAIN] Step 79 | Loss=0.019677 | Best makespan in group=412.00
+[TRAIN] Step 80/100 | 03:54:13
+[TRAIN] Step 80 | Loss=2.318382 | Best makespan in group=563.00
+[TRAIN] Refreshing training instances (step 80)...
+[TRAIN] Step 81/100 | 03:54:49
+[TRAIN] Step 81 | Loss=0.000787 | Best makespan in group=404.00
+[TRAIN] Step 82/100 | 03:55:24
+[TRAIN] Step 82 | Loss=9.438860 | Best makespan in group=476.00
+[TRAIN] Step 83/100 | 03:56:00
+[TRAIN] Step 83 | Loss=0.933326 | Best makespan in group=459.00
+[TRAIN] Step 84/100 | 03:56:28
+[TRAIN] Step 84 | Loss=4.958071 | Best makespan in group=483.00
+[TRAIN] Step 85/100 | 03:56:57
+[TRAIN] Step 85 | Loss=3.286198 | Best makespan in group=358.00
+[TRAIN] Step 86/100 | 03:57:32
+[TRAIN] Step 86 | Loss=3.140340 | Best makespan in group=375.00
+[TRAIN] Step 87/100 | 03:57:56
+[TRAIN] Step 87 | Loss=2.340679 | Best makespan in group=417.00
+[TRAIN] Step 88/100 | 03:58:20
+[TRAIN] Step 88 | Loss=6.361411 | Best makespan in group=368.00
+[TRAIN] Step 89/100 | 03:58:48
+[TRAIN] Step 89 | Loss=7.485053 | Best makespan in group=379.00
+[TRAIN] Step 90/100 | 03:59:23
+[TRAIN] Step 90 | Loss=0.613740 | Best makespan in group=551.00
+[TRAIN] Refreshing training instances (step 90)...
+[TRAIN][VAL][ep 90] avg_gap=0.1341 | std_gap=0.0684 | q80_gap=0.2137 | n=40
+[TRAIN] Step 91/100 | 04:00:04
+[TRAIN] Step 91 | Loss=5.247473 | Best makespan in group=491.00
+[TRAIN] Step 92/100 | 04:00:27
+[TRAIN] Step 92 | Loss=0.655757 | Best makespan in group=257.00
+[TRAIN] Step 93/100 | 04:00:55
+[TRAIN] Step 93 | Loss=3.459836 | Best makespan in group=359.00
+[TRAIN] Step 94/100 | 04:01:17
+[TRAIN] Step 94 | Loss=0.333497 | Best makespan in group=370.00
+[TRAIN] Step 95/100 | 04:01:41
+[TRAIN] Step 95 | Loss=0.525791 | Best makespan in group=455.00
+[TRAIN] Step 96/100 | 04:02:07
+[TRAIN] Step 96 | Loss=0.104253 | Best makespan in group=373.00
+[TRAIN] Step 97/100 | 04:02:37
+[TRAIN] Step 97 | Loss=2.242776 | Best makespan in group=361.00
+[TRAIN] Step 98/100 | 04:03:06
+[TRAIN] Step 98 | Loss=5.821586 | Best makespan in group=468.00
+[TRAIN] Step 99/100 | 04:03:36
+[TRAIN] Step 99 | Loss=0.185295 | Best makespan in group=501.00
+[TRAIN] Step 100/100 | 04:03:59
+[TRAIN] Step 100 | Loss=6.107406 | Best makespan in group=348.00
+[TRAIN] Refreshing training instances (step 100)...
+[TRAIN][VAL][ep 100] avg_gap=0.1327 | std_gap=0.0671 | q80_gap=0.1994 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/445752171909992.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1418 | std_gap=0.0718 | q80_gap=0.2029 | n=40
+[TRAIN][04:04:51] Training ended. Validation history and plots updated.
+[I 2026-09-22 04:04:51,480] Trial 0 finished with value: 0.19940838888207316 and parameters: {'new_freq': 10, 'n_cases': 40, 'batch_size': 128, 'lr': 0.0007965261308120511, 'hidden_channels': 256, 'num_layers': 1, 'heads': 4, 'K': 8, 'use_greedy': True}. Best is trial 0 with value: 0.19940838888207316.
+[PARAM][OO] Trial 1 | episodes=100 | lr=8.20e-04 | hidden=512 | layers=3 | heads=4 | K=32 | use_greedy=False | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 04:04:52
+[TRAIN] Hyperparams | max_steps=100 | new_freq=50
+[TRAIN]             | n_cases=40 | B=64 | K=32 | use_greedy=False | lr=0.0008204643365323959 (decaying to 1.64e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=512 | num_layers=3 | heads=4
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_1
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=10 | bc_loss=1.9211 | decisions=43
+[TRAIN][WARMSTART] step 10/100 | instance=28 | bc_loss=2.0178 | decisions=49
+[TRAIN][WARMSTART] step 15/100 | instance=16 | bc_loss=2.1251 | decisions=50
+[TRAIN][WARMSTART] step 20/100 | instance=15 | bc_loss=2.0138 | decisions=51
+[TRAIN][WARMSTART] step 25/100 | instance=25 | bc_loss=1.9049 | decisions=42
+[TRAIN][WARMSTART] step 30/100 | instance=3 | bc_loss=2.0811 | decisions=52
+[TRAIN][WARMSTART] step 35/100 | instance=13 | bc_loss=2.1072 | decisions=55
+[TRAIN][WARMSTART] step 40/100 | instance=25 | bc_loss=1.9016 | decisions=42
+[TRAIN][WARMSTART] step 45/100 | instance=20 | bc_loss=1.8846 | decisions=41
+[TRAIN][WARMSTART] step 50/100 | instance=33 | bc_loss=1.9115 | decisions=43
+[TRAIN][WARMSTART] step 55/100 | instance=1 | bc_loss=1.9033 | decisions=44
+[TRAIN][WARMSTART] step 60/100 | instance=31 | bc_loss=2.1444 | decisions=53
+[TRAIN][WARMSTART] step 65/100 | instance=5 | bc_loss=1.9098 | decisions=41
+[TRAIN][WARMSTART] step 70/100 | instance=21 | bc_loss=2.0034 | decisions=47
+[TRAIN][WARMSTART] step 75/100 | instance=11 | bc_loss=1.9221 | decisions=42
+[TRAIN][WARMSTART] step 80/100 | instance=6 | bc_loss=1.9699 | decisions=48
+[TRAIN][WARMSTART] step 85/100 | instance=29 | bc_loss=2.0093 | decisions=46
+[TRAIN][WARMSTART] step 90/100 | instance=4 | bc_loss=1.8909 | decisions=44
+[TRAIN][WARMSTART] step 95/100 | instance=27 | bc_loss=2.0877 | decisions=56
+[TRAIN][WARMSTART] step 100/100 | instance=24 | bc_loss=2.0581 | decisions=54
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 04:12:49
+[TRAIN] Step 1 | Loss=4.399547 | Best makespan in group=496.00
+[TRAIN] Step 2/100 | 04:15:11
+[TRAIN] Step 2 | Loss=3.081785 | Best makespan in group=417.00
+[TRAIN] Step 3/100 | 04:18:25
+[TRAIN] Step 3 | Loss=3.104576 | Best makespan in group=430.00
+[TRAIN] Step 4/100 | 04:21:36
+[TRAIN] Step 4 | Loss=4.622636 | Best makespan in group=469.00
+[TRAIN] Step 5/100 | 04:24:06
+[TRAIN] Step 5 | Loss=2.418190 | Best makespan in group=468.00
+[TRAIN] Step 6/100 | 04:25:40
+[TRAIN] Step 6 | Loss=0.892684 | Best makespan in group=363.00
+[TRAIN] Step 7/100 | 04:27:16
+[TRAIN] Step 7 | Loss=2.077634 | Best makespan in group=581.00
+[TRAIN] Step 8/100 | 04:29:26
+[TRAIN] Step 8 | Loss=0.573717 | Best makespan in group=364.00
+[TRAIN] Step 9/100 | 04:32:24
+[TRAIN] Step 9 | Loss=1.251213 | Best makespan in group=507.00
+[TRAIN] Step 10/100 | 04:33:57
+[TRAIN] Step 10 | Loss=3.011028 | Best makespan in group=548.00
+[TRAIN] Step 11/100 | 04:35:33
+[TRAIN] Step 11 | Loss=8.756682 | Best makespan in group=382.00
+[TRAIN] Step 12/100 | 04:37:04
+[TRAIN] Step 12 | Loss=1.479196 | Best makespan in group=443.00
+[TRAIN] Step 13/100 | 04:39:48
+[TRAIN] Step 13 | Loss=1.471313 | Best makespan in group=433.00
+[TRAIN] Step 14/100 | 04:43:04
+[TRAIN] Step 14 | Loss=3.529411 | Best makespan in group=658.00
+[TRAIN] Step 15/100 | 04:46:34
+[TRAIN] Step 15 | Loss=2.536924 | Best makespan in group=395.00
+[TRAIN][VAL][ep 15] avg_gap=0.1389 | std_gap=0.0576 | q80_gap=0.1944 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1389 (raw=0.1389) | saving candidate: 293864447427531.pth
+[TRAIN] Step 16/100 | 04:51:56
+[TRAIN] Step 16 | Loss=1.216868 | Best makespan in group=435.00
+[TRAIN] Step 17/100 | 04:53:54
+[TRAIN] Step 17 | Loss=1.244180 | Best makespan in group=331.00
+[TRAIN] Step 18/100 | 04:55:28
+[TRAIN] Step 18 | Loss=0.281215 | Best makespan in group=523.00
+[TRAIN] Step 19/100 | 04:58:14
+[TRAIN] Step 19 | Loss=0.728531 | Best makespan in group=360.00
+[TRAIN] Step 20/100 | 04:59:54
+[TRAIN] Step 20 | Loss=0.816308 | Best makespan in group=663.00
+[TRAIN] Step 21/100 | 05:02:48
+[TRAIN] Step 21 | Loss=0.733538 | Best makespan in group=418.00
+[TRAIN] Step 22/100 | 05:04:27
+[TRAIN] Step 22 | Loss=1.237902 | Best makespan in group=382.00
+[TRAIN] Step 23/100 | 05:06:05
+[TRAIN] Step 23 | Loss=0.208489 | Best makespan in group=290.00
+[TRAIN] Step 24/100 | 05:07:57
+[TRAIN] Step 24 | Loss=0.936119 | Best makespan in group=495.00
+[TRAIN] Step 25/100 | 05:09:29
+[TRAIN] Step 25 | Loss=1.997694 | Best makespan in group=362.00
+[TRAIN] Step 26/100 | 05:11:31
+[TRAIN] Step 26 | Loss=2.062521 | Best makespan in group=338.00
+[TRAIN] Step 27/100 | 05:13:09
+[TRAIN] Step 27 | Loss=1.999016 | Best makespan in group=518.00
+[TRAIN] Step 28/100 | 05:15:39
+[TRAIN] Step 28 | Loss=0.389900 | Best makespan in group=360.00
+[TRAIN] Step 29/100 | 05:18:48
+[TRAIN] Step 29 | Loss=1.120286 | Best makespan in group=367.00
+[TRAIN] Step 30/100 | 05:21:06
+[TRAIN] Step 30 | Loss=0.193552 | Best makespan in group=332.00
+[TRAIN][VAL][ep 30] avg_gap=0.1454 | std_gap=0.0691 | q80_gap=0.1999 | n=40
+[TRAIN] Step 31/100 | 05:24:31
+[TRAIN] Step 31 | Loss=0.650736 | Best makespan in group=549.00
+[TRAIN] Step 32/100 | 05:27:52
+[TRAIN] Step 32 | Loss=3.069382 | Best makespan in group=393.00
+[TRAIN] Step 33/100 | 05:29:36
+[TRAIN] Step 33 | Loss=2.459929 | Best makespan in group=495.00
+[TRAIN] Step 34/100 | 05:32:33
+[TRAIN] Step 34 | Loss=1.022975 | Best makespan in group=450.00
+[TRAIN] Step 35/100 | 05:34:13
+[TRAIN] Step 35 | Loss=2.188433 | Best makespan in group=289.00
+[TRAIN] Step 36/100 | 05:35:42
+[TRAIN] Step 36 | Loss=3.934854 | Best makespan in group=496.00
+[TRAIN] Step 37/100 | 05:38:46
+[TRAIN] Step 37 | Loss=6.120295 | Best makespan in group=426.00
+[TRAIN] Step 38/100 | 05:40:28
+[TRAIN] Step 38 | Loss=0.954200 | Best makespan in group=375.00
+[TRAIN] Step 39/100 | 05:43:33
+[TRAIN] Step 39 | Loss=4.802411 | Best makespan in group=409.00
+[TRAIN] Step 40/100 | 05:46:40
+[TRAIN] Step 40 | Loss=0.576821 | Best makespan in group=379.00
+[TRAIN] Step 41/100 | 05:49:38
+[TRAIN] Step 41 | Loss=1.302470 | Best makespan in group=517.00
+[TRAIN] Step 42/100 | 05:51:10
+[TRAIN] Step 42 | Loss=0.018146 | Best makespan in group=319.00
+[TRAIN] Step 43/100 | 05:52:43
+[TRAIN] Step 43 | Loss=3.833724 | Best makespan in group=345.00
+[TRAIN] Step 44/100 | 05:54:23
+[TRAIN] Step 44 | Loss=1.831379 | Best makespan in group=360.00
+[TRAIN] Step 45/100 | 05:57:20
+[TRAIN] Step 45 | Loss=1.213995 | Best makespan in group=286.00
+[TRAIN][VAL][ep 45] avg_gap=0.1531 | std_gap=0.0620 | q80_gap=0.1952 | n=40
+[TRAIN] Step 46/100 | 06:00:59
+[TRAIN] Step 46 | Loss=3.742639 | Best makespan in group=289.00
+[TRAIN] Step 47/100 | 06:02:29
+[TRAIN] Step 47 | Loss=3.159940 | Best makespan in group=404.00
+[TRAIN] Step 48/100 | 06:05:41
+[TRAIN] Step 48 | Loss=1.573033 | Best makespan in group=466.00
+[TRAIN] Step 49/100 | 06:08:21
+[TRAIN] Step 49 | Loss=0.150332 | Best makespan in group=464.00
+[TRAIN] Step 50/100 | 06:11:17
+[TRAIN] Step 50 | Loss=0.542546 | Best makespan in group=413.00
+[TRAIN] Refreshing training instances (step 50)...
+[TRAIN] Step 51/100 | 06:12:50
+[TRAIN] Step 51 | Loss=0.613388 | Best makespan in group=353.00
+[TRAIN] Step 52/100 | 06:15:31
+[TRAIN] Step 52 | Loss=1.341357 | Best makespan in group=411.00
+[TRAIN] Step 53/100 | 06:17:05
+[TRAIN] Step 53 | Loss=3.167131 | Best makespan in group=464.00
+[TRAIN] Step 54/100 | 06:19:38
+[TRAIN] Step 54 | Loss=0.520078 | Best makespan in group=436.00
+[TRAIN] Step 55/100 | 06:21:17
+[TRAIN] Step 55 | Loss=0.251350 | Best makespan in group=408.00
+[TRAIN] Step 56/100 | 06:23:46
+[TRAIN] Step 56 | Loss=0.195037 | Best makespan in group=386.00
+[TRAIN] Step 57/100 | 06:25:30
+[TRAIN] Step 57 | Loss=3.584891 | Best makespan in group=538.00
+[TRAIN] Step 58/100 | 06:28:31
+[TRAIN] Step 58 | Loss=0.105929 | Best makespan in group=349.00
+[TRAIN] Step 59/100 | 06:29:59
+[TRAIN] Step 59 | Loss=2.732855 | Best makespan in group=566.00
+[TRAIN] Step 60/100 | 06:31:45
+[TRAIN] Step 60 | Loss=3.311815 | Best makespan in group=364.00
+[TRAIN][VAL][ep 60] avg_gap=0.1546 | std_gap=0.0661 | q80_gap=0.2136 | n=40
+[TRAIN] Step 61/100 | 06:35:50
+[TRAIN] Step 61 | Loss=1.528530 | Best makespan in group=569.00
+[TRAIN] Step 62/100 | 06:38:22
+[TRAIN] Step 62 | Loss=0.212422 | Best makespan in group=354.00
+[TRAIN] Step 63/100 | 06:39:57
+[TRAIN] Step 63 | Loss=1.193301 | Best makespan in group=543.00
+[TRAIN] Step 64/100 | 06:42:09
+[TRAIN] Step 64 | Loss=0.727913 | Best makespan in group=482.00
+[TRAIN] Step 65/100 | 06:45:34
+[TRAIN] Step 65 | Loss=1.530002 | Best makespan in group=452.00
+[TRAIN] Step 66/100 | 06:48:25
+[TRAIN] Step 66 | Loss=2.717948 | Best makespan in group=448.00
+[TRAIN] Step 67/100 | 06:51:45
+[TRAIN] Step 67 | Loss=3.009272 | Best makespan in group=431.00
+[TRAIN] Step 68/100 | 06:54:58
+[TRAIN] Step 68 | Loss=3.203269 | Best makespan in group=601.00
+[TRAIN] Step 69/100 | 06:57:25
+[TRAIN] Step 69 | Loss=0.767370 | Best makespan in group=411.00
+[TRAIN] Step 70/100 | 06:58:56
+[TRAIN] Step 70 | Loss=1.303082 | Best makespan in group=512.00
+[TRAIN] Step 71/100 | 07:02:19
+[TRAIN] Step 71 | Loss=3.143708 | Best makespan in group=389.00
+[TRAIN] Step 72/100 | 07:04:21
+[TRAIN] Step 72 | Loss=3.054751 | Best makespan in group=484.00
+[TRAIN] Step 73/100 | 07:06:07
+[TRAIN] Step 73 | Loss=0.438390 | Best makespan in group=544.00
+[TRAIN] Step 74/100 | 07:09:19
+[TRAIN] Step 74 | Loss=0.709948 | Best makespan in group=501.00
+[TRAIN] Step 75/100 | 07:11:47
+[TRAIN] Step 75 | Loss=0.166820 | Best makespan in group=399.00
+[TRAIN][VAL][ep 75] avg_gap=0.1234 | std_gap=0.0521 | q80_gap=0.1662 | n=40
+[TRAIN] Step 76/100 | 07:16:47
+[TRAIN] Step 76 | Loss=0.500843 | Best makespan in group=368.00
+[TRAIN] Step 77/100 | 07:18:24
+[TRAIN] Step 77 | Loss=0.819192 | Best makespan in group=642.00
+[TRAIN] Step 78/100 | 07:21:02
+[TRAIN] Step 78 | Loss=2.833102 | Best makespan in group=351.00
+[TRAIN] Step 79/100 | 07:24:02
+[TRAIN] Step 79 | Loss=3.195244 | Best makespan in group=461.00
+[TRAIN] Step 80/100 | 07:27:01
+[TRAIN] Step 80 | Loss=2.367441 | Best makespan in group=519.00
+[TRAIN] Step 81/100 | 07:28:44
+[TRAIN] Step 81 | Loss=1.628456 | Best makespan in group=511.00
+[TRAIN] Step 82/100 | 07:31:10
+[TRAIN] Step 82 | Loss=0.085687 | Best makespan in group=339.00
+[TRAIN] Step 83/100 | 07:33:20
+[TRAIN] Step 83 | Loss=0.524882 | Best makespan in group=334.00
+[TRAIN] Step 84/100 | 07:36:23
+[TRAIN] Step 84 | Loss=2.223208 | Best makespan in group=475.00
+[TRAIN] Step 85/100 | 07:39:22
+[TRAIN] Step 85 | Loss=0.116194 | Best makespan in group=379.00
+[TRAIN] Step 86/100 | 07:41:25
+[TRAIN] Step 86 | Loss=1.911593 | Best makespan in group=411.00
+[TRAIN] Step 87/100 | 07:44:42
+[TRAIN] Step 87 | Loss=0.259159 | Best makespan in group=470.00
+[TRAIN] Step 88/100 | 07:47:17
+[TRAIN] Step 88 | Loss=1.112537 | Best makespan in group=515.00
+[TRAIN] Step 89/100 | 07:49:26
+[TRAIN] Step 89 | Loss=1.637545 | Best makespan in group=603.00
+[TRAIN] Step 90/100 | 07:51:53
+[TRAIN] Step 90 | Loss=2.920258 | Best makespan in group=540.00
+[TRAIN][VAL][ep 90] avg_gap=0.1488 | std_gap=0.0642 | q80_gap=0.2058 | n=40
+[TRAIN] Step 91/100 | 07:55:27
+[TRAIN] Step 91 | Loss=1.628657 | Best makespan in group=442.00
+[TRAIN] Step 92/100 | 07:58:47
+[TRAIN] Step 92 | Loss=0.279950 | Best makespan in group=509.00
+[TRAIN] Step 93/100 | 08:00:58
+[TRAIN] Step 93 | Loss=2.016732 | Best makespan in group=524.00
+[TRAIN] Step 94/100 | 08:03:11
+[TRAIN] Step 94 | Loss=1.769717 | Best makespan in group=628.00
+[TRAIN] Step 95/100 | 08:05:37
+[TRAIN] Step 95 | Loss=0.998861 | Best makespan in group=417.00
+[TRAIN] Step 96/100 | 08:07:16
+[TRAIN] Step 96 | Loss=0.537383 | Best makespan in group=536.00
+[TRAIN] Step 97/100 | 08:09:04
+[TRAIN] Step 97 | Loss=3.801751 | Best makespan in group=579.00
+[TRAIN] Step 98/100 | 08:11:36
+[TRAIN] Step 98 | Loss=0.570350 | Best makespan in group=441.00
+[TRAIN] Step 99/100 | 08:14:31
+[TRAIN] Step 99 | Loss=0.639847 | Best makespan in group=376.00
+[TRAIN] Step 100/100 | 08:16:07
+[TRAIN] Step 100 | Loss=0.767683 | Best makespan in group=357.00
+[TRAIN] Refreshing training instances (step 100)...
+[TRAIN][VAL][ep 100] avg_gap=0.1615 | std_gap=0.0672 | q80_gap=0.2336 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/293864447427531.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1507 | std_gap=0.0650 | q80_gap=0.1997 | n=40
+[TRAIN][08:22:23] Training ended. Validation history and plots updated.
+[I 2026-09-22 08:22:23,711] Trial 1 finished with value: 0.23361773792395796 and parameters: {'new_freq': 50, 'n_cases': 40, 'batch_size': 64, 'lr': 0.0008204643365323959, 'hidden_channels': 512, 'num_layers': 3, 'heads': 4, 'K': 32, 'use_greedy': False}. Best is trial 0 with value: 0.19940838888207316.
+[PARAM][OO] Trial 2 | episodes=100 | lr=3.78e-03 | hidden=256 | layers=1 | heads=4 | K=16 | use_greedy=False | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 08:22:24
+[TRAIN] Hyperparams | max_steps=100 | new_freq=10
+[TRAIN]             | n_cases=80 | B=64 | K=16 | use_greedy=False | lr=0.003784146030083809 (decaying to 7.57e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=1 | heads=4
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_2
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=22 | bc_loss=2.1074 | decisions=54
+[TRAIN][WARMSTART] step 10/100 | instance=68 | bc_loss=1.8727 | decisions=43
+[TRAIN][WARMSTART] step 15/100 | instance=55 | bc_loss=1.8511 | decisions=50
+[TRAIN][WARMSTART] step 20/100 | instance=49 | bc_loss=1.7125 | decisions=43
+[TRAIN][WARMSTART] step 25/100 | instance=23 | bc_loss=1.8412 | decisions=48
+[TRAIN][WARMSTART] step 30/100 | instance=42 | bc_loss=1.5903 | decisions=42
+[TRAIN][WARMSTART] step 35/100 | instance=73 | bc_loss=1.6505 | decisions=49
+[TRAIN][WARMSTART] step 40/100 | instance=71 | bc_loss=1.6457 | decisions=48
+[TRAIN][WARMSTART] step 45/100 | instance=28 | bc_loss=1.5344 | decisions=54
+[TRAIN][WARMSTART] step 50/100 | instance=54 | bc_loss=1.2245 | decisions=47
+[TRAIN][WARMSTART] step 55/100 | instance=9 | bc_loss=1.2080 | decisions=51
+[TRAIN][WARMSTART] step 60/100 | instance=53 | bc_loss=0.9764 | decisions=50
+[TRAIN][WARMSTART] step 65/100 | instance=26 | bc_loss=0.9716 | decisions=55
+[TRAIN][WARMSTART] step 70/100 | instance=14 | bc_loss=0.5189 | decisions=42
+[TRAIN][WARMSTART] step 75/100 | instance=63 | bc_loss=0.4115 | decisions=48
+[TRAIN][WARMSTART] step 80/100 | instance=44 | bc_loss=0.4485 | decisions=50
+[TRAIN][WARMSTART] step 85/100 | instance=71 | bc_loss=0.2457 | decisions=48
+[TRAIN][WARMSTART] step 90/100 | instance=33 | bc_loss=0.1383 | decisions=45
+[TRAIN][WARMSTART] step 95/100 | instance=24 | bc_loss=0.2170 | decisions=53
+[TRAIN][WARMSTART] step 100/100 | instance=62 | bc_loss=0.2020 | decisions=55
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 08:22:54
+[TRAIN] Step 1 | Loss=2.858635 | Best makespan in group=456.00
+[TRAIN] Step 2/100 | 08:23:13
+[TRAIN] Step 2 | Loss=0.124857 | Best makespan in group=447.00
+[TRAIN] Step 3/100 | 08:23:25
+[TRAIN] Step 3 | Loss=1.661930 | Best makespan in group=495.00
+[TRAIN] Step 4/100 | 08:23:46
+[TRAIN] Step 4 | Loss=8.577364 | Best makespan in group=430.00
+[TRAIN] Step 5/100 | 08:24:05
+[TRAIN] Step 5 | Loss=1.131598 | Best makespan in group=525.00
+[TRAIN] Step 6/100 | 08:24:25
+[TRAIN] Step 6 | Loss=0.038431 | Best makespan in group=447.00
+[TRAIN] Step 7/100 | 08:24:39
+[TRAIN] Step 7 | Loss=1.662310 | Best makespan in group=563.00
+[TRAIN] Step 8/100 | 08:24:58
+[TRAIN] Step 8 | Loss=2.460324 | Best makespan in group=424.00
+[TRAIN] Step 9/100 | 08:25:18
+[TRAIN] Step 9 | Loss=0.697100 | Best makespan in group=487.00
+[TRAIN] Step 10/100 | 08:25:38
+[TRAIN] Step 10 | Loss=0.371104 | Best makespan in group=383.00
+[TRAIN] Refreshing training instances (step 10)...
+[TRAIN] Step 11/100 | 08:25:51
+[TRAIN] Step 11 | Loss=1.170021 | Best makespan in group=506.00
+[TRAIN] Step 12/100 | 08:26:09
+[TRAIN] Step 12 | Loss=0.004506 | Best makespan in group=294.00
+[TRAIN] Step 13/100 | 08:26:24
+[TRAIN] Step 13 | Loss=5.180796 | Best makespan in group=402.00
+[TRAIN] Step 14/100 | 08:26:37
+[TRAIN] Step 14 | Loss=8.294472 | Best makespan in group=433.00
+[TRAIN] Step 15/100 | 08:26:55
+[TRAIN] Step 15 | Loss=7.555864 | Best makespan in group=397.00
+[TRAIN][VAL][ep 15] avg_gap=0.1892 | std_gap=0.0925 | q80_gap=0.2835 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1892 (raw=0.1892) | saving candidate: 956249182387536.pth
+[TRAIN] Step 16/100 | 08:27:24
+[TRAIN] Step 16 | Loss=2.936875 | Best makespan in group=388.00
+[TRAIN] Step 17/100 | 08:27:38
+[TRAIN] Step 17 | Loss=0.205033 | Best makespan in group=482.00
+[TRAIN] Step 18/100 | 08:27:53
+[TRAIN] Step 18 | Loss=2.725455 | Best makespan in group=534.00
+[TRAIN] Step 19/100 | 08:28:13
+[TRAIN] Step 19 | Loss=2.913668 | Best makespan in group=404.00
+[TRAIN] Step 20/100 | 08:28:27
+[TRAIN] Step 20 | Loss=0.497252 | Best makespan in group=339.00
+[TRAIN] Refreshing training instances (step 20)...
+[TRAIN] Step 21/100 | 08:28:40
+[TRAIN] Step 21 | Loss=0.568649 | Best makespan in group=390.00
+[TRAIN] Step 22/100 | 08:28:59
+[TRAIN] Step 22 | Loss=0.002379 | Best makespan in group=513.00
+[TRAIN] Step 23/100 | 08:29:11
+[TRAIN] Step 23 | Loss=0.339401 | Best makespan in group=366.00
+[TRAIN] Step 24/100 | 08:29:29
+[TRAIN] Step 24 | Loss=0.260797 | Best makespan in group=438.00
+[TRAIN] Step 25/100 | 08:29:48
+[TRAIN] Step 25 | Loss=0.442178 | Best makespan in group=431.00
+[TRAIN] Step 26/100 | 08:30:00
+[TRAIN] Step 26 | Loss=1.117361 | Best makespan in group=304.00
+[TRAIN] Step 27/100 | 08:30:18
+[TRAIN] Step 27 | Loss=1.176503 | Best makespan in group=428.00
+[TRAIN] Step 28/100 | 08:30:38
+[TRAIN] Step 28 | Loss=13.373123 | Best makespan in group=624.00
+[TRAIN] Step 29/100 | 08:30:57
+[TRAIN] Step 29 | Loss=5.002395 | Best makespan in group=542.00
+[TRAIN] Step 30/100 | 08:31:17
+[TRAIN] Step 30 | Loss=1.591918 | Best makespan in group=420.00
+[TRAIN] Refreshing training instances (step 30)...
+[TRAIN][VAL][ep 30] avg_gap=0.1212 | std_gap=0.0633 | q80_gap=0.1746 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1552 (raw=0.1212) | saving candidate: 910370452096571.pth
+[TRAIN] Step 31/100 | 08:31:44
+[TRAIN] Step 31 | Loss=5.093123 | Best makespan in group=431.00
+[TRAIN] Step 32/100 | 08:32:03
+[TRAIN] Step 32 | Loss=5.711339 | Best makespan in group=359.00
+[TRAIN] Step 33/100 | 08:32:20
+[TRAIN] Step 33 | Loss=8.209879 | Best makespan in group=367.00
+[TRAIN] Step 34/100 | 08:32:33
+[TRAIN] Step 34 | Loss=13.023136 | Best makespan in group=449.00
+[TRAIN] Step 35/100 | 08:32:45
+[TRAIN] Step 35 | Loss=0.118244 | Best makespan in group=346.00
+[TRAIN] Step 36/100 | 08:33:01
+[TRAIN] Step 36 | Loss=2.020266 | Best makespan in group=374.00
+[TRAIN] Step 37/100 | 08:33:13
+[TRAIN] Step 37 | Loss=5.899941 | Best makespan in group=337.00
+[TRAIN] Step 38/100 | 08:33:25
+[TRAIN] Step 38 | Loss=3.482427 | Best makespan in group=341.00
+[TRAIN] Step 39/100 | 08:33:37
+[TRAIN] Step 39 | Loss=11.101205 | Best makespan in group=397.00
+[TRAIN] Step 40/100 | 08:33:57
+[TRAIN] Step 40 | Loss=1.911476 | Best makespan in group=643.00
+[TRAIN] Refreshing training instances (step 40)...
+[TRAIN] Step 41/100 | 08:34:15
+[TRAIN] Step 41 | Loss=2.700570 | Best makespan in group=465.00
+[TRAIN] Step 42/100 | 08:34:31
+[TRAIN] Step 42 | Loss=0.313341 | Best makespan in group=500.00
+[TRAIN] Step 43/100 | 08:34:50
+[TRAIN] Step 43 | Loss=12.156657 | Best makespan in group=359.00
+[TRAIN] Step 44/100 | 08:35:02
+[TRAIN] Step 44 | Loss=0.016446 | Best makespan in group=326.00
+[TRAIN] Step 45/100 | 08:35:22
+[TRAIN] Step 45 | Loss=2.413080 | Best makespan in group=407.00
+[TRAIN][VAL][ep 45] avg_gap=0.2139 | std_gap=0.0890 | q80_gap=0.2966 | n=40
+[TRAIN] Step 46/100 | 08:35:52
+[TRAIN] Step 46 | Loss=0.850531 | Best makespan in group=395.00
+[TRAIN] Step 47/100 | 08:36:07
+[TRAIN] Step 47 | Loss=0.511790 | Best makespan in group=368.00
+[TRAIN] Step 48/100 | 08:36:27
+[TRAIN] Step 48 | Loss=6.311740 | Best makespan in group=322.00
+[TRAIN] Step 49/100 | 08:36:38
+[TRAIN] Step 49 | Loss=0.730927 | Best makespan in group=435.00
+[TRAIN] Step 50/100 | 08:36:53
+[TRAIN] Step 50 | Loss=0.026708 | Best makespan in group=473.00
+[TRAIN] Refreshing training instances (step 50)...
+[TRAIN] Step 51/100 | 08:37:05
+[TRAIN] Step 51 | Loss=9.556841 | Best makespan in group=430.00
+[TRAIN] Step 52/100 | 08:37:24
+[TRAIN] Step 52 | Loss=3.509006 | Best makespan in group=416.00
+[TRAIN] Step 53/100 | 08:37:36
+[TRAIN] Step 53 | Loss=2.171457 | Best makespan in group=376.00
+[TRAIN] Step 54/100 | 08:37:48
+[TRAIN] Step 54 | Loss=0.304607 | Best makespan in group=360.00
+[TRAIN] Step 55/100 | 08:38:00
+[TRAIN] Step 55 | Loss=0.196074 | Best makespan in group=459.00
+[TRAIN] Step 56/100 | 08:38:16
+[TRAIN] Step 56 | Loss=4.894013 | Best makespan in group=553.00
+[TRAIN] Step 57/100 | 08:38:33
+[TRAIN] Step 57 | Loss=3.916080 | Best makespan in group=369.00
+[TRAIN] Step 58/100 | 08:38:52
+[TRAIN] Step 58 | Loss=0.958256 | Best makespan in group=609.00
+[TRAIN] Step 59/100 | 08:39:12
+[TRAIN] Step 59 | Loss=8.733677 | Best makespan in group=520.00
+[TRAIN] Step 60/100 | 08:39:31
+[TRAIN] Step 60 | Loss=0.305169 | Best makespan in group=342.00
+[TRAIN] Refreshing training instances (step 60)...
+[TRAIN][VAL][ep 60] avg_gap=0.1827 | std_gap=0.0928 | q80_gap=0.2699 | n=40
+[TRAIN] Step 61/100 | 08:39:58
+[TRAIN] Step 61 | Loss=1.944984 | Best makespan in group=399.00
+[TRAIN] Step 62/100 | 08:40:12
+[TRAIN] Step 62 | Loss=0.343732 | Best makespan in group=358.00
+[TRAIN] Step 63/100 | 08:40:30
+[TRAIN] Step 63 | Loss=2.694056 | Best makespan in group=630.00
+[TRAIN] Step 64/100 | 08:40:49
+[TRAIN] Step 64 | Loss=3.340446 | Best makespan in group=411.00
+[TRAIN] Step 65/100 | 08:41:07
+[TRAIN] Step 65 | Loss=0.544113 | Best makespan in group=449.00
+[TRAIN] Step 66/100 | 08:41:22
+[TRAIN] Step 66 | Loss=8.750132 | Best makespan in group=397.00
+[TRAIN] Step 67/100 | 08:41:41
+[TRAIN] Step 67 | Loss=2.334738 | Best makespan in group=402.00
+[TRAIN] Step 68/100 | 08:41:53
+[TRAIN] Step 68 | Loss=0.234144 | Best makespan in group=323.00
+[TRAIN] Step 69/100 | 08:42:05
+[TRAIN] Step 69 | Loss=1.347975 | Best makespan in group=370.00
+[TRAIN] Step 70/100 | 08:42:17
+[TRAIN] Step 70 | Loss=5.658549 | Best makespan in group=353.00
+[TRAIN] Refreshing training instances (step 70)...
+[TRAIN] Step 71/100 | 08:42:35
+[TRAIN] Step 71 | Loss=4.557418 | Best makespan in group=415.00
+[TRAIN] Step 72/100 | 08:42:50
+[TRAIN] Step 72 | Loss=0.115464 | Best makespan in group=532.00
+[TRAIN] Step 73/100 | 08:43:09
+[TRAIN] Step 73 | Loss=2.857196 | Best makespan in group=452.00
+[TRAIN] Step 74/100 | 08:43:24
+[TRAIN] Step 74 | Loss=0.493455 | Best makespan in group=516.00
+[TRAIN] Step 75/100 | 08:43:37
+[TRAIN] Step 75 | Loss=0.395514 | Best makespan in group=462.00
+[TRAIN][VAL][ep 75] avg_gap=0.1248 | std_gap=0.0566 | q80_gap=0.1639 | n=40
+[TRAIN] Step 76/100 | 08:44:03
+[TRAIN] Step 76 | Loss=0.557338 | Best makespan in group=325.00
+[TRAIN] Step 77/100 | 08:44:17
+[TRAIN] Step 77 | Loss=0.761040 | Best makespan in group=524.00
+[TRAIN] Step 78/100 | 08:44:29
+[TRAIN] Step 78 | Loss=1.415705 | Best makespan in group=338.00
+[TRAIN] Step 79/100 | 08:44:42
+[TRAIN] Step 79 | Loss=2.265460 | Best makespan in group=409.00
+[TRAIN] Step 80/100 | 08:44:55
+[TRAIN] Step 80 | Loss=0.524078 | Best makespan in group=344.00
+[TRAIN] Refreshing training instances (step 80)...
+[TRAIN] Step 81/100 | 08:45:13
+[TRAIN] Step 81 | Loss=0.170576 | Best makespan in group=386.00
+[TRAIN] Step 82/100 | 08:45:31
+[TRAIN] Step 82 | Loss=10.053299 | Best makespan in group=359.00
+[TRAIN] Step 83/100 | 08:45:48
+[TRAIN] Step 83 | Loss=0.586232 | Best makespan in group=602.00
+[TRAIN] Step 84/100 | 08:46:07
+[TRAIN] Step 84 | Loss=1.151416 | Best makespan in group=332.00
+[TRAIN] Step 85/100 | 08:46:21
+[TRAIN] Step 85 | Loss=0.173381 | Best makespan in group=327.00
+[TRAIN] Step 86/100 | 08:46:34
+[TRAIN] Step 86 | Loss=0.324539 | Best makespan in group=350.00
+[TRAIN] Step 87/100 | 08:46:51
+[TRAIN] Step 87 | Loss=0.137784 | Best makespan in group=275.00
+[TRAIN] Step 88/100 | 08:47:05
+[TRAIN] Step 88 | Loss=9.397587 | Best makespan in group=354.00
+[TRAIN] Step 89/100 | 08:47:25
+[TRAIN] Step 89 | Loss=0.000109 | Best makespan in group=328.00
+[TRAIN] Step 90/100 | 08:47:37
+[TRAIN] Step 90 | Loss=0.940501 | Best makespan in group=394.00
+[TRAIN] Refreshing training instances (step 90)...
+[TRAIN][VAL][ep 90] avg_gap=0.1052 | std_gap=0.0490 | q80_gap=0.1423 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1376 (raw=0.1052) | saving candidate: 313255318224531.pth
+[TRAIN] Step 91/100 | 08:48:00
+[TRAIN] Step 91 | Loss=5.655569 | Best makespan in group=344.00
+[TRAIN] Step 92/100 | 08:48:18
+[TRAIN] Step 92 | Loss=1.352723 | Best makespan in group=582.00
+[TRAIN] Step 93/100 | 08:48:37
+[TRAIN] Step 93 | Loss=2.676421 | Best makespan in group=511.00
+[TRAIN] Step 94/100 | 08:48:57
+[TRAIN] Step 94 | Loss=0.001599 | Best makespan in group=387.00
+[TRAIN] Step 95/100 | 08:49:17
+[TRAIN] Step 95 | Loss=3.679443 | Best makespan in group=351.00
+[TRAIN] Step 96/100 | 08:49:28
+[TRAIN] Step 96 | Loss=3.149818 | Best makespan in group=353.00
+[TRAIN] Step 97/100 | 08:49:45
+[TRAIN] Step 97 | Loss=8.946050 | Best makespan in group=366.00
+[TRAIN] Step 98/100 | 08:50:05
+[TRAIN] Step 98 | Loss=0.261723 | Best makespan in group=562.00
+[TRAIN] Step 99/100 | 08:50:21
+[TRAIN] Step 99 | Loss=3.398613 | Best makespan in group=340.00
+[TRAIN] Step 100/100 | 08:50:36
+[TRAIN] Step 100 | Loss=6.804262 | Best makespan in group=561.00
+[TRAIN] Refreshing training instances (step 100)...
+[TRAIN][VAL][ep 100] avg_gap=0.1166 | std_gap=0.0565 | q80_gap=0.1558 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1155 (raw=0.1166) | saving candidate: 754087423801083.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/754087423801083.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1162 | std_gap=0.0557 | q80_gap=0.1383 | n=40
+[TRAIN][08:51:15] Training ended. Validation history and plots updated.
+[I 2026-09-22 08:51:15,689] Trial 2 finished with value: 0.15584391616780274 and parameters: {'new_freq': 10, 'n_cases': 80, 'batch_size': 64, 'lr': 0.003784146030083809, 'hidden_channels': 256, 'num_layers': 1, 'heads': 4, 'K': 16, 'use_greedy': False}. Best is trial 2 with value: 0.15584391616780274.
+[PARAM][OO] Trial 3 | episodes=100 | lr=1.30e-03 | hidden=128 | layers=1 | heads=2 | K=32 | use_greedy=True | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 08:51:16
+[TRAIN] Hyperparams | max_steps=100 | new_freq=10
+[TRAIN]             | n_cases=40 | B=128 | K=32 | use_greedy=True | lr=0.0012962378302375805 (decaying to 2.59e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=1 | heads=2
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_3
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=7 | bc_loss=2.1260 | decisions=52
+[TRAIN][WARMSTART] step 10/100 | instance=18 | bc_loss=2.0472 | decisions=47
+[TRAIN][WARMSTART] step 15/100 | instance=10 | bc_loss=2.1474 | decisions=53
+[TRAIN][WARMSTART] step 20/100 | instance=32 | bc_loss=2.1273 | decisions=54
+[TRAIN][WARMSTART] step 25/100 | instance=30 | bc_loss=2.0870 | decisions=54
+[TRAIN][WARMSTART] step 30/100 | instance=25 | bc_loss=2.0243 | decisions=49
+[TRAIN][WARMSTART] step 35/100 | instance=19 | bc_loss=1.9081 | decisions=42
+[TRAIN][WARMSTART] step 40/100 | instance=36 | bc_loss=1.9866 | decisions=49
+[TRAIN][WARMSTART] step 45/100 | instance=3 | bc_loss=1.9062 | decisions=51
+[TRAIN][WARMSTART] step 50/100 | instance=24 | bc_loss=1.8808 | decisions=42
+[TRAIN][WARMSTART] step 55/100 | instance=35 | bc_loss=1.8175 | decisions=45
+[TRAIN][WARMSTART] step 60/100 | instance=11 | bc_loss=2.0349 | decisions=51
+[TRAIN][WARMSTART] step 65/100 | instance=20 | bc_loss=1.8896 | decisions=49
+[TRAIN][WARMSTART] step 70/100 | instance=33 | bc_loss=1.8585 | decisions=47
+[TRAIN][WARMSTART] step 75/100 | instance=32 | bc_loss=1.9684 | decisions=54
+[TRAIN][WARMSTART] step 80/100 | instance=13 | bc_loss=1.7945 | decisions=46
+[TRAIN][WARMSTART] step 85/100 | instance=17 | bc_loss=1.6757 | decisions=45
+[TRAIN][WARMSTART] step 90/100 | instance=29 | bc_loss=1.7216 | decisions=43
+[TRAIN][WARMSTART] step 95/100 | instance=39 | bc_loss=1.9021 | decisions=52
+[TRAIN][WARMSTART] step 100/100 | instance=25 | bc_loss=1.8360 | decisions=49
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 08:51:37
+[TRAIN] Step 1 | Loss=3.594817 | Best makespan in group=319.00
+[TRAIN] Step 2/100 | 08:51:48
+[TRAIN] Step 2 | Loss=0.035567 | Best makespan in group=440.00
+[TRAIN] Step 3/100 | 08:52:01
+[TRAIN] Step 3 | Loss=7.159032 | Best makespan in group=333.00
+[TRAIN] Step 4/100 | 08:52:12
+[TRAIN] Step 4 | Loss=0.401107 | Best makespan in group=336.00
+[TRAIN] Step 5/100 | 08:52:25
+[TRAIN] Step 5 | Loss=0.682441 | Best makespan in group=358.00
+[TRAIN] Step 6/100 | 08:52:37
+[TRAIN] Step 6 | Loss=0.841762 | Best makespan in group=546.00
+[TRAIN] Step 7/100 | 08:52:52
+[TRAIN] Step 7 | Loss=2.796149 | Best makespan in group=366.00
+[TRAIN] Step 8/100 | 08:53:06
+[TRAIN] Step 8 | Loss=1.106175 | Best makespan in group=336.00
+[TRAIN] Step 9/100 | 08:53:17
+[TRAIN] Step 9 | Loss=8.189624 | Best makespan in group=482.00
+[TRAIN] Step 10/100 | 08:53:27
+[TRAIN] Step 10 | Loss=2.763879 | Best makespan in group=387.00
+[TRAIN] Refreshing training instances (step 10)...
+[TRAIN] Step 11/100 | 08:53:40
+[TRAIN] Step 11 | Loss=2.355136 | Best makespan in group=406.00
+[TRAIN] Step 12/100 | 08:53:55
+[TRAIN] Step 12 | Loss=2.682864 | Best makespan in group=337.00
+[TRAIN] Step 13/100 | 08:54:06
+[TRAIN] Step 13 | Loss=8.920042 | Best makespan in group=320.00
+[TRAIN] Step 14/100 | 08:54:18
+[TRAIN] Step 14 | Loss=1.387971 | Best makespan in group=442.00
+[TRAIN] Step 15/100 | 08:54:31
+[TRAIN] Step 15 | Loss=0.157717 | Best makespan in group=488.00
+[TRAIN][VAL][ep 15] avg_gap=0.1483 | std_gap=0.0645 | q80_gap=0.1968 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1483 (raw=0.1483) | saving candidate: 141377149063066.pth
+[TRAIN] Step 16/100 | 08:54:55
+[TRAIN] Step 16 | Loss=0.920315 | Best makespan in group=624.00
+[TRAIN] Step 17/100 | 08:55:10
+[TRAIN] Step 17 | Loss=8.790164 | Best makespan in group=512.00
+[TRAIN] Step 18/100 | 08:55:25
+[TRAIN] Step 18 | Loss=3.747422 | Best makespan in group=418.00
+[TRAIN] Step 19/100 | 08:55:39
+[TRAIN] Step 19 | Loss=0.001343 | Best makespan in group=492.00
+[TRAIN] Step 20/100 | 08:55:56
+[TRAIN] Step 20 | Loss=0.885016 | Best makespan in group=535.00
+[TRAIN] Refreshing training instances (step 20)...
+[TRAIN] Step 21/100 | 08:56:12
+[TRAIN] Step 21 | Loss=0.171031 | Best makespan in group=537.00
+[TRAIN] Step 22/100 | 08:56:28
+[TRAIN] Step 22 | Loss=2.354331 | Best makespan in group=362.00
+[TRAIN] Step 23/100 | 08:56:43
+[TRAIN] Step 23 | Loss=4.393919 | Best makespan in group=320.00
+[TRAIN] Step 24/100 | 08:56:58
+[TRAIN] Step 24 | Loss=5.836452 | Best makespan in group=373.00
+[TRAIN] Step 25/100 | 08:57:10
+[TRAIN] Step 25 | Loss=1.926334 | Best makespan in group=388.00
+[TRAIN] Step 26/100 | 08:57:25
+[TRAIN] Step 26 | Loss=0.107080 | Best makespan in group=328.00
+[TRAIN] Step 27/100 | 08:57:39
+[TRAIN] Step 27 | Loss=0.003144 | Best makespan in group=372.00
+[TRAIN] Step 28/100 | 08:57:52
+[TRAIN] Step 28 | Loss=0.002400 | Best makespan in group=381.00
+[TRAIN] Step 29/100 | 08:58:02
+[TRAIN] Step 29 | Loss=3.712623 | Best makespan in group=337.00
+[TRAIN] Step 30/100 | 08:58:16
+[TRAIN] Step 30 | Loss=1.121296 | Best makespan in group=423.00
+[TRAIN] Refreshing training instances (step 30)...
+[TRAIN][VAL][ep 30] avg_gap=0.1351 | std_gap=0.0636 | q80_gap=0.1982 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1417 (raw=0.1351) | saving candidate: 642434271487111.pth
+[TRAIN] Step 31/100 | 08:58:36
+[TRAIN] Step 31 | Loss=0.050524 | Best makespan in group=458.00
+[TRAIN] Step 32/100 | 08:58:47
+[TRAIN] Step 32 | Loss=1.179826 | Best makespan in group=518.00
+[TRAIN] Step 33/100 | 08:58:59
+[TRAIN] Step 33 | Loss=0.006553 | Best makespan in group=512.00
+[TRAIN] Step 34/100 | 08:59:13
+[TRAIN] Step 34 | Loss=1.289193 | Best makespan in group=361.00
+[TRAIN] Step 35/100 | 08:59:24
+[TRAIN] Step 35 | Loss=0.073536 | Best makespan in group=427.00
+[TRAIN] Step 36/100 | 08:59:36
+[TRAIN] Step 36 | Loss=0.113120 | Best makespan in group=377.00
+[TRAIN] Step 37/100 | 08:59:47
+[TRAIN] Step 37 | Loss=0.000418 | Best makespan in group=515.00
+[TRAIN] Step 38/100 | 08:59:58
+[TRAIN] Step 38 | Loss=0.000840 | Best makespan in group=417.00
+[TRAIN] Step 39/100 | 09:00:14
+[TRAIN] Step 39 | Loss=5.093633 | Best makespan in group=475.00
+[TRAIN] Step 40/100 | 09:00:28
+[TRAIN] Step 40 | Loss=4.545516 | Best makespan in group=324.00
+[TRAIN] Refreshing training instances (step 40)...
+[TRAIN] Step 41/100 | 09:00:44
+[TRAIN] Step 41 | Loss=1.796468 | Best makespan in group=571.00
+[TRAIN] Step 42/100 | 09:00:57
+[TRAIN] Step 42 | Loss=1.514878 | Best makespan in group=500.00
+[TRAIN] Step 43/100 | 09:01:11
+[TRAIN] Step 43 | Loss=0.001915 | Best makespan in group=496.00
+[TRAIN] Step 44/100 | 09:01:23
+[TRAIN] Step 44 | Loss=0.844279 | Best makespan in group=383.00
+[TRAIN] Step 45/100 | 09:01:34
+[TRAIN] Step 45 | Loss=1.724408 | Best makespan in group=485.00
+[TRAIN][VAL][ep 45] avg_gap=0.1332 | std_gap=0.0669 | q80_gap=0.1982 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1389 (raw=0.1332) | saving candidate: 591326221264823.pth
+[TRAIN] Step 46/100 | 09:01:55
+[TRAIN] Step 46 | Loss=0.737862 | Best makespan in group=425.00
+[TRAIN] Step 47/100 | 09:02:10
+[TRAIN] Step 47 | Loss=1.783124 | Best makespan in group=311.00
+[TRAIN] Step 48/100 | 09:02:21
+[TRAIN] Step 48 | Loss=0.005548 | Best makespan in group=531.00
+[TRAIN] Step 49/100 | 09:02:31
+[TRAIN] Step 49 | Loss=0.569361 | Best makespan in group=354.00
+[TRAIN] Step 50/100 | 09:02:42
+[TRAIN] Step 50 | Loss=1.765021 | Best makespan in group=393.00
+[TRAIN] Refreshing training instances (step 50)...
+[TRAIN] Step 51/100 | 09:02:58
+[TRAIN] Step 51 | Loss=0.000585 | Best makespan in group=496.00
+[TRAIN] Step 52/100 | 09:03:13
+[TRAIN] Step 52 | Loss=0.573616 | Best makespan in group=447.00
+[TRAIN] Step 53/100 | 09:03:28
+[TRAIN] Step 53 | Loss=0.002009 | Best makespan in group=382.00
+[TRAIN] Step 54/100 | 09:03:39
+[TRAIN] Step 54 | Loss=0.000536 | Best makespan in group=450.00
+[TRAIN] Step 55/100 | 09:03:54
+[TRAIN] Step 55 | Loss=2.330640 | Best makespan in group=476.00
+[TRAIN] Step 56/100 | 09:04:07
+[TRAIN] Step 56 | Loss=0.015609 | Best makespan in group=444.00
+[TRAIN] Step 57/100 | 09:04:20
+[TRAIN] Step 57 | Loss=3.846147 | Best makespan in group=427.00
+[TRAIN] Step 58/100 | 09:04:31
+[TRAIN] Step 58 | Loss=0.001334 | Best makespan in group=538.00
+[TRAIN] Step 59/100 | 09:04:46
+[TRAIN] Step 59 | Loss=0.218175 | Best makespan in group=284.00
+[TRAIN] Step 60/100 | 09:04:57
+[TRAIN] Step 60 | Loss=0.517512 | Best makespan in group=554.00
+[TRAIN] Refreshing training instances (step 60)...
+[TRAIN][VAL][ep 60] avg_gap=0.1319 | std_gap=0.0661 | q80_gap=0.1707 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1334 (raw=0.1319) | saving candidate: 241334546987359.pth
+[TRAIN] Step 61/100 | 09:05:20
+[TRAIN] Step 61 | Loss=3.164100 | Best makespan in group=362.00
+[TRAIN] Step 62/100 | 09:05:35
+[TRAIN] Step 62 | Loss=8.895636 | Best makespan in group=346.00
+[TRAIN] Step 63/100 | 09:05:48
+[TRAIN] Step 63 | Loss=1.451772 | Best makespan in group=396.00
+[TRAIN] Step 64/100 | 09:06:01
+[TRAIN] Step 64 | Loss=7.386055 | Best makespan in group=404.00
+[TRAIN] Step 65/100 | 09:06:14
+[TRAIN] Step 65 | Loss=0.008003 | Best makespan in group=413.00
+[TRAIN] Step 66/100 | 09:06:30
+[TRAIN] Step 66 | Loss=1.305007 | Best makespan in group=351.00
+[TRAIN] Step 67/100 | 09:06:42
+[TRAIN] Step 67 | Loss=1.641773 | Best makespan in group=408.00
+[TRAIN] Step 68/100 | 09:06:53
+[TRAIN] Step 68 | Loss=0.003348 | Best makespan in group=640.00
+[TRAIN] Step 69/100 | 09:07:08
+[TRAIN] Step 69 | Loss=0.338228 | Best makespan in group=606.00
+[TRAIN] Step 70/100 | 09:07:24
+[TRAIN] Step 70 | Loss=1.327725 | Best makespan in group=370.00
+[TRAIN] Refreshing training instances (step 70)...
+[TRAIN] Step 71/100 | 09:07:36
+[TRAIN] Step 71 | Loss=1.651736 | Best makespan in group=374.00
+[TRAIN] Step 72/100 | 09:07:47
+[TRAIN] Step 72 | Loss=1.067623 | Best makespan in group=506.00
+[TRAIN] Step 73/100 | 09:07:57
+[TRAIN] Step 73 | Loss=0.002682 | Best makespan in group=410.00
+[TRAIN] Step 74/100 | 09:08:11
+[TRAIN] Step 74 | Loss=0.401552 | Best makespan in group=403.00
+[TRAIN] Step 75/100 | 09:08:27
+[TRAIN] Step 75 | Loss=0.002552 | Best makespan in group=387.00
+[TRAIN][VAL][ep 75] avg_gap=0.1297 | std_gap=0.0672 | q80_gap=0.1700 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1316 (raw=0.1297) | saving candidate: 354050451270689.pth
+[TRAIN] Step 76/100 | 09:08:48
+[TRAIN] Step 76 | Loss=3.532136 | Best makespan in group=399.00
+[TRAIN] Step 77/100 | 09:09:03
+[TRAIN] Step 77 | Loss=4.939416 | Best makespan in group=383.00
+[TRAIN] Step 78/100 | 09:09:17
+[TRAIN] Step 78 | Loss=0.266017 | Best makespan in group=539.00
+[TRAIN] Step 79/100 | 09:09:32
+[TRAIN] Step 79 | Loss=0.024208 | Best makespan in group=385.00
+[TRAIN] Step 80/100 | 09:09:45
+[TRAIN] Step 80 | Loss=0.002488 | Best makespan in group=355.00
+[TRAIN] Refreshing training instances (step 80)...
+[TRAIN] Step 81/100 | 09:09:55
+[TRAIN] Step 81 | Loss=0.902443 | Best makespan in group=422.00
+[TRAIN] Step 82/100 | 09:10:05
+[TRAIN] Step 82 | Loss=0.931853 | Best makespan in group=550.00
+[TRAIN] Step 83/100 | 09:10:18
+[TRAIN] Step 83 | Loss=0.064842 | Best makespan in group=495.00
+[TRAIN] Step 84/100 | 09:10:32
+[TRAIN] Step 84 | Loss=2.315479 | Best makespan in group=395.00
+[TRAIN] Step 85/100 | 09:10:46
+[TRAIN] Step 85 | Loss=4.498467 | Best makespan in group=379.00
+[TRAIN] Step 86/100 | 09:10:56
+[TRAIN] Step 86 | Loss=0.490380 | Best makespan in group=448.00
+[TRAIN] Step 87/100 | 09:11:07
+[TRAIN] Step 87 | Loss=1.899485 | Best makespan in group=377.00
+[TRAIN] Step 88/100 | 09:11:20
+[TRAIN] Step 88 | Loss=8.035455 | Best makespan in group=344.00
+[TRAIN] Step 89/100 | 09:11:31
+[TRAIN] Step 89 | Loss=5.818840 | Best makespan in group=336.00
+[TRAIN] Step 90/100 | 09:11:45
+[TRAIN] Step 90 | Loss=0.000216 | Best makespan in group=437.00
+[TRAIN] Refreshing training instances (step 90)...
+[TRAIN][VAL][ep 90] avg_gap=0.1324 | std_gap=0.0722 | q80_gap=0.1809 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1313 (raw=0.1324) | saving candidate: 807976763254063.pth
+[TRAIN] Step 91/100 | 09:12:10
+[TRAIN] Step 91 | Loss=0.001228 | Best makespan in group=389.00
+[TRAIN] Step 92/100 | 09:12:22
+[TRAIN] Step 92 | Loss=10.231259 | Best makespan in group=383.00
+[TRAIN] Step 93/100 | 09:12:35
+[TRAIN] Step 93 | Loss=0.001099 | Best makespan in group=419.00
+[TRAIN] Step 94/100 | 09:12:50
+[TRAIN] Step 94 | Loss=2.607740 | Best makespan in group=438.00
+[TRAIN] Step 95/100 | 09:13:09
+[TRAIN] Step 95 | Loss=0.691244 | Best makespan in group=403.00
+[TRAIN] Step 96/100 | 09:13:24
+[TRAIN] Step 96 | Loss=3.715580 | Best makespan in group=444.00
+[TRAIN] Step 97/100 | 09:13:43
+[TRAIN] Step 97 | Loss=7.600204 | Best makespan in group=354.00
+[TRAIN] Step 98/100 | 09:14:00
+[TRAIN] Step 98 | Loss=5.494734 | Best makespan in group=490.00
+[TRAIN] Step 99/100 | 09:14:14
+[TRAIN] Step 99 | Loss=5.941844 | Best makespan in group=542.00
+[TRAIN] Step 100/100 | 09:14:30
+[TRAIN] Step 100 | Loss=0.975071 | Best makespan in group=296.00
+[TRAIN] Refreshing training instances (step 100)...
+[TRAIN][VAL][ep 100] avg_gap=0.1327 | std_gap=0.0764 | q80_gap=0.1848 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/807976763254063.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1476 | std_gap=0.0803 | q80_gap=0.2229 | n=40
+[TRAIN][09:15:01] Training ended. Validation history and plots updated.
+[I 2026-09-22 09:15:01,713] Trial 3 finished with value: 0.1847871508445099 and parameters: {'new_freq': 10, 'n_cases': 40, 'batch_size': 128, 'lr': 0.0012962378302375805, 'hidden_channels': 128, 'num_layers': 1, 'heads': 2, 'K': 32, 'use_greedy': True}. Best is trial 2 with value: 0.15584391616780274.
+[PARAM][OO] Trial 4 | episodes=100 | lr=5.55e-04 | hidden=64 | layers=2 | heads=4 | K=32 | use_greedy=True | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 09:15:02
+[TRAIN] Hyperparams | max_steps=100 | new_freq=1
+[TRAIN]             | n_cases=80 | B=64 | K=32 | use_greedy=True | lr=0.0005551823656527313 (decaying to 1.11e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=64 | num_layers=2 | heads=4
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_4
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=46 | bc_loss=1.9007 | decisions=43
+[TRAIN][WARMSTART] step 10/100 | instance=21 | bc_loss=1.9380 | decisions=43
+[TRAIN][WARMSTART] step 15/100 | instance=51 | bc_loss=2.0768 | decisions=51
+[TRAIN][WARMSTART] step 20/100 | instance=26 | bc_loss=1.9204 | decisions=42
+[TRAIN][WARMSTART] step 25/100 | instance=57 | bc_loss=1.9143 | decisions=44
+[TRAIN][WARMSTART] step 30/100 | instance=26 | bc_loss=1.9023 | decisions=42
+[TRAIN][WARMSTART] step 35/100 | instance=57 | bc_loss=1.9037 | decisions=44
+[TRAIN][WARMSTART] step 40/100 | instance=65 | bc_loss=1.9597 | decisions=46
+[TRAIN][WARMSTART] step 45/100 | instance=71 | bc_loss=2.0478 | decisions=51
+[TRAIN][WARMSTART] step 50/100 | instance=55 | bc_loss=1.9524 | decisions=47
+[TRAIN][WARMSTART] step 55/100 | instance=49 | bc_loss=2.0736 | decisions=55
+[TRAIN][WARMSTART] step 60/100 | instance=68 | bc_loss=1.9482 | decisions=50
+[TRAIN][WARMSTART] step 65/100 | instance=43 | bc_loss=1.9577 | decisions=44
+[TRAIN][WARMSTART] step 70/100 | instance=65 | bc_loss=1.9521 | decisions=46
+[TRAIN][WARMSTART] step 75/100 | instance=67 | bc_loss=1.9646 | decisions=46
+[TRAIN][WARMSTART] step 80/100 | instance=45 | bc_loss=1.7054 | decisions=44
+[TRAIN][WARMSTART] step 85/100 | instance=11 | bc_loss=1.9373 | decisions=49
+[TRAIN][WARMSTART] step 90/100 | instance=17 | bc_loss=1.7539 | decisions=43
+[TRAIN][WARMSTART] step 95/100 | instance=42 | bc_loss=1.8804 | decisions=44
+[TRAIN][WARMSTART] step 100/100 | instance=29 | bc_loss=1.9661 | decisions=53
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 09:15:40
+[TRAIN] Step 1 | Loss=7.859102 | Best makespan in group=414.00
+[TRAIN] Refreshing training instances (step 1)...
+[TRAIN] Step 2/100 | 09:15:48
+[TRAIN] Step 2 | Loss=2.160953 | Best makespan in group=399.00
+[TRAIN] Refreshing training instances (step 2)...
+[TRAIN] Step 3/100 | 09:15:57
+[TRAIN] Step 3 | Loss=1.458209 | Best makespan in group=380.00
+[TRAIN] Refreshing training instances (step 3)...
+[TRAIN] Step 4/100 | 09:16:05
+[TRAIN] Step 4 | Loss=0.015564 | Best makespan in group=394.00
+[TRAIN] Refreshing training instances (step 4)...
+[TRAIN] Step 5/100 | 09:16:14
+[TRAIN] Step 5 | Loss=1.486751 | Best makespan in group=399.00
+[TRAIN] Refreshing training instances (step 5)...
+[TRAIN] Step 6/100 | 09:16:21
+[TRAIN] Step 6 | Loss=0.631751 | Best makespan in group=580.00
+[TRAIN] Refreshing training instances (step 6)...
+[TRAIN] Step 7/100 | 09:16:31
+[TRAIN] Step 7 | Loss=4.804239 | Best makespan in group=335.00
+[TRAIN] Refreshing training instances (step 7)...
+[TRAIN] Step 8/100 | 09:16:38
+[TRAIN] Step 8 | Loss=1.036400 | Best makespan in group=464.00
+[TRAIN] Refreshing training instances (step 8)...
+[TRAIN] Step 9/100 | 09:16:48
+[TRAIN] Step 9 | Loss=1.368267 | Best makespan in group=454.00
+[TRAIN] Refreshing training instances (step 9)...
+[TRAIN] Step 10/100 | 09:16:57
+[TRAIN] Step 10 | Loss=10.965863 | Best makespan in group=412.00
+[TRAIN] Refreshing training instances (step 10)...
+[TRAIN] Step 11/100 | 09:17:03
+[TRAIN] Step 11 | Loss=2.231119 | Best makespan in group=452.00
+[TRAIN] Refreshing training instances (step 11)...
+[TRAIN] Step 12/100 | 09:17:10
+[TRAIN] Step 12 | Loss=2.620238 | Best makespan in group=511.00
+[TRAIN] Refreshing training instances (step 12)...
+[TRAIN] Step 13/100 | 09:17:21
+[TRAIN] Step 13 | Loss=0.812542 | Best makespan in group=441.00
+[TRAIN] Refreshing training instances (step 13)...
+[TRAIN] Step 14/100 | 09:17:32
+[TRAIN] Step 14 | Loss=1.830202 | Best makespan in group=356.00
+[TRAIN] Refreshing training instances (step 14)...
+[TRAIN] Step 15/100 | 09:17:42
+[TRAIN] Step 15 | Loss=0.724770 | Best makespan in group=421.00
+[TRAIN] Refreshing training instances (step 15)...
+[TRAIN][VAL][ep 15] avg_gap=0.1810 | std_gap=0.0837 | q80_gap=0.2390 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1810 (raw=0.1810) | saving candidate: 684864066409501.pth
+[TRAIN] Step 16/100 | 09:18:02
+[TRAIN] Step 16 | Loss=8.055909 | Best makespan in group=492.00
+[TRAIN] Refreshing training instances (step 16)...
+[TRAIN] Step 17/100 | 09:18:12
+[TRAIN] Step 17 | Loss=2.786066 | Best makespan in group=457.00
+[TRAIN] Refreshing training instances (step 17)...
+[TRAIN] Step 18/100 | 09:18:22
+[TRAIN] Step 18 | Loss=2.437403 | Best makespan in group=642.00
+[TRAIN] Refreshing training instances (step 18)...
+[TRAIN] Step 19/100 | 09:18:32
+[TRAIN] Step 19 | Loss=2.123835 | Best makespan in group=353.00
+[TRAIN] Refreshing training instances (step 19)...
+[TRAIN] Step 20/100 | 09:18:39
+[TRAIN] Step 20 | Loss=3.622268 | Best makespan in group=443.00
+[TRAIN] Refreshing training instances (step 20)...
+[TRAIN] Step 21/100 | 09:18:49
+[TRAIN] Step 21 | Loss=1.063838 | Best makespan in group=448.00
+[TRAIN] Refreshing training instances (step 21)...
+[TRAIN] Step 22/100 | 09:19:00
+[TRAIN] Step 22 | Loss=2.767287 | Best makespan in group=354.00
+[TRAIN] Refreshing training instances (step 22)...
+[TRAIN] Step 23/100 | 09:19:08
+[TRAIN] Step 23 | Loss=2.646522 | Best makespan in group=378.00
+[TRAIN] Refreshing training instances (step 23)...
+[TRAIN] Step 24/100 | 09:19:18
+[TRAIN] Step 24 | Loss=3.268230 | Best makespan in group=345.00
+[TRAIN] Refreshing training instances (step 24)...
+[TRAIN] Step 25/100 | 09:19:26
+[TRAIN] Step 25 | Loss=1.752007 | Best makespan in group=304.00
+[TRAIN] Refreshing training instances (step 25)...
+[TRAIN] Step 26/100 | 09:19:32
+[TRAIN] Step 26 | Loss=2.296939 | Best makespan in group=496.00
+[TRAIN] Refreshing training instances (step 26)...
+[TRAIN] Step 27/100 | 09:19:39
+[TRAIN] Step 27 | Loss=1.857189 | Best makespan in group=553.00
+[TRAIN] Refreshing training instances (step 27)...
+[TRAIN] Step 28/100 | 09:19:50
+[TRAIN] Step 28 | Loss=0.506940 | Best makespan in group=454.00
+[TRAIN] Refreshing training instances (step 28)...
+[TRAIN] Step 29/100 | 09:20:01
+[TRAIN] Step 29 | Loss=2.187114 | Best makespan in group=615.00
+[TRAIN] Refreshing training instances (step 29)...
+[TRAIN] Step 30/100 | 09:20:11
+[TRAIN] Step 30 | Loss=1.909282 | Best makespan in group=482.00
+[TRAIN] Refreshing training instances (step 30)...
+[TRAIN][VAL][ep 30] avg_gap=0.1660 | std_gap=0.0851 | q80_gap=0.2459 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1735 (raw=0.1660) | saving candidate: 963505846075494.pth
+[TRAIN] Step 31/100 | 09:20:35
+[TRAIN] Step 31 | Loss=0.491674 | Best makespan in group=378.00
+[TRAIN] Refreshing training instances (step 31)...
+[TRAIN] Step 32/100 | 09:20:43
+[TRAIN] Step 32 | Loss=1.549751 | Best makespan in group=411.00
+[TRAIN] Refreshing training instances (step 32)...
+[TRAIN] Step 33/100 | 09:20:51
+[TRAIN] Step 33 | Loss=0.497087 | Best makespan in group=366.00
+[TRAIN] Refreshing training instances (step 33)...
+[TRAIN] Step 34/100 | 09:20:59
+[TRAIN] Step 34 | Loss=0.270057 | Best makespan in group=440.00
+[TRAIN] Refreshing training instances (step 34)...
+[TRAIN] Step 35/100 | 09:21:07
+[TRAIN] Step 35 | Loss=0.000064 | Best makespan in group=296.00
+[TRAIN] Refreshing training instances (step 35)...
+[TRAIN] Step 36/100 | 09:21:17
+[TRAIN] Step 36 | Loss=7.274054 | Best makespan in group=469.00
+[TRAIN] Refreshing training instances (step 36)...
+[TRAIN] Step 37/100 | 09:21:24
+[TRAIN] Step 37 | Loss=0.097339 | Best makespan in group=517.00
+[TRAIN] Refreshing training instances (step 37)...
+[TRAIN] Step 38/100 | 09:21:31
+[TRAIN] Step 38 | Loss=1.369632 | Best makespan in group=410.00
+[TRAIN] Refreshing training instances (step 38)...
+[TRAIN] Step 39/100 | 09:21:41
+[TRAIN] Step 39 | Loss=2.338895 | Best makespan in group=532.00
+[TRAIN] Refreshing training instances (step 39)...
+[TRAIN] Step 40/100 | 09:21:52
+[TRAIN] Step 40 | Loss=0.163910 | Best makespan in group=448.00
+[TRAIN] Refreshing training instances (step 40)...
+[TRAIN] Step 41/100 | 09:22:00
+[TRAIN] Step 41 | Loss=5.155063 | Best makespan in group=456.00
+[TRAIN] Refreshing training instances (step 41)...
+[TRAIN] Step 42/100 | 09:22:10
+[TRAIN] Step 42 | Loss=1.530166 | Best makespan in group=444.00
+[TRAIN] Refreshing training instances (step 42)...
+[TRAIN] Step 43/100 | 09:22:16
+[TRAIN] Step 43 | Loss=4.207481 | Best makespan in group=387.00
+[TRAIN] Refreshing training instances (step 43)...
+[TRAIN] Step 44/100 | 09:22:27
+[TRAIN] Step 44 | Loss=3.316546 | Best makespan in group=619.00
+[TRAIN] Refreshing training instances (step 44)...
+[TRAIN] Step 45/100 | 09:22:35
+[TRAIN] Step 45 | Loss=0.001768 | Best makespan in group=430.00
+[TRAIN] Refreshing training instances (step 45)...
+[TRAIN][VAL][ep 45] avg_gap=0.1537 | std_gap=0.0781 | q80_gap=0.2103 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1669 (raw=0.1537) | saving candidate: 707694595553845.pth
+[TRAIN] Step 46/100 | 09:22:57
+[TRAIN] Step 46 | Loss=1.660686 | Best makespan in group=652.00
+[TRAIN] Refreshing training instances (step 46)...
+[TRAIN] Step 47/100 | 09:23:07
+[TRAIN] Step 47 | Loss=3.543657 | Best makespan in group=383.00
+[TRAIN] Refreshing training instances (step 47)...
+[TRAIN] Step 48/100 | 09:23:18
+[TRAIN] Step 48 | Loss=2.737540 | Best makespan in group=398.00
+[TRAIN] Refreshing training instances (step 48)...
+[TRAIN] Step 49/100 | 09:23:27
+[TRAIN] Step 49 | Loss=0.070314 | Best makespan in group=419.00
+[TRAIN] Refreshing training instances (step 49)...
+[TRAIN] Step 50/100 | 09:23:35
+[TRAIN] Step 50 | Loss=1.056466 | Best makespan in group=432.00
+[TRAIN] Refreshing training instances (step 50)...
+[TRAIN] Step 51/100 | 09:23:43
+[TRAIN] Step 51 | Loss=0.980704 | Best makespan in group=556.00
+[TRAIN] Refreshing training instances (step 51)...
+[TRAIN] Step 52/100 | 09:23:52
+[TRAIN] Step 52 | Loss=2.940797 | Best makespan in group=437.00
+[TRAIN] Refreshing training instances (step 52)...
+[TRAIN] Step 53/100 | 09:24:02
+[TRAIN] Step 53 | Loss=3.234802 | Best makespan in group=558.00
+[TRAIN] Refreshing training instances (step 53)...
+[TRAIN] Step 54/100 | 09:24:12
+[TRAIN] Step 54 | Loss=0.097203 | Best makespan in group=406.00
+[TRAIN] Refreshing training instances (step 54)...
+[TRAIN] Step 55/100 | 09:24:22
+[TRAIN] Step 55 | Loss=2.010847 | Best makespan in group=438.00
+[TRAIN] Refreshing training instances (step 55)...
+[TRAIN] Step 56/100 | 09:24:32
+[TRAIN] Step 56 | Loss=0.150229 | Best makespan in group=456.00
+[TRAIN] Refreshing training instances (step 56)...
+[TRAIN] Step 57/100 | 09:24:43
+[TRAIN] Step 57 | Loss=1.769454 | Best makespan in group=368.00
+[TRAIN] Refreshing training instances (step 57)...
+[TRAIN] Step 58/100 | 09:24:51
+[TRAIN] Step 58 | Loss=0.004224 | Best makespan in group=514.00
+[TRAIN] Refreshing training instances (step 58)...
+[TRAIN] Step 59/100 | 09:24:59
+[TRAIN] Step 59 | Loss=1.797284 | Best makespan in group=497.00
+[TRAIN] Refreshing training instances (step 59)...
+[TRAIN] Step 60/100 | 09:25:08
+[TRAIN] Step 60 | Loss=0.022491 | Best makespan in group=376.00
+[TRAIN] Refreshing training instances (step 60)...
+[TRAIN][VAL][ep 60] avg_gap=0.1581 | std_gap=0.0705 | q80_gap=0.2269 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1593 (raw=0.1581) | saving candidate: 793328502268167.pth
+[TRAIN] Step 61/100 | 09:25:31
+[TRAIN] Step 61 | Loss=1.567885 | Best makespan in group=359.00
+[TRAIN] Refreshing training instances (step 61)...
+[TRAIN] Step 62/100 | 09:25:37
+[TRAIN] Step 62 | Loss=0.063922 | Best makespan in group=489.00
+[TRAIN] Refreshing training instances (step 62)...
+[TRAIN] Step 63/100 | 09:25:48
+[TRAIN] Step 63 | Loss=0.036277 | Best makespan in group=560.00
+[TRAIN] Refreshing training instances (step 63)...
+[TRAIN] Step 64/100 | 09:25:58
+[TRAIN] Step 64 | Loss=0.304337 | Best makespan in group=457.00
+[TRAIN] Refreshing training instances (step 64)...
+[TRAIN] Step 65/100 | 09:26:07
+[TRAIN] Step 65 | Loss=2.190717 | Best makespan in group=495.00
+[TRAIN] Refreshing training instances (step 65)...
+[TRAIN] Step 66/100 | 09:26:14
+[TRAIN] Step 66 | Loss=0.042258 | Best makespan in group=324.00
+[TRAIN] Refreshing training instances (step 66)...
+[TRAIN] Step 67/100 | 09:26:20
+[TRAIN] Step 67 | Loss=4.776808 | Best makespan in group=538.00
+[TRAIN] Refreshing training instances (step 67)...
+[TRAIN] Step 68/100 | 09:26:30
+[TRAIN] Step 68 | Loss=0.219118 | Best makespan in group=284.00
+[TRAIN] Refreshing training instances (step 68)...
+[TRAIN] Step 69/100 | 09:26:38
+[TRAIN] Step 69 | Loss=0.329183 | Best makespan in group=570.00
+[TRAIN] Refreshing training instances (step 69)...
+[TRAIN] Step 70/100 | 09:26:46
+[TRAIN] Step 70 | Loss=1.312131 | Best makespan in group=523.00
+[TRAIN] Refreshing training instances (step 70)...
+[TRAIN] Step 71/100 | 09:26:56
+[TRAIN] Step 71 | Loss=4.338618 | Best makespan in group=458.00
+[TRAIN] Refreshing training instances (step 71)...
+[TRAIN] Step 72/100 | 09:27:02
+[TRAIN] Step 72 | Loss=0.564977 | Best makespan in group=394.00
+[TRAIN] Refreshing training instances (step 72)...
+[TRAIN] Step 73/100 | 09:27:09
+[TRAIN] Step 73 | Loss=0.149327 | Best makespan in group=355.00
+[TRAIN] Refreshing training instances (step 73)...
+[TRAIN] Step 74/100 | 09:27:18
+[TRAIN] Step 74 | Loss=3.238152 | Best makespan in group=474.00
+[TRAIN] Refreshing training instances (step 74)...
+[TRAIN] Step 75/100 | 09:27:27
+[TRAIN] Step 75 | Loss=2.507529 | Best makespan in group=406.00
+[TRAIN] Refreshing training instances (step 75)...
+[TRAIN][VAL][ep 75] avg_gap=0.1580 | std_gap=0.0737 | q80_gap=0.2282 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1566 (raw=0.1580) | saving candidate: 274430513980373.pth
+[TRAIN] Step 76/100 | 09:27:47
+[TRAIN] Step 76 | Loss=0.054297 | Best makespan in group=537.00
+[TRAIN] Refreshing training instances (step 76)...
+[TRAIN] Step 77/100 | 09:27:58
+[TRAIN] Step 77 | Loss=1.404802 | Best makespan in group=455.00
+[TRAIN] Refreshing training instances (step 77)...
+[TRAIN] Step 78/100 | 09:28:07
+[TRAIN] Step 78 | Loss=0.690773 | Best makespan in group=554.00
+[TRAIN] Refreshing training instances (step 78)...
+[TRAIN] Step 79/100 | 09:28:14
+[TRAIN] Step 79 | Loss=2.280530 | Best makespan in group=540.00
+[TRAIN] Refreshing training instances (step 79)...
+[TRAIN] Step 80/100 | 09:28:25
+[TRAIN] Step 80 | Loss=0.209780 | Best makespan in group=345.00
+[TRAIN] Refreshing training instances (step 80)...
+[TRAIN] Step 81/100 | 09:28:32
+[TRAIN] Step 81 | Loss=1.784192 | Best makespan in group=491.00
+[TRAIN] Refreshing training instances (step 81)...
+[TRAIN] Step 82/100 | 09:28:39
+[TRAIN] Step 82 | Loss=0.642779 | Best makespan in group=555.00
+[TRAIN] Refreshing training instances (step 82)...
+[TRAIN] Step 83/100 | 09:28:49
+[TRAIN] Step 83 | Loss=2.446176 | Best makespan in group=448.00
+[TRAIN] Refreshing training instances (step 83)...
+[TRAIN] Step 84/100 | 09:28:58
+[TRAIN] Step 84 | Loss=5.850108 | Best makespan in group=391.00
+[TRAIN] Refreshing training instances (step 84)...
+[TRAIN] Step 85/100 | 09:29:08
+[TRAIN] Step 85 | Loss=1.014747 | Best makespan in group=578.00
+[TRAIN] Refreshing training instances (step 85)...
+[TRAIN] Step 86/100 | 09:29:16
+[TRAIN] Step 86 | Loss=0.756943 | Best makespan in group=342.00
+[TRAIN] Refreshing training instances (step 86)...
+[TRAIN] Step 87/100 | 09:29:25
+[TRAIN] Step 87 | Loss=0.125945 | Best makespan in group=392.00
+[TRAIN] Refreshing training instances (step 87)...
+[TRAIN] Step 88/100 | 09:29:33
+[TRAIN] Step 88 | Loss=0.065191 | Best makespan in group=431.00
+[TRAIN] Refreshing training instances (step 88)...
+[TRAIN] Step 89/100 | 09:29:40
+[TRAIN] Step 89 | Loss=0.360232 | Best makespan in group=388.00
+[TRAIN] Refreshing training instances (step 89)...
+[TRAIN] Step 90/100 | 09:29:48
+[TRAIN] Step 90 | Loss=0.893204 | Best makespan in group=447.00
+[TRAIN] Refreshing training instances (step 90)...
+[TRAIN][VAL][ep 90] avg_gap=0.1555 | std_gap=0.0732 | q80_gap=0.2184 | n=40
+[TRAIN] Step 91/100 | 09:30:09
+[TRAIN] Step 91 | Loss=2.981987 | Best makespan in group=472.00
+[TRAIN] Refreshing training instances (step 91)...
+[TRAIN] Step 92/100 | 09:30:16
+[TRAIN] Step 92 | Loss=0.224451 | Best makespan in group=368.00
+[TRAIN] Refreshing training instances (step 92)...
+[TRAIN] Step 93/100 | 09:30:25
+[TRAIN] Step 93 | Loss=0.146606 | Best makespan in group=394.00
+[TRAIN] Refreshing training instances (step 93)...
+[TRAIN] Step 94/100 | 09:30:31
+[TRAIN] Step 94 | Loss=0.359126 | Best makespan in group=383.00
+[TRAIN] Refreshing training instances (step 94)...
+[TRAIN] Step 95/100 | 09:30:38
+[TRAIN] Step 95 | Loss=0.844659 | Best makespan in group=495.00
+[TRAIN] Refreshing training instances (step 95)...
+[TRAIN] Step 96/100 | 09:30:46
+[TRAIN] Step 96 | Loss=1.447064 | Best makespan in group=347.00
+[TRAIN] Refreshing training instances (step 96)...
+[TRAIN] Step 97/100 | 09:30:54
+[TRAIN] Step 97 | Loss=2.941761 | Best makespan in group=364.00
+[TRAIN] Refreshing training instances (step 97)...
+[TRAIN] Step 98/100 | 09:31:04
+[TRAIN] Step 98 | Loss=0.590384 | Best makespan in group=580.00
+[TRAIN] Refreshing training instances (step 98)...
+[TRAIN] Step 99/100 | 09:31:11
+[TRAIN] Step 99 | Loss=1.109144 | Best makespan in group=338.00
+[TRAIN] Refreshing training instances (step 99)...
+[TRAIN] Step 100/100 | 09:31:19
+[TRAIN] Step 100 | Loss=0.950921 | Best makespan in group=384.00
+[TRAIN] Refreshing training instances (step 100)...
+[TRAIN][VAL][ep 100] avg_gap=0.1539 | std_gap=0.0745 | q80_gap=0.2184 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1558 (raw=0.1539) | saving candidate: 981901789386415.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/981901789386415.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1568 | std_gap=0.0722 | q80_gap=0.2069 | n=40
+[TRAIN][09:31:54] Training ended. Validation history and plots updated.
+[I 2026-09-22 09:31:54,452] Trial 4 finished with value: 0.2183538633818589 and parameters: {'new_freq': 1, 'n_cases': 80, 'batch_size': 64, 'lr': 0.0005551823656527313, 'hidden_channels': 64, 'num_layers': 2, 'heads': 4, 'K': 32, 'use_greedy': True}. Best is trial 2 with value: 0.15584391616780274.
+[PARAM][OO] Trial 5 | episodes=100 | lr=3.05e-03 | hidden=256 | layers=1 | heads=4 | K=8 | use_greedy=True | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 09:31:55
+[TRAIN] Hyperparams | max_steps=100 | new_freq=50
+[TRAIN]             | n_cases=120 | B=64 | K=8 | use_greedy=True | lr=0.003048512648745716 (decaying to 6.10e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=1 | heads=4
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_5
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=106 | bc_loss=2.0692 | decisions=46
+[TRAIN][WARMSTART] step 10/100 | instance=62 | bc_loss=1.8715 | decisions=45
+[TRAIN][WARMSTART] step 15/100 | instance=96 | bc_loss=1.9106 | decisions=48
+[TRAIN][WARMSTART] step 20/100 | instance=45 | bc_loss=1.6702 | decisions=41
+[TRAIN][WARMSTART] step 25/100 | instance=59 | bc_loss=1.7613 | decisions=40
+[TRAIN][WARMSTART] step 30/100 | instance=17 | bc_loss=1.5773 | decisions=43
+[TRAIN][WARMSTART] step 35/100 | instance=106 | bc_loss=1.6959 | decisions=46
+[TRAIN][WARMSTART] step 40/100 | instance=15 | bc_loss=1.5613 | decisions=46
+[TRAIN][WARMSTART] step 45/100 | instance=49 | bc_loss=1.6919 | decisions=57
+[TRAIN][WARMSTART] step 50/100 | instance=42 | bc_loss=1.1426 | decisions=44
+[TRAIN][WARMSTART] step 55/100 | instance=6 | bc_loss=0.9728 | decisions=44
+[TRAIN][WARMSTART] step 60/100 | instance=101 | bc_loss=0.8501 | decisions=40
+[TRAIN][WARMSTART] step 65/100 | instance=31 | bc_loss=0.8510 | decisions=49
+[TRAIN][WARMSTART] step 70/100 | instance=106 | bc_loss=0.6440 | decisions=46
+[TRAIN][WARMSTART] step 75/100 | instance=66 | bc_loss=0.6245 | decisions=52
+[TRAIN][WARMSTART] step 80/100 | instance=45 | bc_loss=0.3584 | decisions=41
+[TRAIN][WARMSTART] step 85/100 | instance=87 | bc_loss=0.2296 | decisions=41
+[TRAIN][WARMSTART] step 90/100 | instance=15 | bc_loss=0.3012 | decisions=46
+[TRAIN][WARMSTART] step 95/100 | instance=43 | bc_loss=0.1877 | decisions=46
+[TRAIN][WARMSTART] step 100/100 | instance=57 | bc_loss=0.2419 | decisions=44
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 09:32:24
+[TRAIN] Step 1 | Loss=1.544834 | Best makespan in group=555.00
+[TRAIN] Step 2/100 | 09:32:45
+[TRAIN] Step 2 | Loss=0.024292 | Best makespan in group=422.00
+[TRAIN] Step 3/100 | 09:33:05
+[TRAIN] Step 3 | Loss=3.572551 | Best makespan in group=430.00
+[TRAIN] Step 4/100 | 09:33:18
+[TRAIN] Step 4 | Loss=0.001698 | Best makespan in group=386.00
+[TRAIN] Step 5/100 | 09:33:32
+[TRAIN] Step 5 | Loss=3.066729 | Best makespan in group=510.00
+[TRAIN] Step 6/100 | 09:33:47
+[TRAIN] Step 6 | Loss=0.753027 | Best makespan in group=415.00
+[TRAIN] Step 7/100 | 09:34:08
+[TRAIN] Step 7 | Loss=0.000029 | Best makespan in group=569.00
+[TRAIN] Step 8/100 | 09:34:24
+[TRAIN] Step 8 | Loss=3.392492 | Best makespan in group=440.00
+[TRAIN] Step 9/100 | 09:34:39
+[TRAIN] Step 9 | Loss=0.027728 | Best makespan in group=397.00
+[TRAIN] Step 10/100 | 09:34:51
+[TRAIN] Step 10 | Loss=2.769330 | Best makespan in group=421.00
+[TRAIN] Step 11/100 | 09:35:11
+[TRAIN] Step 11 | Loss=3.807176 | Best makespan in group=339.00
+[TRAIN] Step 12/100 | 09:35:23
+[TRAIN] Step 12 | Loss=0.683254 | Best makespan in group=518.00
+[TRAIN] Step 13/100 | 09:35:39
+[TRAIN] Step 13 | Loss=4.827882 | Best makespan in group=329.00
+[TRAIN] Step 14/100 | 09:35:51
+[TRAIN] Step 14 | Loss=6.068546 | Best makespan in group=385.00
+[TRAIN] Step 15/100 | 09:36:02
+[TRAIN] Step 15 | Loss=0.586073 | Best makespan in group=560.00
+[TRAIN][VAL][ep 15] avg_gap=0.1101 | std_gap=0.0537 | q80_gap=0.1567 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1101 (raw=0.1101) | saving candidate: 852001622969576.pth
+[TRAIN] Step 16/100 | 09:36:33
+[TRAIN] Step 16 | Loss=0.000002 | Best makespan in group=359.00
+[TRAIN] Step 17/100 | 09:36:50
+[TRAIN] Step 17 | Loss=3.671594 | Best makespan in group=533.00
+[TRAIN] Step 18/100 | 09:37:05
+[TRAIN] Step 18 | Loss=0.000007 | Best makespan in group=372.00
+[TRAIN] Step 19/100 | 09:37:19
+[TRAIN] Step 19 | Loss=0.601185 | Best makespan in group=453.00
+[TRAIN] Step 20/100 | 09:37:35
+[TRAIN] Step 20 | Loss=4.401088 | Best makespan in group=409.00
+[TRAIN] Step 21/100 | 09:37:47
+[TRAIN] Step 21 | Loss=2.318280 | Best makespan in group=472.00
+[TRAIN] Step 22/100 | 09:38:01
+[TRAIN] Step 22 | Loss=11.176091 | Best makespan in group=322.00
+[TRAIN] Step 23/100 | 09:38:21
+[TRAIN] Step 23 | Loss=0.322591 | Best makespan in group=343.00
+[TRAIN] Step 24/100 | 09:38:36
+[TRAIN] Step 24 | Loss=2.727567 | Best makespan in group=371.00
+[TRAIN] Step 25/100 | 09:38:52
+[TRAIN] Step 25 | Loss=1.168134 | Best makespan in group=354.00
+[TRAIN] Step 26/100 | 09:39:07
+[TRAIN] Step 26 | Loss=3.949275 | Best makespan in group=380.00
+[TRAIN] Step 27/100 | 09:39:22
+[TRAIN] Step 27 | Loss=1.338664 | Best makespan in group=318.00
+[TRAIN] Step 28/100 | 09:39:44
+[TRAIN] Step 28 | Loss=-0.000000 | Best makespan in group=359.00
+[TRAIN] Step 29/100 | 09:40:09
+[TRAIN] Step 29 | Loss=4.215516 | Best makespan in group=456.00
+[TRAIN] Step 30/100 | 09:40:25
+[TRAIN] Step 30 | Loss=0.036803 | Best makespan in group=390.00
+[TRAIN][VAL][ep 30] avg_gap=0.1430 | std_gap=0.0722 | q80_gap=0.1730 | n=40
+[TRAIN] Step 31/100 | 09:41:00
+[TRAIN] Step 31 | Loss=0.003231 | Best makespan in group=383.00
+[TRAIN] Step 32/100 | 09:41:18
+[TRAIN] Step 32 | Loss=-0.000000 | Best makespan in group=465.00
+[TRAIN] Step 33/100 | 09:41:44
+[TRAIN] Step 33 | Loss=0.020812 | Best makespan in group=594.00
+[TRAIN] Step 34/100 | 09:42:08
+[TRAIN] Step 34 | Loss=0.892685 | Best makespan in group=499.00
+[TRAIN] Step 35/100 | 09:42:27
+[TRAIN] Step 35 | Loss=0.963458 | Best makespan in group=361.00
+[TRAIN] Step 36/100 | 09:42:48
+[TRAIN] Step 36 | Loss=0.028648 | Best makespan in group=391.00
+[TRAIN] Step 37/100 | 09:43:07
+[TRAIN] Step 37 | Loss=3.719869 | Best makespan in group=293.00
+[TRAIN] Step 38/100 | 09:43:22
+[TRAIN] Step 38 | Loss=1.657242 | Best makespan in group=548.00
+[TRAIN] Step 39/100 | 09:43:37
+[TRAIN] Step 39 | Loss=0.286506 | Best makespan in group=330.00
+[TRAIN] Step 40/100 | 09:43:51
+[TRAIN] Step 40 | Loss=0.546668 | Best makespan in group=377.00
+[TRAIN] Step 41/100 | 09:44:06
+[TRAIN] Step 41 | Loss=0.456386 | Best makespan in group=428.00
+[TRAIN] Step 42/100 | 09:44:23
+[TRAIN] Step 42 | Loss=2.901290 | Best makespan in group=453.00
+[TRAIN] Step 43/100 | 09:44:44
+[TRAIN] Step 43 | Loss=0.715774 | Best makespan in group=600.00
+[TRAIN] Step 44/100 | 09:45:06
+[TRAIN] Step 44 | Loss=0.097252 | Best makespan in group=336.00
+[TRAIN] Step 45/100 | 09:45:28
+[TRAIN] Step 45 | Loss=0.000052 | Best makespan in group=310.00
+[TRAIN][VAL][ep 45] avg_gap=0.1366 | std_gap=0.0674 | q80_gap=0.1854 | n=40
+[TRAIN] Step 46/100 | 09:45:52
+[TRAIN] Step 46 | Loss=0.000008 | Best makespan in group=386.00
+[TRAIN] Step 47/100 | 09:46:17
+[TRAIN] Step 47 | Loss=0.362473 | Best makespan in group=447.00
+[TRAIN] Step 48/100 | 09:46:33
+[TRAIN] Step 48 | Loss=1.084480 | Best makespan in group=496.00
+[TRAIN] Step 49/100 | 09:46:48
+[TRAIN] Step 49 | Loss=1.872319 | Best makespan in group=358.00
+[TRAIN] Step 50/100 | 09:47:05
+[TRAIN] Step 50 | Loss=0.807391 | Best makespan in group=577.00
+[TRAIN] Refreshing training instances (step 50)...
+[TRAIN] Step 51/100 | 09:47:26
+[TRAIN] Step 51 | Loss=0.254141 | Best makespan in group=468.00
+[TRAIN] Step 52/100 | 09:47:41
+[TRAIN] Step 52 | Loss=4.859803 | Best makespan in group=384.00
+[TRAIN] Step 53/100 | 09:47:54
+[TRAIN] Step 53 | Loss=0.010165 | Best makespan in group=412.00
+[TRAIN] Step 54/100 | 09:48:09
+[TRAIN] Step 54 | Loss=11.495781 | Best makespan in group=416.00
+[TRAIN] Step 55/100 | 09:48:29
+[TRAIN] Step 55 | Loss=2.754076 | Best makespan in group=558.00
+[TRAIN] Step 56/100 | 09:48:46
+[TRAIN] Step 56 | Loss=0.000344 | Best makespan in group=540.00
+[TRAIN] Step 57/100 | 09:49:09
+[TRAIN] Step 57 | Loss=0.009275 | Best makespan in group=400.00
+[TRAIN] Step 58/100 | 09:49:26
+[TRAIN] Step 58 | Loss=14.966261 | Best makespan in group=409.00
+[TRAIN] Step 59/100 | 09:49:48
+[TRAIN] Step 59 | Loss=-0.000000 | Best makespan in group=556.00
+[TRAIN] Step 60/100 | 09:50:05
+[TRAIN] Step 60 | Loss=0.904754 | Best makespan in group=496.00
+[TRAIN][VAL][ep 60] avg_gap=0.1609 | std_gap=0.0731 | q80_gap=0.2129 | n=40
+[TRAIN] Step 61/100 | 09:50:35
+[TRAIN] Step 61 | Loss=5.170125 | Best makespan in group=577.00
+[TRAIN] Step 62/100 | 09:50:56
+[TRAIN] Step 62 | Loss=0.006873 | Best makespan in group=404.00
+[TRAIN] Step 63/100 | 09:51:13
+[TRAIN] Step 63 | Loss=0.419926 | Best makespan in group=311.00
+[TRAIN] Step 64/100 | 09:51:31
+[TRAIN] Step 64 | Loss=0.430442 | Best makespan in group=398.00
+[TRAIN] Step 65/100 | 09:51:54
+[TRAIN] Step 65 | Loss=4.458168 | Best makespan in group=444.00
+[TRAIN] Step 66/100 | 09:52:16
+[TRAIN] Step 66 | Loss=3.928917 | Best makespan in group=435.00
+[TRAIN] Step 67/100 | 09:52:39
+[TRAIN] Step 67 | Loss=1.352193 | Best makespan in group=332.00
+[TRAIN] Step 68/100 | 09:52:52
+[TRAIN] Step 68 | Loss=0.000561 | Best makespan in group=459.00
+[TRAIN] Step 69/100 | 09:53:05
+[TRAIN] Step 69 | Loss=7.388236 | Best makespan in group=386.00
+[TRAIN] Step 70/100 | 09:53:18
+[TRAIN] Step 70 | Loss=1.468070 | Best makespan in group=335.00
+[TRAIN] Step 71/100 | 09:53:39
+[TRAIN] Step 71 | Loss=0.004221 | Best makespan in group=398.00
+[TRAIN] Step 72/100 | 09:53:56
+[TRAIN] Step 72 | Loss=0.000014 | Best makespan in group=383.00
+[TRAIN] Step 73/100 | 09:54:13
+[TRAIN] Step 73 | Loss=0.109492 | Best makespan in group=503.00
+[TRAIN] Step 74/100 | 09:54:26
+[TRAIN] Step 74 | Loss=0.010506 | Best makespan in group=397.00
+[TRAIN] Step 75/100 | 09:54:42
+[TRAIN] Step 75 | Loss=1.361488 | Best makespan in group=446.00
+[TRAIN][VAL][ep 75] avg_gap=0.1591 | std_gap=0.0698 | q80_gap=0.2163 | n=40
+[TRAIN] Step 76/100 | 09:55:14
+[TRAIN] Step 76 | Loss=4.360417 | Best makespan in group=417.00
+[TRAIN] Step 77/100 | 09:55:33
+[TRAIN] Step 77 | Loss=0.624440 | Best makespan in group=490.00
+[TRAIN] Step 78/100 | 09:55:49
+[TRAIN] Step 78 | Loss=1.004336 | Best makespan in group=481.00
+[TRAIN] Step 79/100 | 09:56:05
+[TRAIN] Step 79 | Loss=0.107092 | Best makespan in group=462.00
+[TRAIN] Step 80/100 | 09:56:21
+[TRAIN] Step 80 | Loss=1.229014 | Best makespan in group=374.00
+[TRAIN] Step 81/100 | 09:56:39
+[TRAIN] Step 81 | Loss=1.108768 | Best makespan in group=526.00
+[TRAIN] Step 82/100 | 09:57:02
+[TRAIN] Step 82 | Loss=0.973880 | Best makespan in group=508.00
+[TRAIN] Step 83/100 | 09:57:23
+[TRAIN] Step 83 | Loss=1.496732 | Best makespan in group=306.00
+[TRAIN] Step 84/100 | 09:57:39
+[TRAIN] Step 84 | Loss=0.445461 | Best makespan in group=536.00
+[TRAIN] Step 85/100 | 09:57:56
+[TRAIN] Step 85 | Loss=0.325152 | Best makespan in group=475.00
+[TRAIN] Step 86/100 | 09:58:14
+[TRAIN] Step 86 | Loss=6.093696 | Best makespan in group=341.00
+[TRAIN] Step 87/100 | 09:58:28
+[TRAIN] Step 87 | Loss=8.006851 | Best makespan in group=358.00
+[TRAIN] Step 88/100 | 09:58:44
+[TRAIN] Step 88 | Loss=-0.000000 | Best makespan in group=412.00
+[TRAIN] Step 89/100 | 09:58:58
+[TRAIN] Step 89 | Loss=1.255644 | Best makespan in group=342.00
+[TRAIN] Step 90/100 | 09:59:18
+[TRAIN] Step 90 | Loss=0.795926 | Best makespan in group=376.00
+[TRAIN][VAL][ep 90] avg_gap=0.1294 | std_gap=0.0569 | q80_gap=0.1616 | n=40
+[TRAIN] Step 91/100 | 09:59:48
+[TRAIN] Step 91 | Loss=0.000133 | Best makespan in group=406.00
+[TRAIN] Step 92/100 | 10:00:04
+[TRAIN] Step 92 | Loss=0.698427 | Best makespan in group=460.00
+[TRAIN] Step 93/100 | 10:00:17
+[TRAIN] Step 93 | Loss=0.377572 | Best makespan in group=341.00
+[TRAIN] Step 94/100 | 10:00:39
+[TRAIN] Step 94 | Loss=7.947476 | Best makespan in group=394.00
+[TRAIN] Step 95/100 | 10:00:53
+[TRAIN] Step 95 | Loss=4.275168 | Best makespan in group=417.00
+[TRAIN] Step 96/100 | 10:01:10
+[TRAIN] Step 96 | Loss=-0.000000 | Best makespan in group=497.00
+[TRAIN] Step 97/100 | 10:01:26
+[TRAIN] Step 97 | Loss=0.000000 | Best makespan in group=355.00
+[TRAIN] Step 98/100 | 10:01:39
+[TRAIN] Step 98 | Loss=-0.000000 | Best makespan in group=317.00
+[TRAIN] Step 99/100 | 10:01:59
+[TRAIN] Step 99 | Loss=6.940068 | Best makespan in group=370.00
+[TRAIN] Step 100/100 | 10:02:20
+[TRAIN] Step 100 | Loss=1.188586 | Best makespan in group=349.00
+[TRAIN] Refreshing training instances (step 100)...
+[TRAIN][VAL][ep 100] avg_gap=0.1202 | std_gap=0.0551 | q80_gap=0.1602 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/852001622969576.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1110 | std_gap=0.0503 | q80_gap=0.1433 | n=40
+[TRAIN][10:02:57] Training ended. Validation history and plots updated.
+[I 2026-09-22 10:02:58,271] Trial 5 finished with value: 0.16015526196479554 and parameters: {'new_freq': 50, 'n_cases': 120, 'batch_size': 64, 'lr': 0.003048512648745716, 'hidden_channels': 256, 'num_layers': 1, 'heads': 4, 'K': 8, 'use_greedy': True}. Best is trial 2 with value: 0.15584391616780274.
+[PARAM][OO] Trial 6 | episodes=100 | lr=4.21e-03 | hidden=128 | layers=1 | heads=2 | K=16 | use_greedy=False | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 10:02:58
+[TRAIN] Hyperparams | max_steps=100 | new_freq=50
+[TRAIN]             | n_cases=120 | B=128 | K=16 | use_greedy=False | lr=0.004205954732822861 (decaying to 8.41e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=1 | heads=2
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_6
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=7 | bc_loss=1.9308 | decisions=44
+[TRAIN][WARMSTART] step 10/100 | instance=52 | bc_loss=2.1092 | decisions=55
+[TRAIN][WARMSTART] step 15/100 | instance=81 | bc_loss=1.9329 | decisions=47
+[TRAIN][WARMSTART] step 20/100 | instance=104 | bc_loss=1.9314 | decisions=51
+[TRAIN][WARMSTART] step 25/100 | instance=20 | bc_loss=1.7571 | decisions=43
+[TRAIN][WARMSTART] step 30/100 | instance=39 | bc_loss=1.6872 | decisions=43
+[TRAIN][WARMSTART] step 35/100 | instance=107 | bc_loss=1.7576 | decisions=49
+[TRAIN][WARMSTART] step 40/100 | instance=25 | bc_loss=1.7033 | decisions=50
+[TRAIN][WARMSTART] step 45/100 | instance=100 | bc_loss=1.6415 | decisions=48
+[TRAIN][WARMSTART] step 50/100 | instance=116 | bc_loss=1.7022 | decisions=53
+[TRAIN][WARMSTART] step 55/100 | instance=106 | bc_loss=1.3732 | decisions=41
+[TRAIN][WARMSTART] step 60/100 | instance=82 | bc_loss=1.3513 | decisions=54
+[TRAIN][WARMSTART] step 65/100 | instance=36 | bc_loss=0.9688 | decisions=42
+[TRAIN][WARMSTART] step 70/100 | instance=25 | bc_loss=0.7363 | decisions=50
+[TRAIN][WARMSTART] step 75/100 | instance=83 | bc_loss=0.6866 | decisions=57
+[TRAIN][WARMSTART] step 80/100 | instance=105 | bc_loss=0.3876 | decisions=47
+[TRAIN][WARMSTART] step 85/100 | instance=31 | bc_loss=0.4451 | decisions=57
+[TRAIN][WARMSTART] step 90/100 | instance=4 | bc_loss=0.3607 | decisions=49
+[TRAIN][WARMSTART] step 95/100 | instance=88 | bc_loss=0.2453 | decisions=42
+[TRAIN][WARMSTART] step 100/100 | instance=53 | bc_loss=0.2056 | decisions=46
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 10:03:21
+[TRAIN] Step 1 | Loss=0.703995 | Best makespan in group=320.00
+[TRAIN] Step 2/100 | 10:03:35
+[TRAIN] Step 2 | Loss=9.382730 | Best makespan in group=347.00
+[TRAIN] Step 3/100 | 10:03:47
+[TRAIN] Step 3 | Loss=5.599541 | Best makespan in group=541.00
+[TRAIN] Step 4/100 | 10:03:59
+[TRAIN] Step 4 | Loss=3.683775 | Best makespan in group=679.00
+[TRAIN] Step 5/100 | 10:04:16
+[TRAIN] Step 5 | Loss=5.537224 | Best makespan in group=301.00
+[TRAIN] Step 6/100 | 10:04:32
+[TRAIN] Step 6 | Loss=0.537644 | Best makespan in group=400.00
+[TRAIN] Step 7/100 | 10:04:42
+[TRAIN] Step 7 | Loss=0.148817 | Best makespan in group=390.00
+[TRAIN] Step 8/100 | 10:04:54
+[TRAIN] Step 8 | Loss=2.044129 | Best makespan in group=534.00
+[TRAIN] Step 9/100 | 10:05:08
+[TRAIN] Step 9 | Loss=1.660810 | Best makespan in group=449.00
+[TRAIN] Step 10/100 | 10:05:22
+[TRAIN] Step 10 | Loss=0.320148 | Best makespan in group=360.00
+[TRAIN] Step 11/100 | 10:05:33
+[TRAIN] Step 11 | Loss=3.818855 | Best makespan in group=569.00
+[TRAIN] Step 12/100 | 10:05:47
+[TRAIN] Step 12 | Loss=0.878554 | Best makespan in group=375.00
+[TRAIN] Step 13/100 | 10:06:01
+[TRAIN] Step 13 | Loss=5.371871 | Best makespan in group=462.00
+[TRAIN] Step 14/100 | 10:06:17
+[TRAIN] Step 14 | Loss=0.391930 | Best makespan in group=313.00
+[TRAIN] Step 15/100 | 10:06:34
+[TRAIN] Step 15 | Loss=0.071836 | Best makespan in group=500.00
+[TRAIN][VAL][ep 15] avg_gap=0.0953 | std_gap=0.0525 | q80_gap=0.1255 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.0953 (raw=0.0953) | saving candidate: 969867953721052.pth
+[TRAIN] Step 16/100 | 10:06:56
+[TRAIN] Step 16 | Loss=0.026764 | Best makespan in group=444.00
+[TRAIN] Step 17/100 | 10:07:07
+[TRAIN] Step 17 | Loss=0.181602 | Best makespan in group=367.00
+[TRAIN] Step 18/100 | 10:07:18
+[TRAIN] Step 18 | Loss=0.000025 | Best makespan in group=555.00
+[TRAIN] Step 19/100 | 10:07:32
+[TRAIN] Step 19 | Loss=4.830099 | Best makespan in group=582.00
+[TRAIN] Step 20/100 | 10:07:49
+[TRAIN] Step 20 | Loss=1.736235 | Best makespan in group=386.00
+[TRAIN] Step 21/100 | 10:08:02
+[TRAIN] Step 21 | Loss=0.000283 | Best makespan in group=526.00
+[TRAIN] Step 22/100 | 10:08:19
+[TRAIN] Step 22 | Loss=9.807093 | Best makespan in group=361.00
+[TRAIN] Step 23/100 | 10:08:31
+[TRAIN] Step 23 | Loss=0.246313 | Best makespan in group=332.00
+[TRAIN] Step 24/100 | 10:08:42
+[TRAIN] Step 24 | Loss=6.962211 | Best makespan in group=508.00
+[TRAIN] Step 25/100 | 10:08:57
+[TRAIN] Step 25 | Loss=6.568144 | Best makespan in group=361.00
+[TRAIN] Step 26/100 | 10:09:13
+[TRAIN] Step 26 | Loss=0.237881 | Best makespan in group=366.00
+[TRAIN] Step 27/100 | 10:09:26
+[TRAIN] Step 27 | Loss=7.100876 | Best makespan in group=448.00
+[TRAIN] Step 28/100 | 10:09:37
+[TRAIN] Step 28 | Loss=0.019153 | Best makespan in group=532.00
+[TRAIN] Step 29/100 | 10:09:50
+[TRAIN] Step 29 | Loss=0.000009 | Best makespan in group=491.00
+[TRAIN] Step 30/100 | 10:10:06
+[TRAIN] Step 30 | Loss=0.622479 | Best makespan in group=472.00
+[TRAIN][VAL][ep 30] avg_gap=0.1643 | std_gap=0.0771 | q80_gap=0.2107 | n=40
+[TRAIN] Step 31/100 | 10:10:25
+[TRAIN] Step 31 | Loss=0.000032 | Best makespan in group=374.00
+[TRAIN] Step 32/100 | 10:10:39
+[TRAIN] Step 32 | Loss=11.174006 | Best makespan in group=480.00
+[TRAIN] Step 33/100 | 10:10:52
+[TRAIN] Step 33 | Loss=0.552571 | Best makespan in group=501.00
+[TRAIN] Step 34/100 | 10:11:10
+[TRAIN] Step 34 | Loss=1.523222 | Best makespan in group=632.00
+[TRAIN] Step 35/100 | 10:11:26
+[TRAIN] Step 35 | Loss=8.270680 | Best makespan in group=392.00
+[TRAIN] Step 36/100 | 10:11:37
+[TRAIN] Step 36 | Loss=7.129115 | Best makespan in group=609.00
+[TRAIN] Step 37/100 | 10:11:51
+[TRAIN] Step 37 | Loss=7.135534 | Best makespan in group=398.00
+[TRAIN] Step 38/100 | 10:12:02
+[TRAIN] Step 38 | Loss=0.180864 | Best makespan in group=369.00
+[TRAIN] Step 39/100 | 10:12:19
+[TRAIN] Step 39 | Loss=0.974921 | Best makespan in group=325.00
+[TRAIN] Step 40/100 | 10:12:30
+[TRAIN] Step 40 | Loss=0.343170 | Best makespan in group=400.00
+[TRAIN] Step 41/100 | 10:12:41
+[TRAIN] Step 41 | Loss=3.245865 | Best makespan in group=337.00
+[TRAIN] Step 42/100 | 10:12:54
+[TRAIN] Step 42 | Loss=0.058791 | Best makespan in group=369.00
+[TRAIN] Step 43/100 | 10:13:08
+[TRAIN] Step 43 | Loss=5.048831 | Best makespan in group=389.00
+[TRAIN] Step 44/100 | 10:13:21
+[TRAIN] Step 44 | Loss=0.275478 | Best makespan in group=375.00
+[TRAIN] Step 45/100 | 10:13:38
+[TRAIN] Step 45 | Loss=0.030770 | Best makespan in group=369.00
+[TRAIN][VAL][ep 45] avg_gap=0.1196 | std_gap=0.0630 | q80_gap=0.1759 | n=40
+[TRAIN] Step 46/100 | 10:14:01
+[TRAIN] Step 46 | Loss=0.338867 | Best makespan in group=346.00
+[TRAIN] Step 47/100 | 10:14:14
+[TRAIN] Step 47 | Loss=1.394644 | Best makespan in group=329.00
+[TRAIN] Step 48/100 | 10:14:25
+[TRAIN] Step 48 | Loss=6.294786 | Best makespan in group=365.00
+[TRAIN] Step 49/100 | 10:14:41
+[TRAIN] Step 49 | Loss=3.021369 | Best makespan in group=446.00
+[TRAIN] Step 50/100 | 10:14:54
+[TRAIN] Step 50 | Loss=0.379745 | Best makespan in group=373.00
+[TRAIN] Refreshing training instances (step 50)...
+[TRAIN] Step 51/100 | 10:15:09
+[TRAIN] Step 51 | Loss=0.248595 | Best makespan in group=432.00
+[TRAIN] Step 52/100 | 10:15:19
+[TRAIN] Step 52 | Loss=3.756051 | Best makespan in group=404.00
+[TRAIN] Step 53/100 | 10:15:31
+[TRAIN] Step 53 | Loss=2.131205 | Best makespan in group=377.00
+[TRAIN] Step 54/100 | 10:15:45
+[TRAIN] Step 54 | Loss=0.112294 | Best makespan in group=552.00
+[TRAIN] Step 55/100 | 10:16:00
+[TRAIN] Step 55 | Loss=0.004040 | Best makespan in group=457.00
+[TRAIN] Step 56/100 | 10:16:11
+[TRAIN] Step 56 | Loss=8.627076 | Best makespan in group=446.00
+[TRAIN] Step 57/100 | 10:16:28
+[TRAIN] Step 57 | Loss=0.227439 | Best makespan in group=404.00
+[TRAIN] Step 58/100 | 10:16:39
+[TRAIN] Step 58 | Loss=3.353461 | Best makespan in group=421.00
+[TRAIN] Step 59/100 | 10:16:56
+[TRAIN] Step 59 | Loss=4.576651 | Best makespan in group=368.00
+[TRAIN] Step 60/100 | 10:17:13
+[TRAIN] Step 60 | Loss=1.284759 | Best makespan in group=598.00
+[TRAIN][VAL][ep 60] avg_gap=0.1170 | std_gap=0.0589 | q80_gap=0.1677 | n=40
+[TRAIN] Step 61/100 | 10:17:37
+[TRAIN] Step 61 | Loss=0.139158 | Best makespan in group=412.00
+[TRAIN] Step 62/100 | 10:17:53
+[TRAIN] Step 62 | Loss=0.004409 | Best makespan in group=311.00
+[TRAIN] Step 63/100 | 10:18:08
+[TRAIN] Step 63 | Loss=0.784617 | Best makespan in group=417.00
+[TRAIN] Step 64/100 | 10:18:21
+[TRAIN] Step 64 | Loss=6.096121 | Best makespan in group=377.00
+[TRAIN] Step 65/100 | 10:18:35
+[TRAIN] Step 65 | Loss=0.319789 | Best makespan in group=315.00
+[TRAIN] Step 66/100 | 10:18:47
+[TRAIN] Step 66 | Loss=0.025233 | Best makespan in group=383.00
+[TRAIN] Step 67/100 | 10:19:01
+[TRAIN] Step 67 | Loss=4.559347 | Best makespan in group=484.00
+[TRAIN] Step 68/100 | 10:19:11
+[TRAIN] Step 68 | Loss=0.055928 | Best makespan in group=376.00
+[TRAIN] Step 69/100 | 10:19:23
+[TRAIN] Step 69 | Loss=0.072901 | Best makespan in group=343.00
+[TRAIN] Step 70/100 | 10:19:36
+[TRAIN] Step 70 | Loss=3.206645 | Best makespan in group=442.00
+[TRAIN] Step 71/100 | 10:19:52
+[TRAIN] Step 71 | Loss=7.473413 | Best makespan in group=353.00
+[TRAIN] Step 72/100 | 10:20:05
+[TRAIN] Step 72 | Loss=3.111572 | Best makespan in group=369.00
+[TRAIN] Step 73/100 | 10:20:16
+[TRAIN] Step 73 | Loss=5.141883 | Best makespan in group=451.00
+[TRAIN] Step 74/100 | 10:20:27
+[TRAIN] Step 74 | Loss=4.076900 | Best makespan in group=331.00
+[TRAIN] Step 75/100 | 10:20:41
+[TRAIN] Step 75 | Loss=1.207168 | Best makespan in group=298.00
+[TRAIN][VAL][ep 75] avg_gap=0.1076 | std_gap=0.0605 | q80_gap=0.1534 | n=40
+[TRAIN] Step 76/100 | 10:21:01
+[TRAIN] Step 76 | Loss=0.660721 | Best makespan in group=378.00
+[TRAIN] Step 77/100 | 10:21:15
+[TRAIN] Step 77 | Loss=5.991305 | Best makespan in group=371.00
+[TRAIN] Step 78/100 | 10:21:29
+[TRAIN] Step 78 | Loss=0.959120 | Best makespan in group=413.00
+[TRAIN] Step 79/100 | 10:21:41
+[TRAIN] Step 79 | Loss=0.844077 | Best makespan in group=307.00
+[TRAIN] Step 80/100 | 10:21:53
+[TRAIN] Step 80 | Loss=1.064555 | Best makespan in group=495.00
+[TRAIN] Step 81/100 | 10:22:07
+[TRAIN] Step 81 | Loss=0.267825 | Best makespan in group=364.00
+[TRAIN] Step 82/100 | 10:22:19
+[TRAIN] Step 82 | Loss=0.574459 | Best makespan in group=455.00
+[TRAIN] Step 83/100 | 10:22:34
+[TRAIN] Step 83 | Loss=0.015224 | Best makespan in group=546.00
+[TRAIN] Step 84/100 | 10:22:52
+[TRAIN] Step 84 | Loss=5.378250 | Best makespan in group=447.00
+[TRAIN] Step 85/100 | 10:23:03
+[TRAIN] Step 85 | Loss=11.008595 | Best makespan in group=412.00
+[TRAIN] Step 86/100 | 10:23:13
+[TRAIN] Step 86 | Loss=0.390266 | Best makespan in group=431.00
+[TRAIN] Step 87/100 | 10:23:29
+[TRAIN] Step 87 | Loss=0.086747 | Best makespan in group=424.00
+[TRAIN] Step 88/100 | 10:23:43
+[TRAIN] Step 88 | Loss=1.393814 | Best makespan in group=570.00
+[TRAIN] Step 89/100 | 10:23:59
+[TRAIN] Step 89 | Loss=1.072629 | Best makespan in group=360.00
+[TRAIN] Step 90/100 | 10:24:13
+[TRAIN] Step 90 | Loss=3.739985 | Best makespan in group=511.00
+[TRAIN][VAL][ep 90] avg_gap=0.0980 | std_gap=0.0496 | q80_gap=0.1308 | n=40
+[TRAIN] Step 91/100 | 10:24:35
+[TRAIN] Step 91 | Loss=0.901296 | Best makespan in group=451.00
+[TRAIN] Step 92/100 | 10:24:49
+[TRAIN] Step 92 | Loss=0.126687 | Best makespan in group=578.00
+[TRAIN] Step 93/100 | 10:25:06
+[TRAIN] Step 93 | Loss=6.007005 | Best makespan in group=403.00
+[TRAIN] Step 94/100 | 10:25:21
+[TRAIN] Step 94 | Loss=0.574601 | Best makespan in group=350.00
+[TRAIN] Step 95/100 | 10:25:38
+[TRAIN] Step 95 | Loss=2.378334 | Best makespan in group=361.00
+[TRAIN] Step 96/100 | 10:25:50
+[TRAIN] Step 96 | Loss=3.250041 | Best makespan in group=402.00
+[TRAIN] Step 97/100 | 10:26:04
+[TRAIN] Step 97 | Loss=2.150328 | Best makespan in group=363.00
+[TRAIN] Step 98/100 | 10:26:16
+[TRAIN] Step 98 | Loss=0.019514 | Best makespan in group=345.00
+[TRAIN] Step 99/100 | 10:26:30
+[TRAIN] Step 99 | Loss=0.410587 | Best makespan in group=471.00
+[TRAIN] Step 100/100 | 10:26:43
+[TRAIN] Step 100 | Loss=0.403656 | Best makespan in group=543.00
+[TRAIN] Refreshing training instances (step 100)...
+[TRAIN][VAL][ep 100] avg_gap=0.0901 | std_gap=0.0450 | q80_gap=0.1179 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/969867953721052.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1025 | std_gap=0.0471 | q80_gap=0.1354 | n=40
+[TRAIN][10:27:13] Training ended. Validation history and plots updated.
+[I 2026-09-22 10:27:13,953] Trial 6 finished with value: 0.11787136071791374 and parameters: {'new_freq': 50, 'n_cases': 120, 'batch_size': 128, 'lr': 0.004205954732822861, 'hidden_channels': 128, 'num_layers': 1, 'heads': 2, 'K': 16, 'use_greedy': False}. Best is trial 6 with value: 0.11787136071791374.
+[PARAM][OO] Trial 7 | episodes=100 | lr=9.25e-04 | hidden=256 | layers=1 | heads=4 | K=16 | use_greedy=True | tf=4
+============================================================
+[TRAIN] Training started at: 2026-09-22 10:27:14
+[TRAIN] Hyperparams | max_steps=100 | new_freq=1
+[TRAIN]             | n_cases=40 | B=128 | K=16 | use_greedy=True | lr=0.000924760829486363 (decaying to 1.85e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=1 | heads=4
+[TRAIN] Representation | oo | GNN | gat
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_oo_1790043240\trial_7
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=15 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=27 | bc_loss=2.0673 | decisions=49
+[TRAIN][WARMSTART] step 10/100 | instance=37 | bc_loss=2.1420 | decisions=52
+[TRAIN][WARMSTART] step 15/100 | instance=12 | bc_loss=1.9126 | decisions=43
+[TRAIN][WARMSTART] step 20/100 | instance=16 | bc_loss=1.9413 | decisions=43
+[TRAIN][WARMSTART] step 25/100 | instance=28 | bc_loss=2.1042 | decisions=55
+[TRAIN][WARMSTART] step 30/100 | instance=31 | bc_loss=2.0367 | decisions=48
+[TRAIN][WARMSTART] step 35/100 | instance=11 | bc_loss=1.8729 | decisions=44
+[TRAIN][WARMSTART] step 40/100 | instance=33 | bc_loss=1.8889 | decisions=43
+[TRAIN][WARMSTART] step 45/100 | instance=37 | bc_loss=2.0542 | decisions=52
+[TRAIN][WARMSTART] step 50/100 | instance=36 | bc_loss=1.8214 | decisions=43
+[TRAIN][WARMSTART] step 55/100 | instance=18 | bc_loss=1.9284 | decisions=48
+[TRAIN][WARMSTART] step 60/100 | instance=29 | bc_loss=1.9028 | decisions=48
+[TRAIN][WARMSTART] step 65/100 | instance=26 | bc_loss=1.7858 | decisions=43
+[TRAIN][WARMSTART] step 70/100 | instance=36 | bc_loss=1.7462 | decisions=43
+[TRAIN][WARMSTART] step 75/100 | instance=19 | bc_loss=1.7780 | decisions=48
+[TRAIN][WARMSTART] step 80/100 | instance=36 | bc_loss=1.6953 | decisions=43
+[TRAIN][WARMSTART] step 85/100 | instance=4 | bc_loss=1.6842 | decisions=43
+[TRAIN][WARMSTART] step 90/100 | instance=30 | bc_loss=1.6911 | decisions=42
+[TRAIN][WARMSTART] step 95/100 | instance=1 | bc_loss=1.6418 | decisions=43
+[TRAIN][WARMSTART] step 100/100 | instance=8 | bc_loss=1.8220 | decisions=54
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 10:27:42
+[TRAIN] Step 1 | Loss=1.232000 | Best makespan in group=513.00
+[TRAIN] Refreshing training instances (step 1)...
+[TRAIN] Step 2/100 | 10:28:27
+[TRAIN] Step 2 | Loss=0.290872 | Best makespan in group=489.00
+[TRAIN] Refreshing training instances (step 2)...
+[TRAIN] Step 3/100 | 10:29:08
+[TRAIN] Step 3 | Loss=0.000050 | Best makespan in group=337.00
+[TRAIN] Refreshing training instances (step 3)...
+[TRAIN] Step 4/100 | 10:29:36
+[TRAIN] Step 4 | Loss=0.002766 | Best makespan in group=371.00
+[TRAIN] Refreshing training instances (step 4)...
+[TRAIN] Step 5/100 | 10:30:04
+[TRAIN] Step 5 | Loss=0.057162 | Best makespan in group=492.00
+[TRAIN] Refreshing training instances (step 5)...
+[TRAIN] Step 6/100 | 10:30:34
+=== resuming optuna sweep: oo (3 more trials) ===
+p y t h o n   :   d : \ D i s s e r t a %є %ъ o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ v e n v \ L i b \ s i t e - p a c k a g e s \ t o r c h \ j i t \ _ s c r i p t . p y : 1 4 8 5 :    
+ F u t u r e W a r n i n g :   ` t o r c h . j i t . s c r i p t `   i s   n o t   s u p p o r t e d   i n   P y t h o n   3 . 1 4 +   a n d   m a y   b r e a k .   P l e a s e   s w i t c h   t o   ` t o r c h . c o m p i l e `   o r    
+ ` t o r c h . e x p o r t ` .  
+ A t   D : \ D i s s e r t a з г o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ r u n _ o p t u n a _ r e m a i n i n g . p s 1 : 3   c h a r : 1  
+ +   p y t h o n   - u   m a i n . p y   - - m o d e   o p t u n a   - - r e p r e s e n t a t i o n   o o   - - t r i a l s   3   - - m a x -   . . .  
+ +   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~  
+         +   C a t e g o r y I n f o                     :   N o t S p e c i f i e d :   ( d : \ D i s s e r t a %є %ъ . . . ` t o r c h . e x p o r t ` . : S t r i n g )   [ ] ,   R e m o t e E x c e p t i o n  
+         +   F u l l y Q u a l i f i e d E r r o r I d   :   N a t i v e C o m m a n d E r r o r  
+    
+     w a r n i n g s . w a r n (  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ M A I N ]   R u n   s t a r t e d   a t   2 0 2 6 - 0 9 - 2 2   1 0 : 5 7 : 4 7  
+ [ M A I N ]   m o d e = o p t u n a  
+ [ M A I N ]   r u n _ n a m e = t r a i n _ r u n  
+ [ M A I N ]   r e p r e s e n t a t i o n ( s ) = [ ' o o ' ]  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ P A R A M ]   H y p e r p a r a m e t e r   t u n i n g   r u n n e r   ( O p t u n a )  
+ [ P A R A M ]   R e p r e s e n t a t i o n s   :   [ ' O O ' ]  
+ [ P A R A M ]   T r i a l s                     :   3  
+ [ P A R A M ]   M a x   e p i s o d e s         :   1 0 0  
+ [ P A R A M ]   O b j e c t i v e               :   m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   S t o r a g e                   :   s q l i t e : / / / o p t u n a . d b  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ I   2 0 2 6 - 0 9 - 2 2   1 0 : 5 7 : 4 9 , 0 9 6 ]   U s i n g   a n   e x i s t i n g   s t u d y   w i t h   ` s t u d y _ n a m e = ' f j s p _ t u n i n g _ o o ' `   i n s t e a d   o f   c r e a t i n g   a   n e w   o n e .  
+ [ P A R A M ]   S t a r t i n g   O p t u n a   s t u d y   f o r   O O   |   t r i a l s = 3   |   m a x _ e p i s o d e s = 1 0 0   |   o b j e c t i v e = m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   C r i t i c a l   p a r a m s   ( O O ) :   [ ' l r ' ,   ' h i d d e n _ c h a n n e l s ' ,   ' b a t c h _ s i z e ' ,   ' n u m _ l a y e r s ' ,   ' h e a d s ' ,   ' n _ c a s e s ' ,   ' n e w _ f r e q ' ,   ' K ' ,   ' u s e _ g r e e d y ' ]  
+ [ P A R A M ] [ O O ]   T r i a l   8   |   e p i s o d e s = 1 0 0   |   l r = 7 . 9 7 e - 0 4   |   h i d d e n = 2 5 6   |   l a y e r s = 1   |   h e a d s = 4   |   K = 8   |   u s e _ g r e e d y = T r u e   |   t f = 4  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   T r a i n i n g   s t a r t e d   a t :   2 0 2 6 - 0 9 - 2 2   1 0 : 5 7 : 4 9  
+ [ T R A I N ]   H y p e r p a r a m s   |   m a x _ s t e p s = 1 0 0   |   n e w _ f r e q = 1 0  
+ [ T R A I N ]                           |   n _ c a s e s = 4 0   |   B = 1 2 8   |   K = 8   |   u s e _ g r e e d y = T r u e   |   l r = 0 . 0 0 0 7 9 6 5 2 6 1 3 0 8 1 2 0 5 1 1   ( d e c a y i n g   t o   1 . 5 9 e - 0 4 )  
+ [ T R A I N ]                           |   w a r m _ s t a r t _ s t e p s = 1 0 0   |   c h e c k p o i n t _ s m o o t h _ w i n d o w = 3   |   s e e d = N o n e  
+ [ T R A I N ]                           |   h i d d e n _ c h a n n e l s = 2 5 6   |   n u m _ l a y e r s = 1   |   h e a d s = 4  
+ [ T R A I N ]   R e p r e s e n t a t i o n   |   o o   |   G N N   |   g a t  
+ [ T R A I N ]   P r o b l e m   s i z e   |   j o b s = [ 8 , 1 0 ]   |   m a c h i n e s = [ 5 , 1 0 ]   |   o p s _ p e r _ j o b = [ 5 , 6 ]   |   m a x _ p r o c = 1 0 0  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   O u t p u t   r u n   f o l d e r :   r e s u l t s \ o p t u n a _ o o _ 1 7 9 0 0 7 1 0 6 7 \ t r i a l _ 8  
+ [ V A L I D A T I O N ]   N o t e :   u s i n g   t h e   e x i s t i n g   f i x e d   v a l i d a t i o n   d a t a s e t   a t   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( 4 0   i n s t a n c e s )   -   t h e   r e q u e s t e d   s a m p l e _ s i z e = 2 0   i s   i g n o r e d   s o   e v e r y   r u n   s t a y s   c o m p a r a b l e .   D e l e t e   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( a n d   i t s   p a i r e d   v a l / t e s t _ d a t a s e t . j s o n )   t o   r e g e n e r a t e   b o t h   s p l i t s   a t   a   n e w   s i z e .  
+ [ T R A I N ]   V a l i d a t i o n   c o n f i g   |   e v e r y = 1 5   s t e p s   |   i n s t a n c e s = 4 0   ( r e p r e s e n t a t i v e   s u b s e t )  
+ [ T R A I N ]   W a r m - s t a r t   ( b e h a v i o r   c l o n i n g   v s .   d i s p a t c h   h e u r i s t i c )   |   1 0 0   s t e p ( s ) . . .  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 / 1 0 0   |   i n s t a n c e = 1 5   |   b c _ l o s s = 1 . 8 9 9 3   |   d e c i s i o n s = 4 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 / 1 0 0   |   i n s t a n c e = 2 9   |   b c _ l o s s = 2 . 0 4 2 9   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 5 / 1 0 0   |   i n s t a n c e = 1 4   |   b c _ l o s s = 2 . 0 6 6 8   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 0 / 1 0 0   |   i n s t a n c e = 2 7   |   b c _ l o s s = 2 . 0 4 9 9   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 5 / 1 0 0   |   i n s t a n c e = 2 4   |   b c _ l o s s = 1 . 8 5 9 0   |   d e c i s i o n s = 4 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 0 / 1 0 0   |   i n s t a n c e = 1 7   |   b c _ l o s s = 1 . 9 3 0 9   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 5 / 1 0 0   |   i n s t a n c e = 3 6   |   b c _ l o s s = 1 . 9 9 3 2   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 0 / 1 0 0   |   i n s t a n c e = 1   |   b c _ l o s s = 2 . 0 7 7 9   |   d e c i s i o n s = 5 3  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 5 / 1 0 0   |   i n s t a n c e = 0   |   b c _ l o s s = 2 . 0 6 4 7   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 0 / 1 0 0   |   i n s t a n c e = 2 4   |   b c _ l o s s = 1 . 8 0 5 5   |   d e c i s i o n s = 4 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 5 / 1 0 0   |   i n s t a n c e = 1 5   |   b c _ l o s s = 1 . 7 8 3 1   |   d e c i s i o n s = 4 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 0 / 1 0 0   |   i n s t a n c e = 2 1   |   b c _ l o s s = 1 . 9 1 7 7   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 5 / 1 0 0   |   i n s t a n c e = 2 3   |   b c _ l o s s = 1 . 8 9 2 6   |   d e c i s i o n s = 5 0  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 0 / 1 0 0   |   i n s t a n c e = 3 8   |   b c _ l o s s = 1 . 8 7 2 7   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 5 / 1 0 0   |   i n s t a n c e = 2   |   b c _ l o s s = 1 . 7 3 3 1   |   d e c i s i o n s = 4 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 0 / 1 0 0   |   i n s t a n c e = 3 8   |   b c _ l o s s = 1 . 8 5 9 7   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 5 / 1 0 0   |   i n s t a n c e = 1 3   |   b c _ l o s s = 1 . 8 3 6 1   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 0 / 1 0 0   |   i n s t a n c e = 1 6   |   b c _ l o s s = 1 . 7 7 0 3   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 5 / 1 0 0   |   i n s t a n c e = 2 2   |   b c _ l o s s = 1 . 7 4 2 0   |   d e c i s i o n s = 4 3  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 0 / 1 0 0   |   i n s t a n c e = 3 4   |   b c _ l o s s = 1 . 8 9 4 0   |   d e c i s i o n s = 5 2  
+ [ T R A I N ]   W a r m - s t a r t   c o m p l e t e ,   s w i t c h i n g   t o   B O P O   p r e f e r e n c e   o p t i m i z a t i o n .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   B O P O   a g e n t   r e a d y .   S t a r t i n g   t r a i n i n g   l o o p   f o r   1 0 0   s t e p ( s ) . . .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   S t e p   1 / 1 0 0   |   1 0 : 5 8 : 2 7  
+ [ T R A I N ]   S t e p   1   |   L o s s = 7 . 2 5 7 1 8 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 2 1 . 0 0  
+ [ T R A I N ]   S t e p   2 / 1 0 0   |   1 0 : 5 8 : 5 7  
+ [ T R A I N ]   S t e p   2   |   L o s s = 2 . 3 8 8 3 0 9   |   B e s t   m a k e s p a n   i n   g r o u p = 4 3 8 . 0 0  
+ [ T R A I N ]   S t e p   3 / 1 0 0   |   1 0 : 5 9 : 2 9  
+ [ T R A I N ]   S t e p   3   |   L o s s = 1 . 9 8 9 9 0 6   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 9 . 0 0  
+ [ T R A I N ]   S t e p   4 / 1 0 0   |   1 0 : 5 9 : 5 7  
+ [ T R A I N ]   S t e p   4   |   L o s s = 1 . 5 0 5 0 7 8   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 5 . 0 0  
+ [ T R A I N ]   S t e p   5 / 1 0 0   |   1 1 : 0 0 : 3 3  
+ [ T R A I N ]   S t e p   5   |   L o s s = 1 . 7 1 0 2 2 9   |   B e s t   m a k e s p a n   i n   g r o u p = 5 7 9 . 0 0  
+ [ T R A I N ]   S t e p   6 / 1 0 0   |   1 1 : 0 1 : 1 0  
+ [ T R A I N ]   S t e p   6   |   L o s s = 2 . 4 0 5 0 0 7   |   B e s t   m a k e s p a n   i n   g r o u p = 4 9 3 . 0 0  
+ [ T R A I N ]   S t e p   7 / 1 0 0   |   1 1 : 0 1 : 5 3  
+ [ T R A I N ]   S t e p   7   |   L o s s = 0 . 7 4 3 8 1 6   |   B e s t   m a k e s p a n   i n   g r o u p = 5 8 3 . 0 0  
+ [ T R A I N ]   S t e p   8 / 1 0 0   |   1 1 : 0 2 : 2 9  
+ [ T R A I N ]   S t e p   8   |   L o s s = 2 . 0 0 8 6 9 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 9 . 0 0  
+ [ T R A I N ]   S t e p   9 / 1 0 0   |   1 1 : 0 2 : 5 7  
+ [ T R A I N ]   S t e p   9   |   L o s s = 0 . 0 0 0 0 0 0   |   B e s t   m a k e s p a n   i n   g r o u p = 3 3 5 . 0 0  
+ [ T R A I N ]   S t e p   1 0 / 1 0 0   |   1 1 : 0 3 : 2 5  
+ [ T R A I N ]   S t e p   1 0   |   L o s s = 0 . 0 0 0 0 5 4   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 2 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   1 0 ) . . .  
+ [ T R A I N ]   S t e p   1 1 / 1 0 0   |   1 1 : 0 4 : 0 0  
+ [ T R A I N ]   S t e p   1 1   |   L o s s = 3 . 1 1 3 7 0 9   |   B e s t   m a k e s p a n   i n   g r o u p = 4 2 8 . 0 0  
+ [ T R A I N ]   S t e p   1 2 / 1 0 0   |   1 1 : 0 4 : 4 6  
+ [ T R A I N ]   S t e p   1 2   |   L o s s = 8 . 5 6 2 1 6 6   |   B e s t   m a k e s p a n   i n   g r o u p = 3 9 1 . 0 0  
+ [ T R A I N ]   S t e p   1 3 / 1 0 0   |   1 1 : 0 5 : 2 1  
+ [ T R A I N ]   S t e p   1 3   |   L o s s = 0 . 7 1 5 3 2 7   |   B e s t   m a k e s p a n   i n   g r o u p = 2 8 0 . 0 0  
+ [ T R A I N ]   S t e p   1 4 / 1 0 0   |   1 1 : 0 5 : 5 3  
+ [ T R A I N ]   S t e p   1 4   |   L o s s = 4 . 9 9 5 4 0 3   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 3 . 0 0  
+ [ T R A I N ]   S t e p   1 5 / 1 0 0   |   1 1 : 0 6 : 2 3  
+ [ T R A I N ]   S t e p   1 5   |   L o s s = 0 . 9 1 5 0 7 7   |   B e s t   m a k e s p a n   i n   g r o u p = 5 0 0 . 0 0  
+ [ T R A I N ] [ V A L ] [ e p   1 5 ]   a v g _ g a p = 0 . 1 4 4 4   |   s t d _ g a p = 0 . 0 6 6 6   |   q 8 0 _ g a p = 0 . 1 9 6 1   |   n = 4 0  
+ [ T R A I N ]   V a l i d a t i o n   i m p r o v e d   |   s m o o t h e d _ a v g _ g a p = 0 . 1 4 4 4   ( r a w = 0 . 1 4 4 4 )   |   s a v i n g   c a n d i d a t e :   6 9 3 8 9 5 1 4 3 6 4 3 9 3 7 . p t h  
+ [ T R A I N ]   S t e p   1 6 / 1 0 0   |   1 1 : 0 7 : 2 4  
+ [ T R A I N ]   S t e p   1 6   |   L o s s = 1 . 4 3 4 4 9 3   |   B e s t   m a k e s p a n   i n   g r o u p = 4 4 8 . 0 0  
+ [ T R A I N ]   S t e p   1 7 / 1 0 0   |   1 1 : 0 7 : 5 4  
+ [ T R A I N ]   S t e p   1 7   |   L o s s = 1 . 4 0 2 4 0 7   |   B e s t   m a k e s p a n   i n   g r o u p = 4 7 4 . 0 0  
+ [ T R A I N ]   S t e p   1 8 / 1 0 0   |   1 1 : 0 8 : 3 9  
+ [ T R A I N ]   S t e p   1 8   |   L o s s = 0 . 0 0 0 3 1 9   |   B e s t   m a k e s p a n   i n   g r o u p = 5 6 6 . 0 0  
+ [ T R A I N ]   S t e p   1 9 / 1 0 0   |   1 1 : 0 9 : 1 0  
+ [ T R A I N ]   S t e p   1 9   |   L o s s = 2 . 3 5 7 1 8 5   |   B e s t   m a k e s p a n   i n   g r o u p = 4 5 4 . 0 0  
+ [ T R A I N ]   S t e p   2 0 / 1 0 0   |   1 1 : 0 9 : 4 9  
+ [ T R A I N ]   S t e p   2 0   |   L o s s = 5 . 9 1 8 1 3 8   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 3 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   2 0 ) . . .  
+ [ T R A I N ]   S t e p   2 1 / 1 0 0   |   1 1 : 1 0 : 3 1  
+ [ T R A I N ]   S t e p   2 1   |   L o s s = 9 . 4 3 3 3 5 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 5 8 . 0 0  
+ [ T R A I N ]   S t e p   2 2 / 1 0 0   |   1 1 : 1 1 : 4 9  
+ [ T R A I N ]   S t e p   2 2   |   L o s s = 1 . 9 6 5 2 9 8   |   B e s t   m a k e s p a n   i n   g r o u p = 5 3 7 . 0 0  
+ [ T R A I N ]   S t e p   2 3 / 1 0 0   |   1 1 : 1 2 : 3 4  
+ [ T R A I N ]   S t e p   2 3   |   L o s s = 0 . 0 2 2 2 1 1   |   B e s t   m a k e s p a n   i n   g r o u p = 5 2 3 . 0 0  
+ [ T R A I N ]   S t e p   2 4 / 1 0 0   |   1 1 : 1 3 : 2 7  
+ [ T R A I N ]   S t e p   2 4   |   L o s s = 0 . 0 0 0 0 0 0   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 8 . 0 0  
+ [ T R A I N ]   S t e p   2 5 / 1 0 0   |   1 1 : 1 4 : 4 1  
+ [ T R A I N ]   S t e p   2 5   |   L o s s = 0 . 0 2 3 6 8 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 7 2 . 0 0  
+ [ T R A I N ]   S t e p   2 6 / 1 0 0   |   1 1 : 1 6 : 1 0  
+ [ T R A I N ]   S t e p   2 6   |   L o s s = 1 . 9 7 9 6 3 6   |   B e s t   m a k e s p a n   i n   g r o u p = 4 5 5 . 0 0  
+ [ T R A I N ]   S t e p   2 7 / 1 0 0   |   1 1 : 1 7 : 3 8  
+ [ T R A I N ]   S t e p   2 7   |   L o s s = 0 . 9 4 1 5 7 4   |   B e s t   m a k e s p a n   i n   g r o u p = 4 2 8 . 0 0  
+ [ T R A I N ]   S t e p   2 8 / 1 0 0   |   1 1 : 1 9 : 0 6  
+ [ T R A I N ]   S t e p   2 8   |   L o s s = 0 . 5 3 6 8 6 9   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 5 . 0 0  
+ [ T R A I N ]   S t e p   2 9 / 1 0 0   |   1 1 : 2 0 : 1 1  
+ [ T R A I N ]   S t e p   2 9   |   L o s s = 1 0 . 5 4 4 7 2 6   |   B e s t   m a k e s p a n   i n   g r o u p = 3 2 3 . 0 0  
+ [ T R A I N ]   S t e p   3 0 / 1 0 0   |   1 1 : 2 1 : 5 2  
+ [ T R A I N ]   S t e p   3 0   |   L o s s = 4 . 9 2 1 6 5 7   |   B e s t   m a k e s p a n   i n   g r o u p = 4 9 9 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   3 0 ) . . .  
+ [ T R A I N ] [ V A L ] [ e p   3 0 ]   a v g _ g a p = 0 . 1 4 6 0   |   s t d _ g a p = 0 . 0 6 5 8   |   q 8 0 _ g a p = 0 . 2 1 5 8   |   n = 4 0  
+ [ T R A I N ]   S t e p   3 1 / 1 0 0   |   1 1 : 2 3 : 5 8  
+ [ T R A I N ]   S t e p   3 1   |   L o s s = 0 . 4 8 6 3 0 2   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 3 . 0 0  
+ [ T R A I N ]   S t e p   3 2 / 1 0 0   |   1 1 : 2 5 : 0 3  
+ [ T R A I N ]   S t e p   3 2   |   L o s s = 0 . 0 2 9 2 6 2   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 5 . 0 0  
+ [ T R A I N ]   S t e p   3 3 / 1 0 0   |   1 1 : 2 6 : 3 5  
+ [ T R A I N ]   S t e p   3 3   |   L o s s = 1 . 5 5 2 7 7 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 4 6 . 0 0  
+ [ T R A I N ]   S t e p   3 4 / 1 0 0   |   1 1 : 2 7 : 5 1  
+ [ T R A I N ]   S t e p   3 4   |   L o s s = 1 . 3 3 2 3 8 5   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 5 . 0 0  
+ [ T R A I N ]   S t e p   3 5 / 1 0 0   |   1 1 : 2 8 : 4 7  
+ [ T R A I N ]   S t e p   3 5   |   L o s s = 2 . 4 9 8 0 3 4   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 1 . 0 0  
+ [ T R A I N ]   S t e p   3 6 / 1 0 0   |   1 1 : 3 0 : 1 3  
+ [ T R A I N ]   S t e p   3 6   |   L o s s = 2 . 0 3 6 7 8 3   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 7 . 0 0  
+ [ T R A I N ]   S t e p   3 7 / 1 0 0   |   1 1 : 3 1 : 5 4  
+ [ T R A I N ]   S t e p   3 7   |   L o s s = 8 . 1 2 0 2 1 1   |   B e s t   m a k e s p a n   i n   g r o u p = 5 2 1 . 0 0  
+ [ T R A I N ]   S t e p   3 8 / 1 0 0   |   1 1 : 3 3 : 4 4  
+ [ T R A I N ]   S t e p   3 8   |   L o s s = 0 . 1 2 4 0 4 7   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 4 . 0 0  
+ [ T R A I N ]   S t e p   3 9 / 1 0 0   |   1 1 : 3 4 : 5 8  
+ [ T R A I N ]   S t e p   3 9   |   L o s s = 0 . 6 5 2 9 6 3   |   B e s t   m a k e s p a n   i n   g r o u p = 5 0 2 . 0 0  
+ [ T R A I N ]   S t e p   4 0 / 1 0 0   |   1 1 : 3 6 : 5 9  
+ [ T R A I N ]   S t e p   4 0   |   L o s s = 5 . 2 4 0 1 7 3   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 6 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   4 0 ) . . .  
+ [ T R A I N ]   S t e p   4 1 / 1 0 0   |   1 1 : 3 8 : 5 3  
+ [ T R A I N ]   S t e p   4 1   |   L o s s = 0 . 4 2 3 0 3 9   |   B e s t   m a k e s p a n   i n   g r o u p = 5 6 2 . 0 0  
+ [ T R A I N ]   S t e p   4 2 / 1 0 0   |   1 1 : 4 0 : 0 2  
+ [ T R A I N ]   S t e p   4 2   |   L o s s = 0 . 0 0 0 0 3 6   |   B e s t   m a k e s p a n   i n   g r o u p = 3 1 7 . 0 0  
+ [ T R A I N ]   S t e p   4 3 / 1 0 0   |   1 1 : 4 1 : 3 1  
+ [ T R A I N ]   S t e p   4 3   |   L o s s = 6 . 1 1 8 4 2 1   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 6 . 0 0  
+ [ T R A I N ]   S t e p   4 4 / 1 0 0   |   1 1 : 4 3 : 1 9  
+ [ T R A I N ]   S t e p   4 4   |   L o s s = 0 . 0 0 0 0 0 7   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 7 . 0 0  
+ [ T R A I N ]   S t e p   4 5 / 1 0 0   |   1 1 : 4 4 : 3 2  
+ [ T R A I N ]   S t e p   4 5   |   L o s s = 0 . 0 0 0 5 9 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 1 1 . 0 0  
+ [ T R A I N ] [ V A L ] [ e p   4 5 ]   a v g _ g a p = 0 . 1 4 0 5   |   s t d _ g a p = 0 . 0 7 3 3   |   q 8 0 _ g a p = 0 . 2 2 3 1   |   n = 4 0  
+ [ T R A I N ]   V a l i d a t i o n   i m p r o v e d   |   s m o o t h e d _ a v g _ g a p = 0 . 1 4 3 6   ( r a w = 0 . 1 4 0 5 )   |   s a v i n g   c a n d i d a t e :   5 1 9 6 1 8 3 9 4 2 6 6 3 8 5 . p t h  
+ [ T R A I N ]   S t e p   4 6 / 1 0 0   |   1 1 : 4 5 : 4 4  
+ [ T R A I N ]   S t e p   4 6   |   L o s s = 0 . 3 3 3 2 9 1   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 9 . 0 0  
+ [ T R A I N ]   S t e p   4 7 / 1 0 0   |   1 1 : 4 6 : 4 4  
+ [ T R A I N ]   S t e p   4 7   |   L o s s = 0 . 0 0 0 0 2 3   |   B e s t   m a k e s p a n   i n   g r o u p = 5 1 1 . 0 0  
+ [ T R A I N ]   S t e p   4 8 / 1 0 0   |   1 1 : 4 7 : 3 1  
+ [ T R A I N ]   S t e p   4 8   |   L o s s = 0 . 1 3 5 4 8 6   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 5 . 0 0  
+ [ T R A I N ]   S t e p   4 9 / 1 0 0   |   1 1 : 4 8 : 4 5  
+ [ T R A I N ]   S t e p   4 9   |   L o s s = 1 . 2 5 5 1 0 8   |   B e s t   m a k e s p a n   i n   g r o u p = 3 9 6 . 0 0  
+ [ T R A I N ]   S t e p   5 0 / 1 0 0   |   1 1 : 5 0 : 1 9  
+ [ T R A I N ]   S t e p   5 0   |   L o s s = 0 . 8 6 3 0 7 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 0 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   5 0 ) . . .  
+ [ T R A I N ]   S t e p   5 1 / 1 0 0   |   1 1 : 5 1 : 1 7  
+ [ T R A I N ]   S t e p   5 1   |   L o s s = 0 . 0 0 0 0 0 6   |   B e s t   m a k e s p a n   i n   g r o u p = 4 3 5 . 0 0  
+ [ T R A I N ]   S t e p   5 2 / 1 0 0   |   1 1 : 5 3 : 0 4  
+ [ T R A I N ]   S t e p   5 2   |   L o s s = 0 . 0 4 6 4 0 8   |   B e s t   m a k e s p a n   i n   g r o u p = 5 2 6 . 0 0  
+ [ T R A I N ]   S t e p   5 3 / 1 0 0   |   1 1 : 5 4 : 0 1  
+ [ T R A I N ]   S t e p   5 3   |   L o s s = 5 . 5 9 9 1 8 4   |   B e s t   m a k e s p a n   i n   g r o u p = 4 4 1 . 0 0  
+ [ T R A I N ]   S t e p   5 4 / 1 0 0   |   1 1 : 5 5 : 3 2  
+ [ T R A I N ]   S t e p   5 4   |   L o s s = 0 . 2 9 5 8 3 4   |   B e s t   m a k e s p a n   i n   g r o u p = 5 2 2 . 0 0  
+ [ T R A I N ]   S t e p   5 5 / 1 0 0   |   1 1 : 5 6 : 3 9  
+ [ T R A I N ]   S t e p   5 5   |   L o s s = 2 . 1 1 4 8 9 4   |   B e s t   m a k e s p a n   i n   g r o u p = 3 1 5 . 0 0  
+ [ T R A I N ]   S t e p   5 6 / 1 0 0   |   1 1 : 5 7 : 3 7  
+ [ T R A I N ]   S t e p   5 6   |   L o s s = 0 . 0 6 0 8 8 5   |   B e s t   m a k e s p a n   i n   g r o u p = 5 4 4 . 0 0  
+ [ T R A I N ]   S t e p   5 7 / 1 0 0   |   1 1 : 5 9 : 3 8  
+ [ T R A I N ]   S t e p   5 7   |   L o s s = 4 . 6 3 8 8 2 3   |   B e s t   m a k e s p a n   i n   g r o u p = 6 4 8 . 0 0  
+ [ T R A I N ]   S t e p   5 8 / 1 0 0   |   1 2 : 0 1 : 0 8  
+ [ T R A I N ]   S t e p   5 8   |   L o s s = 0 . 0 0 0 2 5 9   |   B e s t   m a k e s p a n   i n   g r o u p = 5 5 9 . 0 0  
+ [ T R A I N ]   S t e p   5 9 / 1 0 0   |   1 2 : 0 2 : 2 9  
+ [ T R A I N ]   S t e p   5 9   |   L o s s = 1 . 4 7 7 8 0 8   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 0 . 0 0  
+ [ T R A I N ]   S t e p   6 0 / 1 0 0   |   1 2 : 0 3 : 3 1  
+ [ T R A I N ]   S t e p   6 0   |   L o s s = 0 . 0 3 8 6 9 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 2 8 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   6 0 ) . . .  
+ [ T R A I N ] [ V A L ] [ e p   6 0 ]   a v g _ g a p = 0 . 1 4 5 1   |   s t d _ g a p = 0 . 0 7 1 4   |   q 8 0 _ g a p = 0 . 2 0 5 5   |   n = 4 0  
+ [ T R A I N ]   S t e p   6 1 / 1 0 0   |   1 2 : 0 4 : 5 2  
+ [ T R A I N ]   S t e p   6 1   |   L o s s = 5 . 8 4 5 2 0 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 4 5 . 0 0  
+ [ T R A I N ]   S t e p   6 2 / 1 0 0   |   1 2 : 0 6 : 2 2  
+ [ T R A I N ]   S t e p   6 2   |   L o s s = 9 . 7 1 4 5 1 4   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 6 . 0 0  
+ [ T R A I N ]   S t e p   6 3 / 1 0 0   |   1 2 : 0 7 : 1 8  
+ [ T R A I N ]   S t e p   6 3   |   L o s s = 2 . 5 6 1 4 0 2   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 0 . 0 0  
+ [ T R A I N ]   S t e p   6 4 / 1 0 0   |   1 2 : 0 8 : 1 8  
+ [ T R A I N ]   S t e p   6 4   |   L o s s = 6 . 7 4 8 8 5 2   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 9 . 0 0  
+ [ T R A I N ]   S t e p   6 5 / 1 0 0   |   1 2 : 0 9 : 4 1  
+ [ T R A I N ]   S t e p   6 5   |   L o s s = 4 . 9 2 1 5 3 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 2 8 . 0 0  
+ [ T R A I N ]   S t e p   6 6 / 1 0 0   |   1 2 : 1 0 : 3 1  
+ [ T R A I N ]   S t e p   6 6   |   L o s s = 4 . 8 0 8 4 0 2   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 4 . 0 0  
+ [ T R A I N ]   S t e p   6 7 / 1 0 0   |   1 2 : 1 1 : 3 1  
+ [ T R A I N ]   S t e p   6 7   |   L o s s = 2 . 8 3 3 4 1 7   |   B e s t   m a k e s p a n   i n   g r o u p = 4 7 9 . 0 0  
+ [ T R A I N ]   S t e p   6 8 / 1 0 0   |   1 2 : 1 2 : 2 2  
+ [ T R A I N ]   S t e p   6 8   |   L o s s = 3 . 5 4 4 3 9 6   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 5 . 0 0  
+ [ T R A I N ]   S t e p   6 9 / 1 0 0   |   1 2 : 1 3 : 1 5  
+ [ T R A I N ]   S t e p   6 9   |   L o s s = 0 . 9 7 6 2 8 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 4 . 0 0  
+ [ T R A I N ]   S t e p   7 0 / 1 0 0   |   1 2 : 1 4 : 2 4  
+ [ T R A I N ]   S t e p   7 0   |   L o s s = 0 . 0 7 5 8 7 4   |   B e s t   m a k e s p a n   i n   g r o u p = 3 2 1 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   7 0 ) . . .  
+ [ T R A I N ]   S t e p   7 1 / 1 0 0   |   1 2 : 1 5 : 2 4  
+ [ T R A I N ]   S t e p   7 1   |   L o s s = 0 . 0 0 2 6 3 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 7 . 0 0  
+ [ T R A I N ]   S t e p   7 2 / 1 0 0   |   1 2 : 1 6 : 4 7  
+ [ T R A I N ]   S t e p   7 2   |   L o s s = 0 . 0 0 8 6 3 7   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 5 . 0 0  
+ [ T R A I N ]   S t e p   7 3 / 1 0 0   |   1 2 : 1 7 : 4 6  
+ [ T R A I N ]   S t e p   7 3   |   L o s s = 5 . 2 0 3 6 6 7   |   B e s t   m a k e s p a n   i n   g r o u p = 3 9 5 . 0 0  
+ [ T R A I N ]   S t e p   7 4 / 1 0 0   |   1 2 : 1 9 : 0 3  
+ [ T R A I N ]   S t e p   7 4   |   L o s s = 0 . 0 6 4 6 4 8   |   B e s t   m a k e s p a n   i n   g r o u p = 3 8 7 . 0 0  
+ [ T R A I N ]   S t e p   7 5 / 1 0 0   |   1 2 : 2 0 : 2 2  
+ [ T R A I N ]   S t e p   7 5   |   L o s s = 8 . 3 7 3 3 0 4   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 1 . 0 0  
+ [ T R A I N ] [ V A L ] [ e p   7 5 ]   a v g _ g a p = 0 . 1 3 7 6   |   s t d _ g a p = 0 . 0 6 1 2   |   q 8 0 _ g a p = 0 . 1 8 5 8   |   n = 4 0  
+ [ T R A I N ]   V a l i d a t i o n   i m p r o v e d   |   s m o o t h e d _ a v g _ g a p = 0 . 1 4 1 1   ( r a w = 0 . 1 3 7 6 )   |   s a v i n g   c a n d i d a t e :   5 6 2 4 7 0 9 0 9 8 0 2 3 7 2 . p t h  
+ [ T R A I N ]   S t e p   7 6 / 1 0 0   |   1 2 : 2 2 : 3 4  
+ [ T R A I N ]   S t e p   7 6   |   L o s s = 0 . 1 0 0 7 1 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 2 5 . 0 0  
+ [ T R A I N ]   S t e p   7 7 / 1 0 0   |   1 2 : 2 3 : 5 8  
+ [ T R A I N ]   S t e p   7 7   |   L o s s = 0 . 2 5 8 9 2 9   |   B e s t   m a k e s p a n   i n   g r o u p = 4 8 4 . 0 0  
+ [ T R A I N ]   S t e p   7 8 / 1 0 0   |   1 2 : 2 5 : 2 0  
+ [ T R A I N ]   S t e p   7 8   |   L o s s = 5 . 7 2 1 5 8 8   |   B e s t   m a k e s p a n   i n   g r o u p = 4 7 7 . 0 0  
+ [ T R A I N ]   S t e p   7 9 / 1 0 0   |   1 2 : 2 6 : 3 7  
+ [ T R A I N ]   S t e p   7 9   |   L o s s = 7 . 6 0 5 3 4 6   |   B e s t   m a k e s p a n   i n   g r o u p = 4 9 8 . 0 0  
+ [ T R A I N ]   S t e p   8 0 / 1 0 0   |   1 2 : 2 8 : 2 5  
+ [ T R A I N ]   S t e p   8 0   |   L o s s = 0 . 0 0 0 0 0 3   |   B e s t   m a k e s p a n   i n   g r o u p = 3 8 2 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   8 0 ) . . .  
+ [ T R A I N ]   S t e p   8 1 / 1 0 0   |   1 2 : 2 9 : 4 3  
+ [ T R A I N ]   S t e p   8 1   |   L o s s = 0 . 8 5 0 7 3 4   |   B e s t   m a k e s p a n   i n   g r o u p = 5 4 0 . 0 0  
+ [ T R A I N ]   S t e p   8 2 / 1 0 0   |   1 2 : 3 0 : 5 4  
+ [ T R A I N ]   S t e p   8 2   |   L o s s = 0 . 0 5 9 3 2 8   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 5 . 0 0  
+ [ T R A I N ]   S t e p   8 3 / 1 0 0   |   1 2 : 3 1 : 5 2  
+ [ T R A I N ]   S t e p   8 3   |   L o s s = 0 . 0 0 3 7 7 3   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 4 . 0 0  
+ [ T R A I N ]   S t e p   8 4 / 1 0 0   |   1 2 : 3 2 : 4 4  
+ [ T R A I N ]   S t e p   8 4   |   L o s s = 0 . 1 2 4 9 3 3   |   B e s t   m a k e s p a n   i n   g r o u p = 4 4 1 . 0 0  
+ [ T R A I N ]   S t e p   8 5 / 1 0 0   |   1 2 : 3 3 : 4 6  
+ [ T R A I N ]   S t e p   8 5   |   L o s s = 0 . 0 4 4 3 2 3   |   B e s t   m a k e s p a n   i n   g r o u p = 2 5 3 . 0 0  
+ [ T R A I N ]   S t e p   8 6 / 1 0 0   |   1 2 : 3 4 : 5 2  
+ [ T R A I N ]   S t e p   8 6   |   L o s s = 0 . 0 0 0 3 1 7   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 1 . 0 0  
+ [ T R A I N ]   S t e p   8 7 / 1 0 0   |   1 2 : 3 5 : 5 6  
+ [ T R A I N ]   S t e p   8 7   |   L o s s = 2 . 5 3 1 4 0 9   |   B e s t   m a k e s p a n   i n   g r o u p = 4 5 4 . 0 0  
+ [ T R A I N ]   S t e p   8 8 / 1 0 0   |   1 2 : 3 7 : 0 5  
+ [ T R A I N ]   S t e p   8 8   |   L o s s = 1 . 8 8 4 6 2 3   |   B e s t   m a k e s p a n   i n   g r o u p = 7 0 3 . 0 0  
+ [ T R A I N ]   S t e p   8 9 / 1 0 0   |   1 2 : 3 8 : 4 0  
+ [ T R A I N ]   S t e p   8 9   |   L o s s = 0 . 0 4 7 8 5 9   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 1 . 0 0  
+ [ T R A I N ]   S t e p   9 0 / 1 0 0   |   1 2 : 3 9 : 4 7  
+ [ T R A I N ]   S t e p   9 0   |   L o s s = 8 . 3 6 6 9 4 1   |   B e s t   m a k e s p a n   i n   g r o u p = 4 1 6 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   9 0 ) . . .  
+ [ T R A I N ] [ V A L ] [ e p   9 0 ]   a v g _ g a p = 0 . 1 3 9 3   |   s t d _ g a p = 0 . 0 6 3 8   |   q 8 0 _ g a p = 0 . 1 8 3 6   |   n = 4 0  
+ [ T R A I N ]   V a l i d a t i o n   i m p r o v e d   |   s m o o t h e d _ a v g _ g a p = 0 . 1 4 0 7   ( r a w = 0 . 1 3 9 3 )   |   s a v i n g   c a n d i d a t e :   9 7 7 8 3 0 2 3 5 1 8 9 0 9 8 . p t h  
+ [ T R A I N ]   S t e p   9 1 / 1 0 0   |   1 2 : 4 2 : 3 0  
+ [ T R A I N ]   S t e p   9 1   |   L o s s = 1 . 8 4 1 5 6 4   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 6 . 0 0  
+ [ T R A I N ]   S t e p   9 2 / 1 0 0   |   1 2 : 4 3 : 2 7  
+ [ T R A I N ]   S t e p   9 2   |   L o s s = 1 4 . 7 6 7 6 9 0   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 0 . 0 0  
+ [ T R A I N ]   S t e p   9 3 / 1 0 0   |   1 2 : 4 4 : 1 9  
+ [ T R A I N ]   S t e p   9 3   |   L o s s = 1 . 7 7 2 9 5 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 9 5 . 0 0  
+ [ T R A I N ]   S t e p   9 4 / 1 0 0   |   1 2 : 4 5 : 1 3  
+ [ T R A I N ]   S t e p   9 4   |   L o s s = 0 . 0 0 7 0 1 8   |   B e s t   m a k e s p a n   i n   g r o u p = 3 2 7 . 0 0  
+ [ T R A I N ]   S t e p   9 5 / 1 0 0   |   1 2 : 4 6 : 0 4  
+ [ T R A I N ]   S t e p   9 5   |   L o s s = 0 . 0 5 9 1 5 2   |   B e s t   m a k e s p a n   i n   g r o u p = 3 8 5 . 0 0  
+ [ T R A I N ]   S t e p   9 6 / 1 0 0   |   1 2 : 4 7 : 0 2  
+ [ T R A I N ]   S t e p   9 6   |   L o s s = 1 . 3 9 2 8 3 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 2 7 . 0 0  
+ [ T R A I N ]   S t e p   9 7 / 1 0 0   |   1 2 : 4 7 : 5 7  
+ [ T R A I N ]   S t e p   9 7   |   L o s s = 0 . 6 8 9 2 4 3   |   B e s t   m a k e s p a n   i n   g r o u p = 5 8 3 . 0 0  
+ [ T R A I N ]   S t e p   9 8 / 1 0 0   |   1 2 : 4 9 : 1 0  
+ [ T R A I N ]   S t e p   9 8   |   L o s s = 3 . 2 6 8 3 3 1   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 0 . 0 0  
+ [ T R A I N ]   S t e p   9 9 / 1 0 0   |   1 2 : 4 9 : 5 5  
+ [ T R A I N ]   S t e p   9 9   |   L o s s = 2 . 5 8 1 1 1 0   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 2 . 0 0  
+ [ T R A I N ]   S t e p   1 0 0 / 1 0 0   |   1 2 : 5 0 : 5 5  
+ [ T R A I N ]   S t e p   1 0 0   |   L o s s = 2 . 0 2 1 8 2 4   |   B e s t   m a k e s p a n   i n   g r o u p = 5 7 7 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   1 0 0 ) . . .  
+ [ T R A I N ] [ V A L ] [ e p   1 0 0 ]   a v g _ g a p = 0 . 1 3 9 2   |   s t d _ g a p = 0 . 0 6 5 6   |   q 8 0 _ g a p = 0 . 1 8 3 6   |   n = 4 0  
+ [ T R A I N ]   V a l i d a t i o n   i m p r o v e d   |   s m o o t h e d _ a v g _ g a p = 0 . 1 3 8 7   ( r a w = 0 . 1 3 9 2 )   |   s a v i n g   c a n d i d a t e :   1 0 1 3 0 0 1 6 8 9 0 9 8 6 1 . p t h  
+ [ T R A I N ]   E v a l u a t i n g   b e s t   c h e c k p o i n t   ( c a n d i d a t e _ m o d e l s / 1 0 1 3 0 0 1 6 8 9 0 9 8 6 1 . p t h )   o n   t h e   h e l d - o u t   t e s t   s p l i t . . .  
+ [ T R A I N ] [ T E S T ]   a v g _ g a p = 0 . 1 4 8 0   |   s t d _ g a p = 0 . 0 7 6 5   |   q 8 0 _ g a p = 0 . 2 2 3 5   |   n = 4 0  
+ [ T R A I N ] [ 1 2 : 5 3 : 0 7 ]   T r a i n i n g   e n d e d .   V a l i d a t i o n   h i s t o r y   a n d   p l o t s   u p d a t e d .  
+ [ I   2 0 2 6 - 0 9 - 2 2   1 2 : 5 3 : 0 7 , 9 1 4 ]   T r i a l   8   f i n i s h e d   w i t h   v a l u e :   0 . 1 8 3 6 0 7 5 8 6 1 1 0 7 2 3 7 3   a n d   p a r a m e t e r s :   { ' n e w _ f r e q ' :   1 0 ,    
+ ' n _ c a s e s ' :   4 0 ,   ' b a t c h _ s i z e ' :   1 2 8 ,   ' l r ' :   0 . 0 0 0 7 9 6 5 2 6 1 3 0 8 1 2 0 5 1 1 ,   ' h i d d e n _ c h a n n e l s ' :   2 5 6 ,   ' n u m _ l a y e r s ' :   1 ,   ' h e a d s ' :   4 ,    
+ ' K ' :   8 ,   ' u s e _ g r e e d y ' :   T r u e } .   B e s t   i s   t r i a l   6   w i t h   v a l u e :   0 . 1 1 7 8 7 1 3 6 0 7 1 7 9 1 3 7 4 .  
+ [ P A R A M ] [ O O ]   T r i a l   9   |   e p i s o d e s = 1 0 0   |   l r = 8 . 2 0 e - 0 4   |   h i d d e n = 5 1 2   |   l a y e r s = 3   |   h e a d s = 4   |   K = 3 2   |   u s e _ g r e e d y = F a l s e   |   t f = 4  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   T r a i n i n g   s t a r t e d   a t :   2 0 2 6 - 0 9 - 2 2   1 2 : 5 3 : 0 8  
+ [ T R A I N ]   H y p e r p a r a m s   |   m a x _ s t e p s = 1 0 0   |   n e w _ f r e q = 5 0  
+ [ T R A I N ]                           |   n _ c a s e s = 4 0   |   B = 6 4   |   K = 3 2   |   u s e _ g r e e d y = F a l s e   |   l r = 0 . 0 0 0 8 2 0 4 6 4 3 3 6 5 3 2 3 9 5 9   ( d e c a y i n g   t o   1 . 6 4 e - 0 4 )  
+ [ T R A I N ]                           |   w a r m _ s t a r t _ s t e p s = 1 0 0   |   c h e c k p o i n t _ s m o o t h _ w i n d o w = 3   |   s e e d = N o n e  
+ [ T R A I N ]                           |   h i d d e n _ c h a n n e l s = 5 1 2   |   n u m _ l a y e r s = 3   |   h e a d s = 4  
+ [ T R A I N ]   R e p r e s e n t a t i o n   |   o o   |   G N N   |   g a t  
+ [ T R A I N ]   P r o b l e m   s i z e   |   j o b s = [ 8 , 1 0 ]   |   m a c h i n e s = [ 5 , 1 0 ]   |   o p s _ p e r _ j o b = [ 5 , 6 ]   |   m a x _ p r o c = 1 0 0  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   O u t p u t   r u n   f o l d e r :   r e s u l t s \ o p t u n a _ o o _ 1 7 9 0 0 7 1 0 6 7 \ t r i a l _ 9  
+ [ V A L I D A T I O N ]   N o t e :   u s i n g   t h e   e x i s t i n g   f i x e d   v a l i d a t i o n   d a t a s e t   a t   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( 4 0   i n s t a n c e s )   -   t h e   r e q u e s t e d   s a m p l e _ s i z e = 2 0   i s   i g n o r e d   s o   e v e r y   r u n   s t a y s   c o m p a r a b l e .   D e l e t e   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( a n d   i t s   p a i r e d   v a l / t e s t _ d a t a s e t . j s o n )   t o   r e g e n e r a t e   b o t h   s p l i t s   a t   a   n e w   s i z e .  
+ [ T R A I N ]   V a l i d a t i o n   c o n f i g   |   e v e r y = 1 5   s t e p s   |   i n s t a n c e s = 4 0   ( r e p r e s e n t a t i v e   s u b s e t )  
+ [ T R A I N ]   W a r m - s t a r t   ( b e h a v i o r   c l o n i n g   v s .   d i s p a t c h   h e u r i s t i c )   |   1 0 0   s t e p ( s ) . . .  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 / 1 0 0   |   i n s t a n c e = 0   |   b c _ l o s s = 2 . 0 3 1 1   |   d e c i s i o n s = 5 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 / 1 0 0   |   i n s t a n c e = 3 4   |   b c _ l o s s = 1 . 9 9 4 8   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 5 / 1 0 0   |   i n s t a n c e = 1 9   |   b c _ l o s s = 2 . 0 4 6 0   |   d e c i s i o n s = 4 7  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 0 / 1 0 0   |   i n s t a n c e = 3 1   |   b c _ l o s s = 2 . 1 5 1 2   |   d e c i s i o n s = 5 6  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 5 / 1 0 0   |   i n s t a n c e = 5   |   b c _ l o s s = 1 . 9 1 0 4   |   d e c i s i o n s = 4 3  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 0 / 1 0 0   |   i n s t a n c e = 1 7   |   b c _ l o s s = 1 . 9 6 4 3   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 5 / 1 0 0   |   i n s t a n c e = 3 4   |   b c _ l o s s = 1 . 9 9 0 0   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 0 / 1 0 0   |   i n s t a n c e = 1 7   |   b c _ l o s s = 2 . 0 2 4 7   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 5 / 1 0 0   |   i n s t a n c e = 3   |   b c _ l o s s = 1 . 9 6 7 0   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 0 / 1 0 0   |   i n s t a n c e = 2 2   |   b c _ l o s s = 1 . 9 5 6 4   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 5 / 1 0 0   |   i n s t a n c e = 1 1   |   b c _ l o s s = 2 . 1 2 2 7   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 0 / 1 0 0   |   i n s t a n c e = 6   |   b c _ l o s s = 1 . 9 1 8 3   |   d e c i s i o n s = 4 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 5 / 1 0 0   |   i n s t a n c e = 7   |   b c _ l o s s = 1 . 7 5 4 9   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 0 / 1 0 0   |   i n s t a n c e = 1 8   |   b c _ l o s s = 2 . 1 0 2 2   |   d e c i s i o n s = 5 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 5 / 1 0 0   |   i n s t a n c e = 2 9   |   b c _ l o s s = 1 . 9 9 6 4   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 0 / 1 0 0   |   i n s t a n c e = 2 2   |   b c _ l o s s = 1 . 9 4 0 4   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 5 / 1 0 0   |   i n s t a n c e = 2 6   |   b c _ l o s s = 2 . 0 3 5 0   |   d e c i s i o n s = 5 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 0 / 1 0 0   |   i n s t a n c e = 1 7   |   b c _ l o s s = 1 . 9 2 3 3   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 5 / 1 0 0   |   i n s t a n c e = 1 5   |   b c _ l o s s = 1 . 9 1 2 9   |   d e c i s i o n s = 4 3  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 0 / 1 0 0   |   i n s t a n c e = 3   |   b c _ l o s s = 1 . 9 4 3 0   |   d e c i s i o n s = 4 8  
+ [ T R A I N ]   W a r m - s t a r t   c o m p l e t e ,   s w i t c h i n g   t o   B O P O   p r e f e r e n c e   o p t i m i z a t i o n .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   B O P O   a g e n t   r e a d y .   S t a r t i n g   t r a i n i n g   l o o p   f o r   1 0 0   s t e p ( s ) . . .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   S t e p   1 / 1 0 0   |   1 3 : 0 8 : 4 7  
+ [ T R A I N ]   S t e p   1   |   L o s s = 1 . 0 9 0 3 3 3   |   B e s t   m a k e s p a n   i n   g r o u p = 3 9 1 . 0 0  
+ [ T R A I N ]   S t e p   2 / 1 0 0   |   1 3 : 1 2 : 1 6  
+ [ T R A I N ]   S t e p   2   |   L o s s = 4 . 2 4 6 0 0 7   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 1 . 0 0  
+ [ T R A I N ]   S t e p   3 / 1 0 0   |   1 3 : 1 6 : 0 3  
+ [ T R A I N ]   S t e p   3   |   L o s s = 6 . 3 0 2 8 5 0   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 4 . 0 0  
+ [ T R A I N ]   S t e p   4 / 1 0 0   |   1 3 : 2 0 : 0 0  
+ [ T R A I N ]   S t e p   4   |   L o s s = 1 . 6 0 5 5 5 7   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 5 . 0 0  
+ [ T R A I N ]   S t e p   5 / 1 0 0   |   1 3 : 2 2 : 5 4  
+ [ T R A I N ]   S t e p   5   |   L o s s = 2 . 9 3 0 3 1 6   |   B e s t   m a k e s p a n   i n   g r o u p = 4 9 5 . 0 0  
+ [ T R A I N ]   S t e p   6 / 1 0 0   |   1 3 : 2 9 : 1 7  
+ [ T R A I N ]   S t e p   6   |   L o s s = 2 . 4 8 3 4 9 3   |   B e s t   m a k e s p a n   i n   g r o u p = 6 8 4 . 0 0  
+ [ T R A I N ]   S t e p   7 / 1 0 0   |   1 3 : 3 5 : 1 2  
+ [ T R A I N ]   S t e p   7   |   L o s s = 1 . 0 3 5 5 0 5   |   B e s t   m a k e s p a n   i n   g r o u p = 4 8 6 . 0 0  
+ [ T R A I N ]   S t e p   8 / 1 0 0   |   1 3 : 4 1 : 3 9  
+ [ T R A I N ]   S t e p   8   |   L o s s = 2 . 8 3 1 3 7 3   |   B e s t   m a k e s p a n   i n   g r o u p = 5 3 4 . 0 0  
+ [ T R A I N ]   S t e p   9 / 1 0 0   |   1 3 : 4 7 : 0 6  
+ [ T R A I N ]   S t e p   9   |   L o s s = 5 . 0 6 4 5 6 1   |   B e s t   m a k e s p a n   i n   g r o u p = 5 3 0 . 0 0  
+ [ T R A I N ]   S t e p   1 0 / 1 0 0   |   1 3 : 5 2 : 5 7  
+ [ T R A I N ]   S t e p   1 0   |   L o s s = 2 . 6 0 0 2 7 9   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 7 . 0 0  
+ [ T R A I N ]   S t e p   1 1 / 1 0 0   |   1 3 : 5 6 : 0 6  
+ === optuna sweep: om (10 trials) ===
+p y t h o n   :   d : \ D i s s e r t a %є %ъ o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ v e n v \ L i b \ s i t e - p a c k a g e s \ t o r c h \ j i t \ _ s c r i p t . p y : 1 4 8 5 :    
+ F u t u r e W a r n i n g :   ` t o r c h . j i t . s c r i p t `   i s   n o t   s u p p o r t e d   i n   P y t h o n   3 . 1 4 +   a n d   m a y   b r e a k .   P l e a s e   s w i t c h   t o   ` t o r c h . c o m p i l e `   o r    
+ ` t o r c h . e x p o r t ` .  
+ A t   D : \ D i s s e r t a з г o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ r u n _ o p t u n a _ r e m a i n i n g . p s 1 : 5   c h a r : 1  
+ +   p y t h o n   - u   m a i n . p y   - - m o d e   o p t u n a   - - r e p r e s e n t a t i o n   o m   - - t r i a l s   1 0   - - m a x   . . .  
+ +   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~  
+         +   C a t e g o r y I n f o                     :   N o t S p e c i f i e d :   ( d : \ D i s s e r t a %є %ъ . . . ` t o r c h . e x p o r t ` . : S t r i n g )   [ ] ,   R e m o t e E x c e p t i o n  
+         +   F u l l y Q u a l i f i e d E r r o r I d   :   N a t i v e C o m m a n d E r r o r  
+    
+     w a r n i n g s . w a r n (  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ M A I N ]   R u n   s t a r t e d   a t   2 0 2 6 - 0 9 - 2 2   1 3 : 5 8 : 4 1  
+ [ M A I N ]   m o d e = o p t u n a  
+ [ M A I N ]   r u n _ n a m e = t r a i n _ r u n  
+ [ M A I N ]   r e p r e s e n t a t i o n ( s ) = [ ' o m ' ]  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ P A R A M ]   H y p e r p a r a m e t e r   t u n i n g   r u n n e r   ( O p t u n a )  
+ [ P A R A M ]   R e p r e s e n t a t i o n s   :   [ ' O M ' ]  
+ [ P A R A M ]   T r i a l s                     :   1 0  
+ [ P A R A M ]   M a x   e p i s o d e s         :   1 0 0  
+ [ P A R A M ]   O b j e c t i v e               :   m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   S t o r a g e                   :   s q l i t e : / / / o p t u n a . d b  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ I   2 0 2 6 - 0 9 - 2 2   1 3 : 5 8 : 4 3 , 4 1 0 ]   A   n e w   s t u d y   c r e a t e d   i n   R D B   w i t h   n a m e :   f j s p _ t u n i n g _ o m  
+ [ P A R A M ]   S t a r t i n g   O p t u n a   s t u d y   f o r   O M   |   t r i a l s = 1 0   |   m a x _ e p i s o d e s = 1 0 0   |   o b j e c t i v e = m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   C r i t i c a l   p a r a m s   ( O M ) :   [ ' l r ' ,   ' h i d d e n _ c h a n n e l s ' ,   ' b a t c h _ s i z e ' ,   ' n u m _ l a y e r s ' ,   ' h e a d s ' ,   ' n _ c a s e s ' ,   ' n e w _ f r e q ' ,   ' K ' ,   ' u s e _ g r e e d y ' ,   ' m a s k _ o p t i o n ' ,   ' s e l _ k ' ]  
+ [ P A R A M ] [ O M ]   T r i a l   0   |   e p i s o d e s = 1 0 0   |   l r = 7 . 9 7 e - 0 4   |   h i d d e n = 2 5 6   |   l a y e r s = 1   |   h e a d s = 4   |   K = 8   |   u s e _ g r e e d y = T r u e   |   t f = 4  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   T r a i n i n g   s t a r t e d   a t :   2 0 2 6 - 0 9 - 2 2   1 3 : 5 8 : 4 3  
+ [ T R A I N ]   H y p e r p a r a m s   |   m a x _ s t e p s = 1 0 0   |   n e w _ f r e q = 1 0  
+ [ T R A I N ]                           |   n _ c a s e s = 4 0   |   B = 1 2 8   |   K = 8   |   u s e _ g r e e d y = T r u e   |   l r = 0 . 0 0 0 7 9 6 5 2 6 1 3 0 8 1 2 0 5 1 1   ( d e c a y i n g   t o   1 . 5 9 e - 0 4 )  
+ [ T R A I N ]                           |   w a r m _ s t a r t _ s t e p s = 1 0 0   |   c h e c k p o i n t _ s m o o t h _ w i n d o w = 3   |   s e e d = N o n e  
+ [ T R A I N ]                           |   h i d d e n _ c h a n n e l s = 2 5 6   |   n u m _ l a y e r s = 1   |   h e a d s = 4  
+ [ T R A I N ]   R e p r e s e n t a t i o n   |   o m   |   G N N   |   g a t  
+ [ T R A I N ]   P r o b l e m   s i z e   |   j o b s = [ 8 , 1 0 ]   |   m a c h i n e s = [ 5 , 1 0 ]   |   o p s _ p e r _ j o b = [ 5 , 6 ]   |   m a x _ p r o c = 1 0 0  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   O u t p u t   r u n   f o l d e r :   r e s u l t s \ o p t u n a _ o m _ 1 7 9 0 0 8 1 9 2 1 \ t r i a l _ 0  
+ [ V A L I D A T I O N ]   N o t e :   u s i n g   t h e   e x i s t i n g   f i x e d   v a l i d a t i o n   d a t a s e t   a t   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( 4 0   i n s t a n c e s )   -   t h e   r e q u e s t e d   s a m p l e _ s i z e = 2 0   i s   i g n o r e d   s o   e v e r y   r u n   s t a y s   c o m p a r a b l e .   D e l e t e   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( a n d   i t s   p a i r e d   v a l / t e s t _ d a t a s e t . j s o n )   t o   r e g e n e r a t e   b o t h   s p l i t s   a t   a   n e w   s i z e .  
+ [ T R A I N ]   V a l i d a t i o n   c o n f i g   |   e v e r y = 1 5   s t e p s   |   i n s t a n c e s = 4 0   ( r e p r e s e n t a t i v e   s u b s e t )  
+ [ T R A I N ]   W a r m - s t a r t   ( b e h a v i o r   c l o n i n g   v s .   d i s p a t c h   h e u r i s t i c )   |   1 0 0   s t e p ( s ) . . .  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 / 1 0 0   |   i n s t a n c e = 1 8   |   b c _ l o s s = 2 . 6 3 2 5   |   d e c i s i o n s = 5 7  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 / 1 0 0   |   i n s t a n c e = 2 9   |   b c _ l o s s = 2 . 2 7 1 4   |   d e c i s i o n s = 4 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 5 / 1 0 0   |   i n s t a n c e = 4   |   b c _ l o s s = 2 . 3 3 0 8   |   d e c i s i o n s = 5 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 0 / 1 0 0   |   i n s t a n c e = 1 6   |   b c _ l o s s = 2 . 6 4 9 9   |   d e c i s i o n s = 5 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 5 / 1 0 0   |   i n s t a n c e = 2 5   |   b c _ l o s s = 2 . 5 0 7 0   |   d e c i s i o n s = 5 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 0 / 1 0 0   |   i n s t a n c e = 1 0   |   b c _ l o s s = 2 . 3 5 2 4   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 5 / 1 0 0   |   i n s t a n c e = 2 5   |   b c _ l o s s = 2 . 4 4 5 4   |   d e c i s i o n s = 5 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 0 / 1 0 0   |   i n s t a n c e = 1 0   |   b c _ l o s s = 2 . 2 5 6 5   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 5 / 1 0 0   |   i n s t a n c e = 6   |   b c _ l o s s = 2 . 1 0 2 7   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 0 / 1 0 0   |   i n s t a n c e = 1 3   |   b c _ l o s s = 1 . 8 8 2 8   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 5 / 1 0 0   |   i n s t a n c e = 3 0   |   b c _ l o s s = 2 . 2 9 7 8   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 0 / 1 0 0   |   i n s t a n c e = 2 2   |   b c _ l o s s = 2 . 0 7 3 4   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 5 / 1 0 0   |   i n s t a n c e = 4   |   b c _ l o s s = 2 . 1 4 6 5   |   d e c i s i o n s = 5 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 0 / 1 0 0   |   i n s t a n c e = 8   |   b c _ l o s s = 2 . 3 7 0 1   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 5 / 1 0 0   |   i n s t a n c e = 3 0   |   b c _ l o s s = 2 . 1 5 4 0   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 0 / 1 0 0   |   i n s t a n c e = 1 7   |   b c _ l o s s = 1 . 8 8 1 2   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 5 / 1 0 0   |   i n s t a n c e = 4   |   b c _ l o s s = 2 . 0 2 1 7   |   d e c i s i o n s = 5 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 0 / 1 0 0   |   i n s t a n c e = 1 0   |   b c _ l o s s = 2 . 0 6 9 6   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 5 / 1 0 0   |   i n s t a n c e = 4   |   b c _ l o s s = 1 . 9 8 1 6   |   d e c i s i o n s = 5 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 0 / 1 0 0   |   i n s t a n c e = 2 0   |   b c _ l o s s = 2 . 1 5 4 1   |   d e c i s i o n s = 4 4  
+ [ T R A I N ]   W a r m - s t a r t   c o m p l e t e ,   s w i t c h i n g   t o   B O P O   p r e f e r e n c e   o p t i m i z a t i o n .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   B O P O   a g e n t   r e a d y .   S t a r t i n g   t r a i n i n g   l o o p   f o r   1 0 0   s t e p ( s ) . . .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   S t e p   1 / 1 0 0   |   1 3 : 5 9 : 5 5  
+ [ T R A I N ]   S t e p   1   |   L o s s = 1 0 . 8 6 3 2 3 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 4 4 . 0 0  
+ [ T R A I N ]   S t e p   2 / 1 0 0   |   1 4 : 0 0 : 5 2  
+ === resuming optuna sweep: oo (3 more trials) ===
+p y t h o n   :   d : \ D i s s e r t a %є %ъ o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ v e n v \ L i b \ s i t e - p a c k a g e s \ t o r c h \ j i t \ _ s c r i p t . p y : 1 4 8 5 :    
+ F u t u r e W a r n i n g :   ` t o r c h . j i t . s c r i p t `   i s   n o t   s u p p o r t e d   i n   P y t h o n   3 . 1 4 +   a n d   m a y   b r e a k .   P l e a s e   s w i t c h   t o   ` t o r c h . c o m p i l e `   o r    
+ ` t o r c h . e x p o r t ` .  
+ A t   D : \ D i s s e r t a з г o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ r u n _ o p t u n a _ r e m a i n i n g . p s 1 : 3   c h a r : 1  
+ +   p y t h o n   - u   m a i n . p y   - - m o d e   o p t u n a   - - r e p r e s e n t a t i o n   o o   - - t r i a l s   3   - - m a x -   . . .  
+ +   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~  
+         +   C a t e g o r y I n f o                     :   N o t S p e c i f i e d :   ( d : \ D i s s e r t a %є %ъ . . . ` t o r c h . e x p o r t ` . : S t r i n g )   [ ] ,   R e m o t e E x c e p t i o n  
+         +   F u l l y Q u a l i f i e d E r r o r I d   :   N a t i v e C o m m a n d E r r o r  
+    
+     w a r n i n g s . w a r n (  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ M A I N ]   R u n   s t a r t e d   a t   2 0 2 6 - 0 9 - 2 2   1 4 : 0 2 : 4 2  
+ [ M A I N ]   m o d e = o p t u n a  
+ [ M A I N ]   r u n _ n a m e = t r a i n _ r u n  
+ [ M A I N ]   r e p r e s e n t a t i o n ( s ) = [ ' o o ' ]  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ P A R A M ]   H y p e r p a r a m e t e r   t u n i n g   r u n n e r   ( O p t u n a )  
+ [ P A R A M ]   R e p r e s e n t a t i o n s   :   [ ' O O ' ]  
+ [ P A R A M ]   T r i a l s                     :   3  
+ [ P A R A M ]   M a x   e p i s o d e s         :   1 0 0  
+ [ P A R A M ]   O b j e c t i v e               :   m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   S t o r a g e                   :   s q l i t e : / / / o p t u n a . d b  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ I   2 0 2 6 - 0 9 - 2 2   1 4 : 0 2 : 4 4 , 6 5 0 ]   U s i n g   a n   e x i s t i n g   s t u d y   w i t h   ` s t u d y _ n a m e = ' f j s p _ t u n i n g _ o o ' `   i n s t e a d   o f   c r e a t i n g   a   n e w   o n e .  
+ [ P A R A M ]   S t a r t i n g   O p t u n a   s t u d y   f o r   O O   |   t r i a l s = 3   |   m a x _ e p i s o d e s = 1 0 0   |   o b j e c t i v e = m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   C r i t i c a l   p a r a m s   ( O O ) :   [ ' l r ' ,   ' h i d d e n _ c h a n n e l s ' ,   ' b a t c h _ s i z e ' ,   ' n u m _ l a y e r s ' ,   ' h e a d s ' ,   ' n _ c a s e s ' ,   ' n e w _ f r e q ' ,   ' K ' ,   ' u s e _ g r e e d y ' ]  
+ [ P A R A M ] [ O O ]   T r i a l   1 0   |   e p i s o d e s = 1 0 0   |   l r = 7 . 9 7 e - 0 4   |   h i d d e n = 2 5 6   |   l a y e r s = 1   |   h e a d s = 4   |   K = 8   |   u s e _ g r e e d y = T r u e   |   t f = 4  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   T r a i n i n g   s t a r t e d   a t :   2 0 2 6 - 0 9 - 2 2   1 4 : 0 2 : 4 4  
+ [ T R A I N ]   H y p e r p a r a m s   |   m a x _ s t e p s = 1 0 0   |   n e w _ f r e q = 1 0  
+ [ T R A I N ]                           |   n _ c a s e s = 4 0   |   B = 1 2 8   |   K = 8   |   u s e _ g r e e d y = T r u e   |   l r = 0 . 0 0 0 7 9 6 5 2 6 1 3 0 8 1 2 0 5 1 1   ( d e c a y i n g   t o   1 . 5 9 e - 0 4 )  
+ [ T R A I N ]                           |   w a r m _ s t a r t _ s t e p s = 1 0 0   |   c h e c k p o i n t _ s m o o t h _ w i n d o w = 3   |   s e e d = N o n e  
+ [ T R A I N ]                           |   h i d d e n _ c h a n n e l s = 2 5 6   |   n u m _ l a y e r s = 1   |   h e a d s = 4  
+ [ T R A I N ]   R e p r e s e n t a t i o n   |   o o   |   G N N   |   g a t  
+ [ T R A I N ]   P r o b l e m   s i z e   |   j o b s = [ 8 , 1 0 ]   |   m a c h i n e s = [ 5 , 1 0 ]   |   o p s _ p e r _ j o b = [ 5 , 6 ]   |   m a x _ p r o c = 1 0 0  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   O u t p u t   r u n   f o l d e r :   r e s u l t s \ o p t u n a _ o o _ 1 7 9 0 0 8 2 1 6 3 \ t r i a l _ 1 0  
+ [ V A L I D A T I O N ]   N o t e :   u s i n g   t h e   e x i s t i n g   f i x e d   v a l i d a t i o n   d a t a s e t   a t   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( 4 0   i n s t a n c e s )   -   t h e   r e q u e s t e d   s a m p l e _ s i z e = 2 0   i s   i g n o r e d   s o   e v e r y   r u n   s t a y s   c o m p a r a b l e .   D e l e t e   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( a n d   i t s   p a i r e d   v a l / t e s t _ d a t a s e t . j s o n )   t o   r e g e n e r a t e   b o t h   s p l i t s   a t   a   n e w   s i z e .  
+ [ T R A I N ]   V a l i d a t i o n   c o n f i g   |   e v e r y = 1 5   s t e p s   |   i n s t a n c e s = 4 0   ( r e p r e s e n t a t i v e   s u b s e t )  
+ [ T R A I N ]   W a r m - s t a r t   ( b e h a v i o r   c l o n i n g   v s .   d i s p a t c h   h e u r i s t i c )   |   1 0 0   s t e p ( s ) . . .  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 / 1 0 0   |   i n s t a n c e = 9   |   b c _ l o s s = 2 . 1 4 9 7   |   d e c i s i o n s = 5 3  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 / 1 0 0   |   i n s t a n c e = 1 8   |   b c _ l o s s = 2 . 0 3 8 7   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 5 / 1 0 0   |   i n s t a n c e = 2 3   |   b c _ l o s s = 1 . 9 0 6 8   |   d e c i s i o n s = 4 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 0 / 1 0 0   |   i n s t a n c e = 2 9   |   b c _ l o s s = 1 . 9 4 7 0   |   d e c i s i o n s = 4 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 5 / 1 0 0   |   i n s t a n c e = 3 2   |   b c _ l o s s = 2 . 1 4 5 4   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 0 / 1 0 0   |   i n s t a n c e = 3 4   |   b c _ l o s s = 1 . 8 8 4 6   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 5 / 1 0 0   |   i n s t a n c e = 1 5   |   b c _ l o s s = 2 . 0 7 6 9   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 0 / 1 0 0   |   i n s t a n c e = 2 9   |   b c _ l o s s = 1 . 8 8 3 3   |   d e c i s i o n s = 4 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 5 / 1 0 0   |   i n s t a n c e = 1 9   |   b c _ l o s s = 1 . 9 4 2 5   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 0 / 1 0 0   |   i n s t a n c e = 3 7   |   b c _ l o s s = 1 . 7 8 8 2   |   d e c i s i o n s = 4 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 5 / 1 0 0   |   i n s t a n c e = 2 0   |   b c _ l o s s = 1 . 8 0 3 5   |   d e c i s i o n s = 4 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 0 / 1 0 0   |   i n s t a n c e = 2 9   |   b c _ l o s s = 1 . 7 7 9 2   |   d e c i s i o n s = 4 1  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 5 / 1 0 0   |   i n s t a n c e = 1 8   |   b c _ l o s s = 1 . 8 8 2 9   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 0 / 1 0 0   |   i n s t a n c e = 2 2   |   b c _ l o s s = 1 . 8 7 8 3   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 5 / 1 0 0   |   i n s t a n c e = 3 9   |   b c _ l o s s = 2 . 0 2 8 5   |   d e c i s i o n s = 5 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 0 / 1 0 0   |   i n s t a n c e = 1 2   |   b c _ l o s s = 1 . 6 4 6 2   |   d e c i s i o n s = 4 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   8 5 / 1 0 0   |   i n s t a n c e = 2 0   |   b c _ l o s s = 1 . 6 0 6 7   |   d e c i s i o n s = 4 2  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 0 / 1 0 0   |   i n s t a n c e = 0   |   b c _ l o s s = 1 . 6 8 9 9   |   d e c i s i o n s = 4 7  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   9 5 / 1 0 0   |   i n s t a n c e = 1 4   |   b c _ l o s s = 1 . 7 3 5 5   |   d e c i s i o n s = 5 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 0 / 1 0 0   |   i n s t a n c e = 5   |   b c _ l o s s = 1 . 6 3 4 6   |   d e c i s i o n s = 4 7  
+ [ T R A I N ]   W a r m - s t a r t   c o m p l e t e ,   s w i t c h i n g   t o   B O P O   p r e f e r e n c e   o p t i m i z a t i o n .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   B O P O   a g e n t   r e a d y .   S t a r t i n g   t r a i n i n g   l o o p   f o r   1 0 0   s t e p ( s ) . . .  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ [ T R A I N ]   S t e p   1 / 1 0 0   |   1 4 : 0 3 : 2 0  
+ [ T R A I N ]   S t e p   1   |   L o s s = 0 . 2 3 0 0 6 3   |   B e s t   m a k e s p a n   i n   g r o u p = 4 3 6 . 0 0  
+ [ T R A I N ]   S t e p   2 / 1 0 0   |   1 4 : 0 4 : 0 9  
+ [ T R A I N ]   S t e p   2   |   L o s s = 2 . 9 1 2 5 4 8   |   B e s t   m a k e s p a n   i n   g r o u p = 5 0 6 . 0 0  
+ [ T R A I N ]   S t e p   3 / 1 0 0   |   1 4 : 0 4 : 5 6  
+ [ T R A I N ]   S t e p   3   |   L o s s = 8 . 0 8 6 0 5 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 7 8 . 0 0  
+ [ T R A I N ]   S t e p   4 / 1 0 0   |   1 4 : 0 5 : 4 0  
+ [ T R A I N ]   S t e p   4   |   L o s s = 0 . 0 0 0 0 0 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 7 4 . 0 0  
+ [ T R A I N ]   S t e p   5 / 1 0 0   |   1 4 : 0 6 : 2 3  
+ [ T R A I N ]   S t e p   5   |   L o s s = 5 . 2 9 8 2 4 0   |   B e s t   m a k e s p a n   i n   g r o u p = 5 0 0 . 0 0  
+ [ T R A I N ]   S t e p   6 / 1 0 0   |   1 4 : 0 7 : 0 9  
+ [ T R A I N ]   S t e p   6   |   L o s s = 0 . 0 0 0 0 0 2   |   B e s t   m a k e s p a n   i n   g r o u p = 4 7 6 . 0 0  
+ [ T R A I N ]   S t e p   7 / 1 0 0   |   1 4 : 0 7 : 4 8  
+ [ T R A I N ]   S t e p   7   |   L o s s = 1 . 8 6 7 4 4 4   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 7 . 0 0  
+ [ T R A I N ]   S t e p   8 / 1 0 0   |   1 4 : 0 8 : 2 6  
+ [ T R A I N ]   S t e p   8   |   L o s s = 0 . 0 0 1 4 6 2   |   B e s t   m a k e s p a n   i n   g r o u p = 5 1 4 . 0 0  
+ [ T R A I N ]   S t e p   9 / 1 0 0   |   1 4 : 0 8 : 5 7  
+ [ T R A I N ]   S t e p   9   |   L o s s = 4 . 4 5 7 1 9 6   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 5 . 0 0  
+ [ T R A I N ]   S t e p   1 0 / 1 0 0   |   1 4 : 0 9 : 3 8  
+ [ T R A I N ]   S t e p   1 0   |   L o s s = 5 . 3 2 1 7 1 7   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 3 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   1 0 ) . . .  
+ [ T R A I N ]   S t e p   1 1 / 1 0 0   |   1 4 : 1 0 : 1 9  
+ [ T R A I N ]   S t e p   1 1   |   L o s s = 8 . 8 2 2 5 6 3   |   B e s t   m a k e s p a n   i n   g r o u p = 5 5 5 . 0 0  
+ [ T R A I N ]   S t e p   1 2 / 1 0 0   |   1 4 : 1 0 : 5 0  
+ [ T R A I N ]   S t e p   1 2   |   L o s s = 0 . 0 0 1 2 7 2   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 4 . 0 0  
+ [ T R A I N ]   S t e p   1 3 / 1 0 0   |   1 4 : 1 1 : 3 5  
+ [ T R A I N ]   S t e p   1 3   |   L o s s = 0 . 0 0 0 0 0 0   |   B e s t   m a k e s p a n   i n   g r o u p = 4 0 9 . 0 0  
+ [ T R A I N ]   S t e p   1 4 / 1 0 0   |   1 4 : 1 2 : 2 5  
+ [ T R A I N ]   S t e p   1 4   |   L o s s = 0 . 9 8 6 9 4 2   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 3 . 0 0  
+ [ T R A I N ]   S t e p   1 5 / 1 0 0   |   1 4 : 1 3 : 0 8  
+ [ T R A I N ]   S t e p   1 5   |   L o s s = 0 . 0 2 8 9 1 9   |   B e s t   m a k e s p a n   i n   g r o u p = 3 9 8 . 0 0  
+ [ T R A I N ] [ V A L ] [ e p   1 5 ]   a v g _ g a p = 0 . 1 4 3 4   |   s t d _ g a p = 0 . 0 6 7 2   |   q 8 0 _ g a p = 0 . 1 9 3 3   |   n = 4 0  
+ [ T R A I N ]   V a l i d a t i o n   i m p r o v e d   |   s m o o t h e d _ a v g _ g a p = 0 . 1 4 3 4   ( r a w = 0 . 1 4 3 4 )   |   s a v i n g   c a n d i d a t e :   1 2 1 6 8 9 7 3 1 6 2 1 2 1 7 . p t h  
+ [ T R A I N ]   S t e p   1 6 / 1 0 0   |   1 4 : 1 4 : 0 9  
+ [ T R A I N ]   S t e p   1 6   |   L o s s = 2 . 9 6 3 1 3 7   |   B e s t   m a k e s p a n   i n   g r o u p = 3 1 2 . 0 0  
+ [ T R A I N ]   S t e p   1 7 / 1 0 0   |   1 4 : 1 4 : 4 4  
+ [ T R A I N ]   S t e p   1 7   |   L o s s = 7 . 8 9 9 6 2 3   |   B e s t   m a k e s p a n   i n   g r o u p = 4 3 8 . 0 0  
+ [ T R A I N ]   S t e p   1 8 / 1 0 0   |   1 4 : 1 5 : 3 6  
+ [ T R A I N ]   S t e p   1 8   |   L o s s = 3 . 3 4 4 0 0 5   |   B e s t   m a k e s p a n   i n   g r o u p = 3 7 2 . 0 0  
+ [ T R A I N ]   S t e p   1 9 / 1 0 0   |   1 4 : 1 6 : 0 3  
+ [ T R A I N ]   S t e p   1 9   |   L o s s = 1 . 9 0 6 4 5 6   |   B e s t   m a k e s p a n   i n   g r o u p = 3 5 1 . 0 0  
+ [ T R A I N ]   S t e p   2 0 / 1 0 0   |   1 4 : 1 6 : 3 3  
+ [ T R A I N ]   S t e p   2 0   |   L o s s = 3 . 8 2 6 3 5 6   |   B e s t   m a k e s p a n   i n   g r o u p = 5 2 4 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   2 0 ) . . .  
+ [ T R A I N ]   S t e p   2 1 / 1 0 0   |   1 4 : 1 7 : 0 4  
+ [ T R A I N ]   S t e p   2 1   |   L o s s = 6 . 3 9 7 6 5 2   |   B e s t   m a k e s p a n   i n   g r o u p = 4 6 8 . 0 0  
+ [ T R A I N ]   S t e p   2 2 / 1 0 0   |   1 4 : 1 7 : 4 9  
+ [ T R A I N ]   S t e p   2 2   |   L o s s = 6 . 9 4 2 8 8 4   |   B e s t   m a k e s p a n   i n   g r o u p = 5 3 1 . 0 0  
+ [ T R A I N ]   S t e p   2 3 / 1 0 0   |   1 4 : 1 8 : 4 8  
+ [ T R A I N ]   S t e p   2 3   |   L o s s = 0 . 6 5 9 5 9 9   |   B e s t   m a k e s p a n   i n   g r o u p = 4 2 7 . 0 0  
+ [ T R A I N ]   S t e p   2 4 / 1 0 0   |   1 4 : 1 9 : 1 8  
+ [ T R A I N ]   S t e p   2 4   |   L o s s = 9 . 2 7 4 6 2 1   |   B e s t   m a k e s p a n   i n   g r o u p = 3 8 3 . 0 0  
+ [ T R A I N ]   S t e p   2 5 / 1 0 0   |   1 4 : 2 0 : 1 0  
+ [ T R A I N ]   S t e p   2 5   |   L o s s = 0 . 4 0 7 4 6 2   |   B e s t   m a k e s p a n   i n   g r o u p = 5 9 8 . 0 0  
+ [ T R A I N ]   S t e p   2 6 / 1 0 0   |   1 4 : 2 1 : 0 3  
+ [ T R A I N ]   S t e p   2 6   |   L o s s = 2 . 3 3 5 5 6 3   |   B e s t   m a k e s p a n   i n   g r o u p = 3 4 4 . 0 0  
+ [ T R A I N ]   S t e p   2 7 / 1 0 0   |   1 4 : 2 1 : 3 5  
+ [ T R A I N ]   S t e p   2 7   |   L o s s = 0 . 5 0 0 7 7 9   |   B e s t   m a k e s p a n   i n   g r o u p = 3 6 8 . 0 0  
+ [ T R A I N ]   S t e p   2 8 / 1 0 0   |   1 4 : 2 2 : 0 8  
+ [ T R A I N ]   S t e p   2 8   |   L o s s = 0 . 6 5 7 7 7 4   |   B e s t   m a k e s p a n   i n   g r o u p = 6 2 6 . 0 0  
+ [ T R A I N ]   S t e p   2 9 / 1 0 0   |   1 4 : 2 2 : 5 9  
+ [ T R A I N ]   S t e p   2 9   |   L o s s = 0 . 5 1 6 0 0 8   |   B e s t   m a k e s p a n   i n   g r o u p = 5 1 7 . 0 0  
+ [ T R A I N ]   S t e p   3 0 / 1 0 0   |   1 4 : 2 3 : 3 5  
+ [ T R A I N ]   S t e p   3 0   |   L o s s = 0 . 7 9 8 2 6 1   |   B e s t   m a k e s p a n   i n   g r o u p = 4 9 2 . 0 0  
+ [ T R A I N ]   R e f r e s h i n g   t r a i n i n g   i n s t a n c e s   ( s t e p   3 0 ) . . .  
+ [ T R A I N ] [ V A L ] [ e p   3 0 ]   a v g _ g a p = 0 . 1 1 8 9   |   s t d _ g a p = 0 . 0 5 8 2   |   q 8 0 _ g a p = 0 . 1 6 6 2   |   n = 4 0  
+ [ T R A I N ]   V a l i d a t i o n   i m p r o v e d   |   s m o o t h e d _ a v g _ g a p = 0 . 1 3 1 2   ( r a w = 0 . 1 1 8 9 )   |   s a v i n g   c a n d i d a t e :   9 9 6 9 8 0 0 3 1 0 8 0 7 9 3 . p t h  
+ [ T R A I N ]   S t e p   3 1 / 1 0 0   |   1 4 : 2 4 : 2 0  
+ === optuna sweep: om (10 trials) ===
+p y t h o n   :   d : \ D i s s e r t a %є %ъ o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ v e n v \ L i b \ s i t e - p a c k a g e s \ t o r c h \ j i t \ _ s c r i p t . p y : 1 4 8 5 :    
+ F u t u r e W a r n i n g :   ` t o r c h . j i t . s c r i p t `   i s   n o t   s u p p o r t e d   i n   P y t h o n   3 . 1 4 +   a n d   m a y   b r e a k .   P l e a s e   s w i t c h   t o   ` t o r c h . c o m p i l e `   o r    
+ ` t o r c h . e x p o r t ` .  
+ A t   D : \ D i s s e r t a з г o \ d i s s e r t a t i o n - b o p o _ i n t r o d u c t i o n \ r u n _ o p t u n a _ r e m a i n i n g . p s 1 : 5   c h a r : 1  
+ +   p y t h o n   - u   m a i n . p y   - - m o d e   o p t u n a   - - r e p r e s e n t a t i o n   o m   - - t r i a l s   1 0   - - m a x   . . .  
+ +   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~  
+         +   C a t e g o r y I n f o                     :   N o t S p e c i f i e d :   ( d : \ D i s s e r t a %є %ъ . . . ` t o r c h . e x p o r t ` . : S t r i n g )   [ ] ,   R e m o t e E x c e p t i o n  
+         +   F u l l y Q u a l i f i e d E r r o r I d   :   N a t i v e C o m m a n d E r r o r  
+    
+     w a r n i n g s . w a r n (  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ M A I N ]   R u n   s t a r t e d   a t   2 0 2 6 - 0 9 - 2 2   1 4 : 2 4 : 4 8  
+ [ M A I N ]   m o d e = o p t u n a  
+ [ M A I N ]   r u n _ n a m e = t r a i n _ r u n  
+ [ M A I N ]   r e p r e s e n t a t i o n ( s ) = [ ' o m ' ]  
+ [ M A I N ]   g n n _ t y p e = g a t  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ P A R A M ]   H y p e r p a r a m e t e r   t u n i n g   r u n n e r   ( O p t u n a )  
+ [ P A R A M ]   R e p r e s e n t a t i o n s   :   [ ' O M ' ]  
+ [ P A R A M ]   T r i a l s                     :   1 0  
+ [ P A R A M ]   M a x   e p i s o d e s         :   1 0 0  
+ [ P A R A M ]   O b j e c t i v e               :   m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   S t o r a g e                   :   s q l i t e : / / / o p t u n a . d b  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ I   2 0 2 6 - 0 9 - 2 2   1 4 : 2 4 : 4 9 , 6 0 8 ]   U s i n g   a n   e x i s t i n g   s t u d y   w i t h   ` s t u d y _ n a m e = ' f j s p _ t u n i n g _ o m ' `   i n s t e a d   o f   c r e a t i n g   a   n e w   o n e .  
+ [ P A R A M ]   S t a r t i n g   O p t u n a   s t u d y   f o r   O M   |   g n n _ t y p e = g a t   |   s t u d y _ n a m e = f j s p _ t u n i n g _ o m   |   t r i a l s = 1 0   |   m a x _ e p i s o d e s = 1 0 0   |   o b j e c t i v e = m i n ( l a s t _ v a l _ g a p _ Q 8 0 )  
+ [ P A R A M ]   C r i t i c a l   p a r a m s   ( O M ) :   [ ' l r ' ,   ' h i d d e n _ c h a n n e l s ' ,   ' b a t c h _ s i z e ' ,   ' n u m _ l a y e r s ' ,   ' h e a d s ' ,   ' n _ c a s e s ' ,   ' n e w _ f r e q ' ,   ' K ' ,   ' u s e _ g r e e d y ' ,   ' m a s k _ o p t i o n ' ,   ' s e l _ k ' ]  
+ [ P A R A M ] [ O M ]   T r i a l   1   |   g n n _ t y p e = g a t   |   e p i s o d e s = 1 0 0   |   l r = 7 . 9 7 e - 0 4   |   h i d d e n = 2 5 6   |   l a y e r s = 1   |   h e a d s = 4   |   K = 8   |   u s e _ g r e e d y = T r u e   |   t f = 4  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   T r a i n i n g   s t a r t e d   a t :   2 0 2 6 - 0 9 - 2 2   1 4 : 2 4 : 4 9  
+ [ T R A I N ]   H y p e r p a r a m s   |   m a x _ s t e p s = 1 0 0   |   n e w _ f r e q = 1 0  
+ [ T R A I N ]                           |   n _ c a s e s = 4 0   |   B = 1 2 8   |   K = 8   |   u s e _ g r e e d y = T r u e   |   l r = 0 . 0 0 0 7 9 6 5 2 6 1 3 0 8 1 2 0 5 1 1   ( d e c a y i n g   t o   1 . 5 9 e - 0 4 )  
+ [ T R A I N ]                           |   w a r m _ s t a r t _ s t e p s = 1 0 0   |   c h e c k p o i n t _ s m o o t h _ w i n d o w = 3   |   s e e d = N o n e  
+ [ T R A I N ]                           |   h i d d e n _ c h a n n e l s = 2 5 6   |   n u m _ l a y e r s = 1   |   h e a d s = 4  
+ [ T R A I N ]   R e p r e s e n t a t i o n   |   o m   |   G N N   |   g a t  
+ [ T R A I N ]   P r o b l e m   s i z e   |   j o b s = [ 8 , 1 0 ]   |   m a c h i n e s = [ 5 , 1 0 ]   |   o p s _ p e r _ j o b = [ 5 , 6 ]   |   m a x _ p r o c = 1 0 0  
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+ [ T R A I N ]   O u t p u t   r u n   f o l d e r :   r e s u l t s \ o p t u n a _ o m _ g a t _ 1 7 9 0 0 8 3 4 8 8 \ t r i a l _ 1  
+ [ V A L I D A T I O N ]   N o t e :   u s i n g   t h e   e x i s t i n g   f i x e d   v a l i d a t i o n   d a t a s e t   a t   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( 4 0   i n s t a n c e s )   -   t h e   r e q u e s t e d   s a m p l e _ s i z e = 2 0   i s   i g n o r e d   s o   e v e r y   r u n   s t a y s   c o m p a r a b l e .   D e l e t e   v a l / v a l i d a t i o n _ d a t a s e t . j s o n   ( a n d   i t s   p a i r e d   v a l / t e s t _ d a t a s e t . j s o n )   t o   r e g e n e r a t e   b o t h   s p l i t s   a t   a   n e w   s i z e .  
+ [ T R A I N ]   V a l i d a t i o n   c o n f i g   |   e v e r y = 1 5   s t e p s   |   i n s t a n c e s = 4 0   ( r e p r e s e n t a t i v e   s u b s e t )  
+ [ T R A I N ]   W a r m - s t a r t   ( b e h a v i o r   c l o n i n g   v s .   d i s p a t c h   h e u r i s t i c )   |   1 0 0   s t e p ( s ) . . .  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 / 1 0 0   |   i n s t a n c e = 1   |   b c _ l o s s = 2 . 1 8 7 7   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 0 / 1 0 0   |   i n s t a n c e = 1 0   |   b c _ l o s s = 2 . 1 5 4 5   |   d e c i s i o n s = 4 3  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   1 5 / 1 0 0   |   i n s t a n c e = 1   |   b c _ l o s s = 2 . 1 5 5 5   |   d e c i s i o n s = 4 5  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 0 / 1 0 0   |   i n s t a n c e = 2 3   |   b c _ l o s s = 2 . 2 2 0 7   |   d e c i s i o n s = 4 6  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   2 5 / 1 0 0   |   i n s t a n c e = 2 4   |   b c _ l o s s = 2 . 4 9 5 2   |   d e c i s i o n s = 4 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 0 / 1 0 0   |   i n s t a n c e = 2 1   |   b c _ l o s s = 2 . 3 8 6 7   |   d e c i s i o n s = 5 0  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   3 5 / 1 0 0   |   i n s t a n c e = 3 0   |   b c _ l o s s = 2 . 1 2 6 9   |   d e c i s i o n s = 4 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 0 / 1 0 0   |   i n s t a n c e = 1 4   |   b c _ l o s s = 2 . 3 7 3 1   |   d e c i s i o n s = 4 9  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   4 5 / 1 0 0   |   i n s t a n c e = 9   |   b c _ l o s s = 1 . 9 6 4 8   |   d e c i s i o n s = 4 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 0 / 1 0 0   |   i n s t a n c e = 1 9   |   b c _ l o s s = 2 . 0 8 2 9   |   d e c i s i o n s = 4 3  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   5 5 / 1 0 0   |   i n s t a n c e = 1 8   |   b c _ l o s s = 2 . 3 3 8 6   |   d e c i s i o n s = 5 4  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 0 / 1 0 0   |   i n s t a n c e = 3   |   b c _ l o s s = 1 . 9 7 6 9   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   6 5 / 1 0 0   |   i n s t a n c e = 3 5   |   b c _ l o s s = 2 . 0 2 1 1   |   d e c i s i o n s = 4 8  
+ [ T R A I N ] [ W A R M S T A R T ]   s t e p   7 0 / 1 0 0   |   i n s t a n c e = 5   |   b c _ l o s s = 2 . 0 5 9 7   |   d e c i s i o n s = 4 5  
+ 
