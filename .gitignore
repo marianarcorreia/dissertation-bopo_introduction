@@ -4,3 +4,9 @@ venv*/
 __pycache__/
 *.db
 
+candidate_models/293864447427531.pth
+candidate_models/390320192531417.pth
+candidate_models/72409785598455.pth
+candidate_models/821057655096065.pth
+candidate_models/825201735967159.pth
+candidate_models/854308061233068.pth
