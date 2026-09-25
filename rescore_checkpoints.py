@@ -89,6 +89,8 @@ for run in runs:
     gnn_type = summary.get("gnn_type") or params.get("gnn_type", "gat")
     rep, env_cls, bopo_cls = _resolve_representation_modules(rep)
     mask_option, sel_k = params["mask_option"], params["sel_k"]
+    jm_design = params.get("jm_design", "baseline")
+    jm_kwargs = {} if jm_design == "baseline" else {"jm_design": jm_design}
 
     if not args.no_heuristic and (rep, mask_option, sel_k) not in heuristics_done:
         heuristics_done.add((rep, mask_option, sel_k))
@@ -100,10 +102,10 @@ for run in runs:
         rows.append(row)
         print(f"[RESCORE] ECT heuristic {rep}: val={row['val_gap']:.4f} test={row['test_gap']:.4f}")
 
-    env = env_cls(splits["val"], mask_option, sel_k)
+    env = env_cls(splits["val"], mask_option, sel_k, **jm_kwargs)
     metadata = env.reset().metadata()
     agent = bopo_cls(1e-3, env, metadata, params["hidden_channels"], params["num_layers"], params["heads"],
-                     gnn_type=gnn_type)
+                     gnn_type=gnn_type, **jm_kwargs)
     with torch.no_grad():  # materialize lazy Linear(-1) parameters before loading weights
         agent.select_action(env.reset(sel_index=0), 2, 0)
     agent.load(ckpt)
@@ -118,13 +120,14 @@ for run in runs:
         "seed": summary.get("seed"),
         "logp_norm": summary.get("logp_norm", "sum"),
         "exclude_greedy_from_loss": summary.get("exclude_greedy_from_loss", False),
+        "jm_design": jm_design,
         "checkpoint": ckpt,
         "checkpoint_episode": params.get("episode"),
         "reported_val_raw": params.get("avg_gap"),
         "reported_test": summary.get("test_avg_gap"),
     }
     for split, data in splits.items():
-        m = run_validation(agent, env_cls(data, mask_option, sel_k), data, print_fn=quiet)
+        m = run_validation(agent, env_cls(data, mask_option, sel_k, **jm_kwargs), data, print_fn=quiet)
         row[f"{split}_gap"] = m["avg_gap"]
         row[f"{split}_q80"] = m["q80_gap"]
     row["reproduces"] = bool(row["reported_test"] is not None and abs(row["test_gap"] - row["reported_test"]) < 1e-6)

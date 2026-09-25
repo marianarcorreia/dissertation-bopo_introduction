@@ -8,6 +8,7 @@ does not carry the backbone). Produces:
 """
 import json
 import os
+import sys
 
 import numpy as np
 import pandas as pd
@@ -16,7 +17,8 @@ import seaborn as sns
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(ROOT, "results")
-OUT_DIR = os.path.join(RESULTS, "comparison_final_3layers_omj")
+SELK2 = "--selk100" in sys.argv
+OUT_DIR = os.path.join(RESULTS, "comparison_final_3layers_selk100" + ("_selk2" if SELK2 else ""))
 PLOTS_DIR = os.path.join(OUT_DIR, "plots")
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
@@ -28,11 +30,14 @@ sns.set_theme(style="whitegrid", palette="pastel")
 
 # Prefer the 3-layer ablation run when it exists (currently only ojm), else
 # fall back to the convergence-check run.
-RUN_TEMPLATES = ["ablation_{rep}_{backbone}_layers3", "convergence_check_{rep}_{backbone}"]
+RUN_TEMPLATES = ["train_run_{rep}", "ablation_{rep}_{backbone}_layers3"]
 
 
 def run_name(rep, backbone):
-    for tmpl in RUN_TEMPLATES:
+    templates = RUN_TEMPLATES
+    if SELK2 and backbone == "transformer":
+        templates = ["ablation_{rep}_{backbone}_layers3_selk2"] + RUN_TEMPLATES
+    for tmpl in templates:
         name = tmpl.format(rep=rep, backbone=backbone)
         if os.path.exists(os.path.join(RESULTS, name, "run_summary.json")):
             return name

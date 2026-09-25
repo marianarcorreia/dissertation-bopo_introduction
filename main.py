@@ -57,7 +57,7 @@ def parse_args():
     parser.add_argument(
         "--max-episodes",
         type=int,
-        default=250,
+        default=100,
         help="[train] Number of BOPO training steps. [optuna] Training steps per trial.",
     )
     parser.add_argument(

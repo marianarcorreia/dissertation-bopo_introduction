@@ -34,7 +34,7 @@ else:
 #maquina->job candidata. Sem baseline/valor de estado, porque a loss do BOPO (SROLoss)
 #compara diretamente a log-likelihood de trajetórias completas, em vez de usar uma vantagem.
 class ActorModel(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat'):
+    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat', jm_design = 'baseline'):
         super().__init__()
         _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
         #modelo gnn homogeneo, apenas processa um tipo de no e de aresta
@@ -50,6 +50,18 @@ class ActorModel(torch.nn.Module):
         self.gnn = to_hetero(self.gnn, metadata=metadata, aggr='mean')
         #um score por aresta
         self.lin3 = Linear(-1, 1)
+        # jm_design="attn": scores each machine->job action edge with the same form
+        # TransformerConv uses for its own attention logits, (W_q h_job) . (W_k h_mach +
+        # W_e e_mj) / sqrt(d), on top of lin3. lin3 is linear in [h_mach, e_mj, h_job], so
+        # it can only add a job term to a machine term - it cannot express how well THIS
+        # job matches THIS machine; the dot product can. Only built when enabled, so the
+        # baseline creates exactly the same parameters (and consumes the same RNG) as before.
+        self.jm_design = jm_design
+        if jm_design == 'attn':
+            self.att_dim = 64
+            self.att_q = Linear(-1, self.att_dim)
+            self.att_k = Linear(-1, self.att_dim)
+            self.att_e = Linear(-1, self.att_dim)
 
     #passa o grafo para o gnn het, embeddings atualizados, e depois processa os embeddings para calcular os scores das ações.
     def forward(self, data: HeteroData):
@@ -57,18 +69,23 @@ class ActorModel(torch.nn.Module):
         res = self.gnn(data.x_dict, data.edge_index_dict, data.edge_attr_dict)
         #concatena os embeddings da maq., features da aresta e emb. do job
         x_src, x_dst = res['machine'][data.edge_index_dict[('machine','exec','job')][0]], res['job'][data.edge_index_dict[('machine','exec','job')][1]]
-        edge_feat = torch.cat([x_src,  data.edge_attr_dict[('machine','exec','job')], x_dst], dim=-1)
+        edge_attr = data.edge_attr_dict[('machine','exec','job')]
+        edge_feat = torch.cat([x_src,  edge_attr, x_dst], dim=-1)
         res = self.lin3(edge_feat)
+        if self.jm_design == 'attn':
+            q = self.att_q(x_dst)
+            k = self.att_k(x_src) + self.att_e(edge_attr)
+            res = res + (q * k).sum(dim=-1, keepdim=True) / self.att_dim ** 0.5
         _dbg(3, f"    actor logits shape={res.shape}")
         return res
 
 
 class Policy(nn.Module):
-    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat'):
+    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat', jm_design = 'baseline'):
         super(Policy, self).__init__()
         _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
         self.gnn_type = gnn_type
-        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type)
+        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type, jm_design=jm_design)
         self.metadata = metadata
         self.soft = torch.nn.Softmax(dim=0)
 
@@ -134,7 +151,7 @@ class Policy(nn.Module):
 class BOPO:
     def __init__(self, lr, env, metadata, hidden_channels=128, num_layers=2, heads=3,
                  B=16, K=8, use_greedy=True, gnn_type='gat',
-                 logp_norm='mean', exclude_greedy_from_loss=True):
+                 logp_norm='mean', exclude_greedy_from_loss=True, jm_design='baseline'):
         _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type} | logp_norm={logp_norm} | exclude_greedy_from_loss={exclude_greedy_from_loss}")
 
         self.env = env
@@ -147,7 +164,7 @@ class BOPO:
         self.logp_norm = logp_norm
         self.exclude_greedy_from_loss = exclude_greedy_from_loss
 
-        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type).to(device)
+        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type, jm_design=jm_design).to(device)
         self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
 
     #inferência de uma única trajetória (usada por test_model/run_validation) - mantém a
@@ -164,7 +181,7 @@ class BOPO:
     #mantido ao longo de todo o rollout - a SROLoss usa diretamente estas log-probs.
     def sample_group(self, instance_index):
         env_cls = type(self.env)
-        rollout_envs = [env_cls(self.env.instances, self.env.mask_option, self.env.sel_k) for _ in range(self.B)]
+        rollout_envs = [env_cls(self.env.instances, self.env.mask_option, self.env.sel_k, jm_design=self.env.jm_design) for _ in range(self.B)]
         states = [e.reset(sel_index=instance_index) for e in rollout_envs]
 
         active = list(range(self.B))

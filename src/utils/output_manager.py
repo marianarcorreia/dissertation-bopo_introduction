@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from datetime import datetime
 
 import matplotlib
@@ -73,9 +74,21 @@ class OutputManager:
     def test_metrics_path(self):
         return os.path.join(self.run_dir, self.test_metrics_file)
 
-    def save_json(self, data, path):
-        with open(path, "w") as outfile:
-            json.dump(data, outfile)
+    def save_json(self, data, path, retries=20, delay=0.25):
+        """Write atomically (temp file + os.replace) and retry on Windows file-lock
+        errors (Errno 22/13), which happen when another process - e.g. the Streamlit
+        dashboard or an antivirus scan - has the file open at the moment of writing."""
+        tmp_path = f"{path}.tmp"
+        for attempt in range(retries):
+            try:
+                with open(tmp_path, "w") as outfile:
+                    json.dump(data, outfile)
+                os.replace(tmp_path, path)
+                return
+            except OSError:
+                if attempt == retries - 1:
+                    raise
+                time.sleep(delay)
 
     def append_json_entry(self, data_list, entry, path):
         data_list.append(entry)

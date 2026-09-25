@@ -58,58 +58,9 @@ def generate_train_instances(train_config):
     _dbg(1, f"  generated {len(instances)} training instance(s)")
     return instances
 
-#o código abaixo é o código original do gerador de instancias, mantido para referência e possível reutilização futura
-def train(max_episodes = 10,
-             # new_freq=1 used to regenerate the WHOLE n_cases training pool every single
-             # step, so no instance was ever revisited and every gradient step spent its
-             # one-shot budget on a brand-new, never-repeated instance. new_freq=500 with
-             # n_cases=100 instead cycles through the same 100 instances ~5x (reshuffled
-             # each pass) before refreshing the pool, trading a bit of diversity for far
-             # more gradient signal per generated instance.
-             new_freq=500, n_cases = 100, mask_option=1, sel_k=1, B=64, K=16, use_greedy=True,
-             # lr=1e-4 combined with only ~100-1000 updates left BOPO's policy stuck near
-             # its (near-uniform) initialization the whole run (see results/*_oo -
-             # action_entropy_max_entropy_normalized stayed >0.99 for 100 straight
-             # episodes). 5e-4 gives meaningfully larger steps without the instability of
-             # going much higher on a from-scratch GNN policy.
-             lr=0.0005, hidden_channels=128,
-             # num_layers=1 gives the GNN only a 1-hop receptive field per decision -
-             # too shallow to reason about anything beyond immediate neighbors. 2 layers
-             # is a modest compute cost increase for a much larger receptive field.
-             num_layers = 2, heads = 3
-         ,j_max = 10, j_min = 8, m_max = 10, m_min = 5, op_max = 6, max_processing = 100,
-         validation_freq=10, validation_size=20, run_name="train_run", representation="oo", gnn_type="gat",
-         # Number of teacher-forced behavior-cloning updates to run BEFORE the BOPO loop
-         # starts (src/bopo_utils.py:run_behavior_cloning). BOPO bootstraps entirely from
-         # its own samples, so a near-uniform initial policy barely learns anything from
-         # the pairwise preference loss (see the module docstring). 0 disables it and
-         # matches the old behavior exactly.
-         warm_start_steps=200,
-         # Cosine-decays the optimizer's lr from `lr` down to `lr * lr_min_ratio` over the
-         # BOPO phase (not applied during warm-start). Motivated by the oo/gin lr=5e-4 vs
-         # lr=2e-4 ablation: the higher lr moves faster early but gets noisier late in
-         # training (checkpoint-to-checkpoint std nearly 2x higher), while the lower lr is
-         # calmer but slower to start. Decaying gets both instead of forcing one fixed
-         # trade-off per representation/backbone.
-         lr_min_ratio=0.2,
-         # Selects the checkpoint to save/report by a moving average of the last
-         # checkpoint_smooth_window validation avg_gaps, not the single best one. A single
-         # checkpoint's avg_gap on only validation_size instances is noisy (see the oo/gin
-         # lr ablation and ojm/gat's val/test gap in conversation - both were artifacts of
-         # this): requiring a SUSTAINED good streak before saving means the reported model
-         # is one that's reliably good, not one that got lucky once.
-         checkpoint_smooth_window=3,
-         # Reproducibility: if set, seeds random/numpy/torch before anything else runs, so
-         # a given (seed, hyperparameters) pair always trains the same instances in the
-         # same order. None (default) matches the old unseeded behavior.
-         seed=None,
-         # BOPO loss options (src/bopo_utils.py:bopo_group_loss). "mean" compares
-         # per-decision mean log-likelihoods instead of whole-trajectory sums, and
-         # exclude_greedy_from_loss keeps the greedy rollout out of the preference pairs -
-         # together they stop the SRO loss from saturating to ~0 (no gradient) on most
-         # updates. logp_norm="sum", exclude_greedy_from_loss=False reproduces every run
-         # made before this option existed.
-         logp_norm="mean", exclude_greedy_from_loss=True):
+
+def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=100, B=64, K=16, use_greedy=True,lr=0.0005, hidden_channels=128,num_layers = 3, heads = 3,j_max = 10, j_min = 8, m_max = 10, m_min = 5, op_max = 6, max_processing = 100,
+         checkpoint_smooth_window=3, warm_start_steps=200, lr_min_ratio=0.2, seed=None, logp_norm="mean", exclude_greedy_from_loss=True, jm_design="baseline", representation="oo", gnn_type="gat", validation_freq=20, validation_size=20, dbg_fn=None, run_name="train_run"):
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
@@ -127,10 +78,16 @@ def train(max_episodes = 10,
     print(f"[TRAIN]             | warm_start_steps={warm_start_steps} | checkpoint_smooth_window={checkpoint_smooth_window} | seed={seed}")
     print(f"[TRAIN]             | hidden_channels={hidden_channels} | num_layers={num_layers} | heads={heads}")
     print(f"[TRAIN]             | logp_norm={logp_norm} | exclude_greedy_from_loss={exclude_greedy_from_loss}")
-    print(f"[TRAIN] Representation | {representation} | GNN | {gnn_type}")
+    print(f"[TRAIN] Representation | {representation} | GNN | {gnn_type} | jm_design | {jm_design}")
     print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[5,{op_max}] | max_proc={max_processing}")
     print("=" * 60)
     rep_name, EnvClass, BOPOClass = _resolve_representation_modules(representation)
+    # only passed when set, so om/oo envs (which don't take it) are built exactly as before
+    jm_kwargs = {}
+    if jm_design != "baseline":
+        if rep_name != "ojm":
+            raise ValueError(f"jm_design={jm_design!r} only applies to the ojm representation")
+        jm_kwargs = {"jm_design": jm_design}
     output_manager = OutputManager(output_dir="results", run_name=run_name)
     print(f"[TRAIN] Output run folder: {output_manager.run_dir}")
     run_start_time = time.time()
@@ -139,12 +96,9 @@ def train(max_episodes = 10,
     _dbg(1, f"Loaded validation set from val/instances + val/solutions: {len(validation_set)} instance(s)")
 
     #ambiente de validação e extrai o metadata (informação sobre o ambiente, como número de jobs, máquinas, etc.)
-    val_env = EnvClass(validation_set, mask_option, sel_k)
+    val_env = EnvClass(validation_set, mask_option, sel_k, **jm_kwargs)
     s = val_env.reset()
     metadata = s.metadata()
-
-    max_episodes = max_episodes
-    new_freq = new_freq
 
     #define e gera instancias de treino
     train_config = {
@@ -158,10 +112,10 @@ def train(max_episodes = 10,
     instances = generate_train_instances(train_config)
 
     #cria ambiente de treino
-    env = EnvClass(instances, mask_option, sel_k)
+    env = EnvClass(instances, mask_option, sel_k, **jm_kwargs)
     #cria agente BOPO (só ator, sem critic - ver src/bopo_utils.py para a SROLoss)
     bopo_agent = BOPOClass(lr, env, metadata, hidden_channels, num_layers, heads, B, K, use_greedy, gnn_type=gnn_type,
-                           logp_norm=logp_norm, exclude_greedy_from_loss=exclude_greedy_from_loss)
+                           logp_norm=logp_norm, exclude_greedy_from_loss=exclude_greedy_from_loss, **jm_kwargs)
 
     if warm_start_steps > 0:
         print(f"[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | {warm_start_steps} step(s)...")
@@ -225,7 +179,7 @@ def train(max_episodes = 10,
         if step_number % new_freq == 0:
             print(f"[TRAIN] Refreshing training instances (step {step_number})...")
             instances = generate_train_instances(train_config)
-            env = EnvClass(instances, mask_option, sel_k)
+            env = EnvClass(instances, mask_option, sel_k, **jm_kwargs)
             bopo_agent.env = env
             instance_order = []
 
@@ -279,6 +233,7 @@ def train(max_episodes = 10,
                     "hidden_channels": hidden_channels,
                     "heads": heads,
                     "gnn_type": gnn_type,
+                    "jm_design": jm_design,
                     "all_val_results": val_metrics["all_gaps"],
                     "avg_gap": val_metrics["avg_gap"],
                     "smoothed_avg_gap": smoothed_avg_gap,
@@ -330,7 +285,7 @@ def train(max_episodes = 10,
     if best_model_path is not None:
         print(f"[TRAIN] Evaluating best checkpoint ({best_model_path}) on the held-out test split...")
         test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg)
-        test_env = EnvClass(test_set, mask_option, sel_k)
+        test_env = EnvClass(test_set, mask_option, sel_k, **jm_kwargs)
         bopo_agent.load(best_model_path)
         test_metrics = run_validation(bopo_agent, test_env, test_set, dbg_fn=_dbg,
                                        print_fn=lambda msg: print(msg.replace("[TRAIN][VAL]", "[TRAIN][TEST]")))
@@ -360,6 +315,7 @@ def train(max_episodes = 10,
         "seed": seed,
         "logp_norm": logp_norm,
         "exclude_greedy_from_loss": bool(exclude_greedy_from_loss),
+        "jm_design": jm_design,
         "run_dir": output_manager.run_dir,
         "max_episodes": int(max_episodes),
         "episodes_completed": int(len(episode_metrics)),
@@ -414,10 +370,12 @@ def test_model(model_name, folder, filename, models_file="models/model_params.js
             # metadata must come from an env built with this model's own mask_option/sel_k —
             # those change the graph's feature dimensions, so reusing metadata from a
             # differently-configured env produces mismatched GNN layer shapes at load time.
-            test_env = ModelEnvClass(test_instances, param["mask_option"], param["sel_k"])
+            jm_design = param.get("jm_design", "baseline")
+            jm_kwargs = {} if jm_design == "baseline" else {"jm_design": jm_design}
+            test_env = ModelEnvClass(test_instances, param["mask_option"], param["sel_k"], **jm_kwargs)
             metadata = test_env.reset().metadata()
             t_ppo_agent = ModelBOPOClass(0.001, test_env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],
-                                          gnn_type=param.get("gnn_type", "gat"))
+                                          gnn_type=param.get("gnn_type", "gat"), **jm_kwargs)
             # preTrained weights directory
             t_ppo_agent.load(os.path.join(models_dir, m))
 

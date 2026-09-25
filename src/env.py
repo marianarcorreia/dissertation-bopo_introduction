@@ -25,13 +25,26 @@ class FJSSPEnv(gym.Env):
                 else: #return the previous operation in the job
                     return j[j.index(o_id) -1]
     #construtor for the FJSSPEnv class. It takes a list of problem instances, a mask option to determine how invalid actions are masked, and sel_k to determine how many candidate actions are selected by the mask. It initializes the base gym environment, stores the instances and parameters, and prints a debug message indicating that the environment has been created with the specified settings.
-    def __init__(self, instances, mask_option = 3, sel_k = 5): #constructor for FJSSPEnv #aqui tenho 3
+    # jm_design (see _refresh_jm_edges and src/bopo.py:ActorModel):
+    #   "baseline" - job-machine action edges exactly as before (machine->job only, features
+    #                set once when the edge is created, with a different column layout for
+    #                edges created in reset() vs step()).
+    #   "edges"/"attn" - adds the reverse job->machine edge type (so a machine can see which
+    #                jobs compete for it) and recomputes every job-machine edge's features
+    #                after each decision with one fixed column layout. "attn" additionally
+    #                switches the actor to the attention scorer; the env side is identical.
+    JM_DESIGNS = ("baseline", "edges", "attn")
+
+    def __init__(self, instances, mask_option = 3, sel_k = 5, jm_design = "baseline"): #constructor for FJSSPEnv #aqui tenho 3
         super(FJSSPEnv, self).__init__() #initialize the gym.Env base class
         self.instances = instances #list of problem instances to solve
         self.current_instance = 0 #which instance is currently being solved
         self.mask_option = mask_option #how invalid actions are masked
         self.sel_k = sel_k #how many candidates are selected by the mask
-        _dbg(1, f"FJSSPEnv created | {len(instances)} instance(s) | mask_option={mask_option} | sel_k={sel_k}") #debug message if debug level is 1, indicate the number of instance, masking mode, n of candidate action kept by mask
+        if jm_design not in self.JM_DESIGNS:
+            raise ValueError(f"jm_design must be one of {self.JM_DESIGNS}, got {jm_design!r}")
+        self.jm_design = jm_design
+        _dbg(1, f"FJSSPEnv created | {len(instances)} instance(s) | mask_option={mask_option} | sel_k={sel_k} | jm_design={jm_design}") #debug message if debug level is 1, indicate the number of instance, masking mode, n of candidate action kept by mask
 
     def generate_instance(self, instance): #extrai os jobs and operatiosn
         jobs, operations = instance["jobs"], instance["operations"]
@@ -63,7 +76,10 @@ class FJSSPEnv(gym.Env):
                 aux_list.append([j, i]) # operation -> job
         
         self.data['operation', 'belongs', 'job'].edge_index = torch.LongTensor(aux_list).T
-        
+
+        # fresh list: reusing the operation->job list above leaked every (operation, job id)
+        # pair into the precedence edges as a spurious operation->operation[job id] edge
+        aux_list = []
         for j in self.jobs:
             for i in range(len(j)-1): #tem -1  pq não faz a última
                 aux_list.append([j[i], j[i]]) #self-loop
@@ -223,7 +239,36 @@ class FJSSPEnv(gym.Env):
         # so the same earliest-completion-time criterion used to build the mask doubles
         # as the teacher's priority rule - no separate heuristic to keep in sync.
         self._last_mask_matrix = mask_matrix
+        if self.jm_design != "baseline":
+            self._refresh_jm_edges()
         _dbg(2, f"    calculate_mask() done | total_edges={mask.numel()} | unmasked={int((~mask).sum())} | masked={int(mask.sum())}")
+
+    def _refresh_jm_edges(self):
+        """Rebuilds the job-machine action edge features from the current schedule state,
+        and mirrors them onto the reverse ('job','exec','machine') edge type.
+
+        In "baseline" these features are written once, when a job's current operation
+        becomes schedulable, and never updated - so after another job is placed on machine
+        m, the edges of every other job waiting for m still show the old start time, even
+        though job_start_machines (and therefore the mask) already moved on. The columns
+        also mean different things for edges created in reset() vs step(). Here every edge
+        gets, from the same live matrices the mask uses:
+          0 processing time t of the job's current operation on m
+          1 t / sum of t over the operation's eligible machines (relative speed of m)
+          2 earliest start time on m
+          3 earliest completion time on m (the value the ECT mask ranks)
+          4 machine idle time this assignment would create (start - machine free time)
+        """
+        edge_index = self.state['machine', 'exec', 'job'].edge_index
+        machine_idx, job_idx = edge_index[0], edge_index[1]
+        proc = self.current_job_proc[job_idx, machine_idx]
+        proc_sum = self.current_job_proc.sum(dim=1)[job_idx]
+        start = self.job_start_machines[job_idx, machine_idx]
+        idle = start - self.state["machine"].x[machine_idx, 0]
+        attr = torch.stack([proc, proc / (proc_sum + 1e-7), start, start + proc, idle.clamp(min=0)], dim=1).float()
+        self.state['machine', 'exec', 'job'].edge_attr = attr
+        self.state['job', 'exec', 'machine'].edge_index = edge_index.flip(0)
+        self.state['job', 'exec', 'machine'].edge_attr = attr.clone()
 
     def expert_action(self):
         """Earliest-completion-time dispatch rule: among the currently unmasked
@@ -392,6 +437,17 @@ class FJSSPEnv(gym.Env):
 
         state[('operation', 'exec', 'machine')].edge_attr = (2*(state[('operation', 'exec', 'machine')].edge_attr -  state[('operation', 'exec', 'machine')].edge_attr.min())/(state[('operation', 'exec', 'machine')].edge_attr.max() - state[('operation', 'exec', 'machine')].edge_attr.min() + 1e-7 )-1).float()
         state[('machine', 'exec', 'operation')].edge_attr = (2*(state[('machine', 'exec', 'operation')].edge_attr -  state[('machine', 'exec', 'operation')].edge_attr.min())/(state[('machine', 'exec', 'operation')].edge_attr.max() - state['machine', 'exec', 'operation'].edge_attr.min() + 1e-7 )-1).float()
-        state[('machine', 'exec', 'job')].edge_attr = (2*(state[('machine', 'exec', 'job')].edge_attr - state[('machine', 'exec', 'job')].edge_attr.min())/(state[('machine', 'exec', 'job')].edge_attr.max() - state[('machine', 'exec', 'job')].edge_attr.min() + 1e-7 )-1).float()
+        if self.jm_design == "baseline":
+            state[('machine', 'exec', 'job')].edge_attr = (2*(state[('machine', 'exec', 'job')].edge_attr - state[('machine', 'exec', 'job')].edge_attr.min())/(state[('machine', 'exec', 'job')].edge_attr.max() - state[('machine', 'exec', 'job')].edge_attr.min() + 1e-7 )-1).float()
+        else:
+            # per column: the columns mix absolute times with a 0-1 ratio, and a single
+            # scalar min/max (as above) would flatten the ratio column to a constant
+            for edge_type in (('machine', 'exec', 'job'), ('job', 'exec', 'machine')):
+                e = state[edge_type].edge_attr
+                if e.numel() == 0:
+                    continue
+                mins = e.min(dim=0, keepdim=True).values
+                maxs = e.max(dim=0, keepdim=True).values
+                state[edge_type].edge_attr = (2 * (e - mins) / (maxs - mins + 1e-7) - 1).float()
         return state
     

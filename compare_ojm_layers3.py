@@ -12,6 +12,7 @@ Produces:
 """
 import json
 import os
+import sys
 
 import numpy as np
 import pandas as pd
@@ -20,7 +21,9 @@ import seaborn as sns
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(ROOT, "results")
-OUT_DIR = os.path.join(RESULTS, "comparison_ojm_layers")
+# --selk2: use the sel_k=2 transformer run and write to a separate output folder.
+SELK2 = "--selk2" in sys.argv
+OUT_DIR = os.path.join(RESULTS, "comparison_ojm_layers" + ("_selk2" if SELK2 else ""))
 PLOTS_DIR = os.path.join(OUT_DIR, "plots")
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
@@ -54,6 +57,8 @@ episode_curves = {}
 for backbone in BACKBONES:
     for num_layers, template in LAYER_CONFIGS:
         name = template.format(backbone=backbone)
+        if SELK2 and backbone == "transformer" and num_layers == 3:
+            name += "_selk2"
         run_dir = os.path.join(RESULTS, name)
         summary_path = os.path.join(run_dir, "run_summary.json")
         val_path = os.path.join(run_dir, "validation_history.json")

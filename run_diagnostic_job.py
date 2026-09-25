@@ -32,6 +32,8 @@ parser.add_argument("--mask-option", type=int, default=1)
 parser.add_argument("--logp-norm", default="mean", choices=["mean", "sum"])
 parser.add_argument("--greedy-in-loss", action="store_true",
                     help="Keep the greedy rollout in the preference pairs (pre-fix behavior).")
+parser.add_argument("--jm-design", default="baseline", choices=["baseline", "edges", "attn"],
+                    help="ojm only: job-machine action edge design (see src/env.py:FJSSPEnv.JM_DESIGNS).")
 args = parser.parse_args()
 
 train(
@@ -44,6 +46,7 @@ train(
     mask_option=args.mask_option,
     logp_norm=args.logp_norm,
     exclude_greedy_from_loss=not args.greedy_in_loss,
+    jm_design=args.jm_design,
     # everything below matches sweep_logs/v2_*.log exactly (the loss options and, for om/ojm, sel_k above do not by default)
     max_episodes=400,
     new_freq=200,

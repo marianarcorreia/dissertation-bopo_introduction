@@ -64,11 +64,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--trials", type=int, default=30,
                         help="Number of Optuna trials per representation (default: 30).")
-    parser.add_argument("--max-episodes", type=int, default=500,
-                        help="Training episodes per trial (default: 500).")
+    parser.add_argument("--max-episodes", type=int, default=400,
+                        help="Training episodes per trial (default: 400).")
     parser.add_argument("--validation-freq", type=int, default=10,
                         help="Validation frequency in episodes (default: 20).")
-    parser.add_argument("--validation-size", type=int, default=30,
+    parser.add_argument("--validation-size", type=int, default=20,
                         help="Size of EACH split (validation and test) the first time "
                              "they're generated. Ignored on later runs once "
                              "val/validation_dataset.json already exists, so every run "
@@ -174,21 +174,16 @@ def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
         }
 
     params = {
-        "train_freq":      4,  # keep fixed; OJM updates are expensive
-        # Fixed (not tuned): a short behavior-cloning warm start against a dispatch
-        # heuristic before BOPO starts, see src/bopo_utils.py:run_behavior_cloning.
+        "train_freq":      10, 
         "warm_start_steps": 100,
-        # new_freq=1 regenerates the whole n_cases pool every step, so no instance is
-        # ever revisited; 10/50 let a trial spend more than one gradient step per
-        # generated instance.
-        "new_freq":        trial.suggest_categorical("new_freq",         [1, 10, 50]),
+        "new_freq":        trial.suggest_categorical("new_freq",         [50,100, 200]),
         "n_cases":         trial.suggest_categorical("n_cases",          [40, 80, 120]),
         "batch_size":      trial.suggest_categorical("batch_size",       [64, 128]),
         "lr":              trial.suggest_float("lr",                     5e-5, 5e-3, log=True),
         "hidden_channels": trial.suggest_categorical("hidden_channels",  [64, 128, 256, 512]),
-        "num_layers":      trial.suggest_int("num_layers",               1, 3),
+        "num_layers":      trial.suggest_int("num_layers",              2, 3),
         "heads":           trial.suggest_categorical("heads",            [2, 3, 4]),
-        "K":               trial.suggest_categorical("K",                [8, 16, 32]),
+        "K":               trial.suggest_categorical("K",                [16,32, 64]),
         # use_greedy: whether one of the B rollouts is a greedy decode instead of sampled.
         "use_greedy":      trial.suggest_categorical("use_greedy",       [True, False]),
         "j_min": 8, "j_max": 10, "m_min": 5, "m_max": 10,
@@ -199,14 +194,14 @@ def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
         # FJSPEnvOO.calculate_mask() doesn't read mask_option/sel_k at all (operation
         # choice is unrestricted; machine choice is a fixed earliest-completion-time
         # heuristic) - fix them instead of spending trials tuning a no-op.
-        params["mask_option"] = 1
-        params["sel_k"] = 1
+        params["mask_option"] = trial.suggest_categorical("mask_option", [0, 1])
+        params["sel_k"] = trial.suggest_categorical("sel_k", [1, 5, 50, 100])
     else:
         # om/ojm now keep the sel_k best candidates PER JOB (env.py/envheterogeneosmo.py
         # calculate_mask), so sel_k is a real, meaningful action-space-size knob again -
         # previously a global top-k could collapse to ~1 legal action overall.
         params["mask_option"] = trial.suggest_categorical("mask_option", [0, 1])
-        params["sel_k"] = trial.suggest_categorical("sel_k", [1, 2, 3])
+        params["sel_k"] = trial.suggest_categorical("sel_k", [1, 5, 50, 100])
 
     return params
 
