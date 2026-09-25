@@ -21,8 +21,19 @@ class CaseGenerator:
         path=PATHS["data"],
         flag_same_opes=True,
         flag_doc=False,
-        max_processing = 25
+        max_processing = 25,
+        mas_per_ope_max=None,
+        n_bottlenecks=0,
+        bottleneck_prob=0.0,
+        bottleneck_factor=1.0,
     ):
+        # mas_per_ope_max: maximum number of eligible machines per operation (flexibility);
+        #   None keeps the original behaviour (up to every machine).
+        # n_bottlenecks / bottleneck_prob / bottleneck_factor: machines 1..n_bottlenecks are
+        #   bottlenecks - each operation includes one of them in its eligible set with probability
+        #   bottleneck_prob, and its processing time there is multiplied by bottleneck_factor.
+        #   Used by the blocking experiments (src/blocking_config.py) to create queues; with the
+        #   defaults no extra random numbers are drawn, so existing instances are reproduced exactly.
         if nums_ope is None:
             nums_ope = []
 
@@ -34,7 +45,10 @@ class CaseGenerator:
         self.num_mas = num_mas
 
         self.mas_per_ope_min = 1
-        self.mas_per_ope_max = num_mas
+        self.mas_per_ope_max = num_mas if mas_per_ope_max is None else min(mas_per_ope_max, num_mas)
+        self.n_bottlenecks = min(n_bottlenecks, num_mas)
+        self.bottleneck_prob = bottleneck_prob
+        self.bottleneck_factor = bottleneck_factor
 
         self.opes_per_job_min = opes_per_job_min
         self.opes_per_job_max = opes_per_job_max
@@ -62,7 +76,12 @@ class CaseGenerator:
         self.num_options = sum(self.nums_option)
         self.ope_ma = []
         for val in self.nums_option:
-            self.ope_ma = self.ope_ma + sorted(random.sample(range(1, self.num_mas + 1), val))
+            options = random.sample(range(1, self.num_mas + 1), val)
+            if self.n_bottlenecks and random.random() < self.bottleneck_prob:
+                bottlenecks = range(1, self.n_bottlenecks + 1)
+                if not any(m in bottlenecks for m in options):
+                    options[random.randrange(val)] = random.choice(bottlenecks)
+            self.ope_ma = self.ope_ma + sorted(options)
         self.proc_time = []
         self.proc_times_mean = [
             random.randint(self.proctime_per_ope_min, self.proctime_per_ope_max)
@@ -78,6 +97,10 @@ class CaseGenerator:
             proc_time_ope = [
                 random.randint(low_bound, high_bound) for _ in range(self.nums_option[i])
             ]
+            if self.n_bottlenecks:
+                machines = self.ope_ma[sum(self.nums_option[:i]):sum(self.nums_option[:i + 1])]
+                proc_time_ope = [round(t * self.bottleneck_factor) if m <= self.n_bottlenecks else t
+                                 for t, m in zip(proc_time_ope, machines)]
             self.proc_time = self.proc_time + proc_time_ope
         self.num_ope_biass = [sum(self.nums_ope[0:i]) for i in range(self.num_jobs)]
         self.num_ma_biass = [sum(self.nums_option[0:i]) for i in range(self.num_opes)]
@@ -145,7 +168,11 @@ def generate_instance_list(
     range_jobs: tuple[int, int] = (8, 10),
     range_machines: tuple[int, int] = (5, 10),
     range_op_per_job: tuple[int, int] = (5, 6),
-    max_processing: int= 100
+    max_processing: int= 100,
+    mas_per_ope_max=None,
+    n_bottlenecks: int = 0,
+    bottleneck_prob: float = 0.0,
+    bottleneck_factor: float = 1.0,
 ) -> list[str]:
 
     list_instances = []
@@ -159,7 +186,11 @@ def generate_instance_list(
             n_machines,
             *range_op_per_job,
             nums_ope=n_operations,
-            max_processing = max_processing
+            max_processing = max_processing,
+            mas_per_ope_max=mas_per_ope_max,
+            n_bottlenecks=n_bottlenecks,
+            bottleneck_prob=bottleneck_prob,
+            bottleneck_factor=bottleneck_factor,
         )
 
         instance = case_generator.get_case()[0]

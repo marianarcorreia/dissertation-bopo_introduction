@@ -46,6 +46,11 @@ class FJSSPEnv(gym.Env):
         self.jm_design = jm_design
         _dbg(1, f"FJSSPEnv created | {len(instances)} instance(s) | mask_option={mask_option} | sel_k={sel_k} | jm_design={jm_design}") #debug message if debug level is 1, indicate the number of instance, masking mode, n of candidate action kept by mask
 
+    def env_kwargs(self):
+        """Constructor kwargs (beyond instances/mask_option/sel_k) needed to build an
+        identically configured copy - used by BOPO's parallel rollouts."""
+        return {"jm_design": self.jm_design}
+
     def generate_instance(self, instance): #extrai os jobs and operatiosn
         jobs, operations = instance["jobs"], instance["operations"]
         _dbg(1, f"  generate_instance | jobs={len(jobs)} | operations={len(operations)} | machines={len(operations[0])}")
@@ -192,8 +197,8 @@ class FJSSPEnv(gym.Env):
                     self.job_start_machines[j_id,m] = 0
                     self.current_job_proc[j_id,m] = int(t)
                 else:
-                    self.job_start_machines[j_id,m] = 10000 #para que nunca seja utilizadas
-        #guarda as arestas iniciais entre máquinas e jobs, com suas respectivas features, no grafo de dados. Essas arestas representam as possíveis atribuições iniciais de operações aos jobs, e as features associadas incluem o tempo de processamento, o rácio do tempo em relação ao total, o rácio do tempo em relação ao tempo pendente acumulado, um valor inicial de 0 que pode ser atualizado posteriormente, e o tempo de processamento da operação atual do job na máquina. A matriz job_start_machines é preenchida para indicar o instante em que cada job pode começar a ser processado em cada máquina, com um valor alto (10000) para máquinas incompatíveis para garantir que elas nunca sejam selecionadas.
+                    self.job_start_machines[j_id,m] = float("inf") #para que nunca seja utilizadas
+        #guarda as arestas iniciais entre máquinas e jobs, com suas respectivas features, no grafo de dados. Essas arestas representam as possíveis atribuições iniciais de operações aos jobs, e as features associadas incluem o tempo de processamento, o rácio do tempo em relação ao total, o rácio do tempo em relação ao tempo pendente acumulado, um valor inicial de 0 que pode ser atualizado posteriormente, e o tempo de processamento da operação atual do job na máquina. A matriz job_start_machines é preenchida para indicar o instante em que cada job pode começar a ser processado em cada máquina, com +inf para máquinas incompatíveis para garantir que elas nunca sejam selecionadas.
         self.state['machine', 'exec', 'job'].edge_index = torch.LongTensor(aux_list).T
         self.state['machine', 'exec', 'job'].edge_attr = torch.Tensor(aux_list_features)
 
@@ -218,9 +223,11 @@ class FJSSPEnv(gym.Env):
         # top-k per row instead keeps every job that still has a pending operation with
         # up to sel_k real candidates, and is done via one vectorized gather - no python
         # loop over (job, machine) pairs or edge_index comparisons.
-        SENTINEL = 10000.0
+        # +inf marks 'not schedulable here'. It used to be 10000, which broke on instances whose
+        # times exceed 10000: legal candidates were ranked as invalid, and incompatible entries
+        # were overwritten by the machine-release update below and became valid.
         k = max(1, int(self.sel_k))
-        valid = mask_matrix < SENTINEL
+        valid = torch.isfinite(mask_matrix)
         ranked = torch.where(valid, mask_matrix, torch.full_like(mask_matrix, float("inf")))
         keep = torch.zeros_like(valid)
         for j in range(ranked.shape[0]):
@@ -342,7 +349,7 @@ class FJSSPEnv(gym.Env):
         self.state["machine"].x[sel_mach, 1] = self.machines_occupations[sel_mach]/final_time
         #registo do tempo de conclusão do job
         self.operations_ends[sel_job] = final_time
-        self.job_start_machines[sel_job,:] = 10000
+        self.job_start_machines[sel_job,:] = float("inf")
         self.current_job_proc[sel_job, :] = 0
         #se esta for a última operação do job selecionado, marca o job como concluído e remove as arestas de escuta entre esse job e os outros jobs. Isso é feito verificando se a operação atual do job selecionado é a última operação na lista de operações para esse job. Se for o caso, a feature 0 do job selecionado é definida como 1 para indicar que o job foi concluído, e as arestas do tipo 'job', 'listens', 'job' que conectam o job selecionado a outros jobs são removidas do grafo de dados. Essa lógica garante que uma vez que um job seja concluído, ele não possa mais ser considerado para agendamento ou influenciar outros jobs no ambiente.
         

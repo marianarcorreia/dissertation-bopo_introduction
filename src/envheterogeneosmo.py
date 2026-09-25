@@ -118,7 +118,7 @@ class FJSPEnvMO(gym.Env):
         self.mk = 0.0
         self.state: Any = self.data.clone()
 
-        self.job_start_machines = torch.full((self.num_jobs, self.num_machines), 10000.0)
+        self.job_start_machines = torch.full((self.num_jobs, self.num_machines), float("inf"))
         self.current_job_proc = torch.zeros((self.num_jobs, self.num_machines))
 
         self.current_operations = [self.jobs[job_id][0] for job_id in range(self.num_jobs)]
@@ -169,9 +169,11 @@ class FJSPEnvMO(gym.Env):
         # top-k per row instead keeps every job that still has a pending operation with
         # up to sel_k real candidates, and is done via one vectorized gather - no python
         # loop over (job, machine) pairs or edge_index comparisons.
-        SENTINEL = 10000.0
+        # +inf marks 'not schedulable here'. It used to be 10000, which broke on instances whose
+        # times exceed 10000: legal candidates were ranked as invalid, and incompatible entries
+        # were overwritten by the machine-release update below and became valid.
         k = max(1, int(self.sel_k))
-        valid = mask_matrix < SENTINEL
+        valid = torch.isfinite(mask_matrix)
         ranked = torch.where(valid, mask_matrix, torch.full_like(mask_matrix, float("inf")))
         keep = torch.zeros_like(valid)
         for j in range(ranked.shape[0]):
@@ -257,7 +259,7 @@ class FJSPEnvMO(gym.Env):
         self.state["machine"].x[sel_machine, 1] = self.machines_occupations[sel_machine] / final_time
 
         self.operations_ends[sel_job] = final_time
-        self.job_start_machines[sel_job, :] = 10000
+        self.job_start_machines[sel_job, :] = float("inf")
         self.current_job_proc[sel_job, :] = 0
 
         job_ops = self.jobs[sel_job]

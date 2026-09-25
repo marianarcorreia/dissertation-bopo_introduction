@@ -18,6 +18,7 @@ import numpy as np
 import time #tempo de execução
 from src.utils import build_validation_dataset, run_validation, OutputManager, get_test_dataset
 from src.bopo_utils import run_behavior_cloning
+from src.blocking_config import BLOCKING_CONFIG
 
 _DBG = int(os.environ.get("FJSP_DEBUG", "0"))
 
@@ -32,9 +33,15 @@ def _resolve_representation_modules(representation: str):
         "oo": ("src.envo_o", "FJSPEnvOO", "src.bopo_oo", "BOPO"),
         "om": ("src.envheterogeneosmo", "FJSPEnvMO", "src.bopomo", "BOPO"),
         "ojm": ("src.env", "FJSSPEnv", "src.bopo", "BOPO"),
+        # blocking FJSP with finite buffers (src/env_blocking.py): "ojmb" adds the buffers
+        # as a new node type, "ojmd" as dummy machines, and "ojm_blk" is the plain OJM graph
+        # on the SAME blocking dynamics - the baseline for both
+        "ojmb": ("src.env_blocking", "FJSPEnvBlocking", "src.bopo", "BOPO"),
+        "ojmd": ("src.env_blocking", "FJSPEnvBlockingDummy", "src.bopo", "BOPO"),
+        "ojm_blk": ("src.env_blocking", "FJSPEnvBlockingNoBuffer", "src.bopo", "BOPO"),
     }
     if rep not in rep_map:
-        raise ValueError(f"Unsupported representation '{representation}'. Use one of: oo, om, ojm")
+        raise ValueError(f"Unsupported representation '{representation}'. Use one of: {', '.join(rep_map)}")
 
     env_module_name, env_class_name, bopo_module_name, bopo_class_name = rep_map[rep]
     env_module = importlib.import_module(env_module_name)
@@ -48,6 +55,23 @@ os.makedirs('candidate_models', exist_ok=True)
 os.makedirs('models', exist_ok=True)
 
 #cria lista de instancias sinteticas com base na configuração
+BLOCKING_REPRESENTATIONS = ("ojmb", "ojmd", "ojm_blk")
+
+
+def _dataset_paths(rep_name):
+    """The blocking representations are scored against blocking-aware CP-SAT references
+    (src/generate_blocking_references.py) on the same fixed instances - the non-blocking
+    references are only a lower bound for them and would inflate every gap."""
+    if rep_name not in BLOCKING_REPRESENTATIONS:
+        return {}
+    paths = {"val_path": "val/validation_dataset_blocking.json",
+             "test_path": "val/test_dataset_blocking.json"}
+    for path in paths.values():
+        if not os.path.isfile(path):
+            raise FileNotFoundError(f"{path} not found: run `python -m src.generate_blocking_references` first.")
+    return paths
+
+
 def generate_train_instances(train_config):
     _dbg(1, f"generate_train_instances | config={train_config}")
     list_instances = generate_instance_list(**train_config)
@@ -85,13 +109,13 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     # only passed when set, so om/oo envs (which don't take it) are built exactly as before
     jm_kwargs = {}
     if jm_design != "baseline":
-        if rep_name != "ojm":
+        if rep_name not in ("ojm",) + BLOCKING_REPRESENTATIONS:
             raise ValueError(f"jm_design={jm_design!r} only applies to the ojm representation")
         jm_kwargs = {"jm_design": jm_design}
     output_manager = OutputManager(output_dir="results", run_name=run_name)
     print(f"[TRAIN] Output run folder: {output_manager.run_dir}")
     run_start_time = time.time()
-    validation_set = build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg)
+    validation_set = build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg, **_dataset_paths(rep_name))
     print(f"[TRAIN] Validation config | every={validation_freq} steps | instances={len(validation_set)} (representative subset)")
     _dbg(1, f"Loaded validation set from val/instances + val/solutions: {len(validation_set)} instance(s)")
 
@@ -108,6 +132,13 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         "range_op_per_job": (5, op_max),
         "max_processing": max_processing
     }
+
+    if rep_name in BLOCKING_REPRESENTATIONS:
+        # blocking experiments use their own instance setting (see src/blocking_config.py):
+        # the default one never makes blocking bind
+        train_config = {"n_cases": n_cases, **BLOCKING_CONFIG["generator"]}
+        print(f"[TRAIN] Blocking setting | buffers in={BLOCKING_CONFIG['in_cap']} out={BLOCKING_CONFIG['out_cap']} | "
+              f"instances={BLOCKING_CONFIG['generator']}")
 
     instances = generate_train_instances(train_config)
 
@@ -234,6 +265,8 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
                     "heads": heads,
                     "gnn_type": gnn_type,
                     "jm_design": jm_design,
+                    **({"in_cap": BLOCKING_CONFIG["in_cap"], "out_cap": BLOCKING_CONFIG["out_cap"]}
+                       if rep_name in BLOCKING_REPRESENTATIONS else {}),
                     "all_val_results": val_metrics["all_gaps"],
                     "avg_gap": val_metrics["avg_gap"],
                     "smoothed_avg_gap": smoothed_avg_gap,
@@ -284,7 +317,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     test_all_gaps = None
     if best_model_path is not None:
         print(f"[TRAIN] Evaluating best checkpoint ({best_model_path}) on the held-out test split...")
-        test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg)
+        test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg, **_dataset_paths(rep_name))
         test_env = EnvClass(test_set, mask_option, sel_k, **jm_kwargs)
         bopo_agent.load(best_model_path)
         test_metrics = run_validation(bopo_agent, test_env, test_set, dbg_fn=_dbg,
@@ -372,7 +405,9 @@ def test_model(model_name, folder, filename, models_file="models/model_params.js
             # differently-configured env produces mismatched GNN layer shapes at load time.
             jm_design = param.get("jm_design", "baseline")
             jm_kwargs = {} if jm_design == "baseline" else {"jm_design": jm_design}
-            test_env = ModelEnvClass(test_instances, param["mask_option"], param["sel_k"], **jm_kwargs)
+            # blocking models are evaluated with the buffer capacities they were trained with
+            cap_kwargs = {k: param[k] for k in ("in_cap", "out_cap") if k in param}
+            test_env = ModelEnvClass(test_instances, param["mask_option"], param["sel_k"], **jm_kwargs, **cap_kwargs)
             metadata = test_env.reset().metadata()
             t_ppo_agent = ModelBOPOClass(0.001, test_env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],
                                           gnn_type=param.get("gnn_type", "gat"), **jm_kwargs)

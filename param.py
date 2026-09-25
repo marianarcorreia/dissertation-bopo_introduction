@@ -1,10 +1,18 @@
-"""Optuna tuner entrypoint for FJSP representations (OO, OM, OJM).
+"""Optuna tuner entrypoint for FJSP representations (OO, OM, OJM, and the blocking
+variants OJMB / OJMD / OJM_BLK).
 
 Usage:
         python param.py
         python param.py --representations OO OM OJM --trials 25 --max-episodes 400
         python param.py --representations OJM --trials 30 --storage sqlite:///optuna.db
         python param.py --smoke --representations OO OM OJM
+        python param.py --representations OJMB OJMD OJM_BLK --storage sqlite:///optuna.db
+
+Blocking variants (src/env_blocking.py, finite input/output buffers per machine):
+    ojmb     OJM graph + buffer node type
+    ojmd     OJM graph + buffers as dummy machine nodes
+    ojm_blk  plain OJM graph on the same blocking dynamics (baseline for ojmb)
+    Both are scored against val/*_blocking.json (python -m src.generate_blocking_references).
 
 What this script does:
         1. Creates one Optuna study per selected representation.
@@ -90,7 +98,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--smoke", action="store_true",
                         help="Quick end-to-end test mode with minimal workload.")
     parser.add_argument("--representations", nargs="+", default=["oo", "om", "ojm"],
-                        help="Representations to tune, any of: oo, om, ojm (default: all three).")
+                        help="Representations to tune, any of: oo, om, ojm, ojmb, ojmd, ojm_blk "
+                             "(default: oo om ojm).")
     parser.add_argument("--gnn-type", default="gat", choices=["gat", "gin", "transformer"],
                         help="GNN backbone used by the actor for every trial (default: gat).")
     parser.add_argument("--no-dashboard", action="store_true",

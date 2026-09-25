@@ -201,7 +201,7 @@ class BOPO:
         record=True: sampled without gradients; also returns, per rollout, the list of
         (normalised state, chosen action) needed to recompute the log-probs later."""
         env_cls = type(self.env)
-        rollout_envs = [env_cls(self.env.instances, self.env.mask_option, self.env.sel_k, jm_design=self.env.jm_design) for _ in range(self.B)]
+        rollout_envs = [env_cls(self.env.instances, self.env.mask_option, self.env.sel_k, **self.env.env_kwargs()) for _ in range(self.B)]
         states = [e.reset(sel_index=instance_index) for e in rollout_envs]
 
         active = list(range(self.B))

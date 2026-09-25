@@ -224,6 +224,7 @@ def get_test_dataset(sample_size=20, instances_dir="val/instances", solutions_di
 
 def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_fn=None, print_fn=print):
     all_val_results = []
+    swaps, blocked = [], []
     with torch.no_grad():
         for i in range(len(validation_set)):
             v_state = val_env.reset(sel_index=i)
@@ -234,6 +235,9 @@ def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_
                     ref = float(validation_set[i]["score"])
                     gap = val_env.mk / ref - 1.0
                     all_val_results.append(float(gap))
+                    if hasattr(val_env, "num_swaps"):
+                        swaps.append(int(val_env.num_swaps))
+                        blocked.append(int(val_env.num_blocked))
                     if dbg_fn is not None:
                         dbg_fn(1, f"  val instance {i+1}/{len(validation_set)} ({validation_set[i]['name']}) | makespan={val_env.mk} | ref={ref:.2f} | gap={gap:.4f}")
                     break
@@ -244,9 +248,18 @@ def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_
     prefix = f"[TRAIN][VAL][ep {episode_number}]" if episode_number is not None else "[TRAIN][VAL]"
     print_fn(f"{prefix} avg_gap={avg_gap:.4f} | std_gap={std_gap:.4f} | q80_gap={q80_gap:.4f} | n={len(all_val_results)}")
 
-    return {
+    metrics = {
         "avg_gap": avg_gap,
         "std_gap": std_gap,
         "q80_gap": q80_gap,
         "all_gaps": all_val_results,
     }
+    if swaps:
+        # blocking env: a swap is a deadlock resolved by moving a cycle of parts at once
+        # (feasible, but worth reporting: it means the policy walked into circular blocking)
+        metrics["total_swaps"] = int(sum(swaps))
+        metrics["instances_with_swap"] = int(sum(1 for s in swaps if s))
+        metrics["total_blocked"] = int(sum(blocked))
+        print_fn(f"{prefix} blocked_events={metrics['total_blocked']} | swaps={metrics['total_swaps']} "
+                 f"in {metrics['instances_with_swap']} instance(s)")
+    return metrics
