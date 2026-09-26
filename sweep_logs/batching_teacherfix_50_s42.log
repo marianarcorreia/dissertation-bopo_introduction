@@ -33,3 +33,7 @@ D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_
 [TRAIN][WARMSTART] step 80/200 | instance=79 | bc_loss=1.7673 | decisions=40
 [TRAIN][WARMSTART] step 90/200 | instance=66 | bc_loss=2.0839 | decisions=52
 [TRAIN][WARMSTART] step 100/200 | instance=13 | bc_loss=1.6850 | decisions=49
+[TRAIN][WARMSTART] step 110/200 | instance=95 | bc_loss=1.7015 | decisions=46
+[TRAIN][WARMSTART] step 120/200 | instance=34 | bc_loss=1.4834 | decisions=52
+[TRAIN][WARMSTART] step 130/200 | instance=26 | bc_loss=1.8281 | decisions=52
+[TRAIN][WARMSTART] step 140/200 | instance=99 | bc_loss=1.4999 | decisions=47
