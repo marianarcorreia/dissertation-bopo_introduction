@@ -16,8 +16,45 @@ from datetime import datetime #timestamp  para logs
 import random
 import numpy as np
 import time #tempo de execução
-from src.utils import build_validation_dataset, run_validation, OutputManager, get_test_dataset
+from src.utils import build_validation_dataset, run_validation, run_expert, OutputManager, get_test_dataset, load_batching_splits
 from src.bopo_utils import run_behavior_cloning
+from src.batch_generator import generate_batching_instance_list
+
+# FJSP with parallel batching (src/env_batching.py): ojm graph + family node (ojmb_node),
+# + batch edge (ojmb_edge), or unchanged as the comparison baseline (ojmb_base).
+# Trained and validated on batching instances (data/batching) instead of plain FJSP ones.
+BATCHING_REPRESENTATIONS = ("ojmb_node", "ojmb_edge", "ojmb_base")
+FJSP_REPRESENTATIONS = ("oo", "om", "ojm")
+# Group names accepted wherever representations are listed (main.py, param.py).
+REPRESENTATION_GROUPS = {"all": FJSP_REPRESENTATIONS, "batching": BATCHING_REPRESENTATIONS}
+REPRESENTATION_CHOICES = FJSP_REPRESENTATIONS + BATCHING_REPRESENTATIONS + tuple(REPRESENTATION_GROUPS)
+
+
+OJM_BASED_REPRESENTATIONS = ("ojm",) + BATCHING_REPRESENTATIONS
+JM_DESIGN_CHOICES = ("auto", "baseline", "edges", "attn")
+# Version of the actor architecture written into model_params (see GAT(legacy=...)):
+# entries without it were trained with the original 8-dim, no-inter-layer-activation GAT.
+MODEL_VERSION = 2
+
+
+def resolve_jm_design(jm_design, representation):
+    """None/'auto' -> 'edges' for the ojm-based representations (action-edge features
+    rebuilt after every decision with one fixed column layout, see
+    FJSSPEnv._refresh_jm_edges) and 'baseline' for oo/om, which have no job-machine edges."""
+    if jm_design in (None, "auto"):
+        return "edges" if representation.lower().strip() in OJM_BASED_REPRESENTATIONS else "baseline"
+    return jm_design
+
+
+def expand_representations(values):
+    """Lower-case, expand the group names ('all', 'batching') and de-duplicate, keeping order."""
+    reps = []
+    for v in values:
+        v = v.lower().strip()
+        for r in REPRESENTATION_GROUPS.get(v, (v,)):
+            if r not in reps:
+                reps.append(r)
+    return reps
 
 _DBG = int(os.environ.get("FJSP_DEBUG", "0"))
 
@@ -32,9 +69,12 @@ def _resolve_representation_modules(representation: str):
         "oo": ("src.envo_o", "FJSPEnvOO", "src.bopo_oo", "BOPO"),
         "om": ("src.envheterogeneosmo", "FJSPEnvMO", "src.bopomo", "BOPO"),
         "ojm": ("src.env", "FJSSPEnv", "src.bopo", "BOPO"),
+        "ojmb_node": ("src.env_batching", "FJSPBatchNodeEnv", "src.bopo", "BOPO"),
+        "ojmb_edge": ("src.env_batching", "FJSPBatchEdgeEnv", "src.bopo", "BOPO"),
+        "ojmb_base": ("src.env_batching", "FJSPBatchBaseEnv", "src.bopo", "BOPO"),
     }
     if rep not in rep_map:
-        raise ValueError(f"Unsupported representation '{representation}'. Use one of: oo, om, ojm")
+        raise ValueError(f"Unsupported representation '{representation}'. Use one of: {', '.join(rep_map)}")
 
     env_module_name, env_class_name, bopo_module_name, bopo_class_name = rep_map[rep]
     env_module = importlib.import_module(env_module_name)
@@ -48,8 +88,10 @@ os.makedirs('candidate_models', exist_ok=True)
 os.makedirs('models', exist_ok=True)
 
 #cria lista de instancias sinteticas com base na configuração
-def generate_train_instances(train_config):
-    _dbg(1, f"generate_train_instances | config={train_config}")
+def generate_train_instances(train_config, batching=False):
+    _dbg(1, f"generate_train_instances | config={train_config} | batching={batching}")
+    if batching:
+        return generate_batching_instance_list(**train_config)
     list_instances = generate_instance_list(**train_config)
     instances = []
     for instance in list_instances:
@@ -60,7 +102,8 @@ def generate_train_instances(train_config):
 
 
 def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=100, B=64, K=16, use_greedy=True,lr=0.0005, hidden_channels=128,num_layers = 3, heads = 3,j_max = 10, j_min = 8, m_max = 10, m_min = 5, op_max = 6, max_processing = 100,
-         checkpoint_smooth_window=3, warm_start_steps=200, lr_min_ratio=0.2, seed=None, logp_norm="mean", exclude_greedy_from_loss=True, jm_design="baseline", representation="oo", gnn_type="gat", validation_freq=20, validation_size=20, dbg_fn=None, run_name="train_run"):
+         checkpoint_smooth_window=3, warm_start_steps=200, lr_min_ratio=0.2, seed=None, logp_norm="mean", exclude_greedy_from_loss=True, jm_design=None, representation="oo", gnn_type="gat", validation_freq=20, validation_size=20, dbg_fn=None, run_name="train_run"):
+    jm_design = resolve_jm_design(jm_design, representation)
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
@@ -79,19 +122,26 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     print(f"[TRAIN]             | hidden_channels={hidden_channels} | num_layers={num_layers} | heads={heads}")
     print(f"[TRAIN]             | logp_norm={logp_norm} | exclude_greedy_from_loss={exclude_greedy_from_loss}")
     print(f"[TRAIN] Representation | {representation} | GNN | {gnn_type} | jm_design | {jm_design}")
+    # the BOPO modules put the policy on cuda:0 whenever a CUDA build of torch sees a GPU
+    print(f"[TRAIN] Device | " + (f"cuda:0 ({torch.cuda.get_device_name(0)})" if torch.cuda.is_available() else "cpu"))
     print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[5,{op_max}] | max_proc={max_processing}")
     print("=" * 60)
     rep_name, EnvClass, BOPOClass = _resolve_representation_modules(representation)
+    batching = rep_name in BATCHING_REPRESENTATIONS
     # only passed when set, so om/oo envs (which don't take it) are built exactly as before
     jm_kwargs = {}
     if jm_design != "baseline":
-        if rep_name != "ojm":
-            raise ValueError(f"jm_design={jm_design!r} only applies to the ojm representation")
+        if rep_name not in OJM_BASED_REPRESENTATIONS:
+            raise ValueError(f"jm_design={jm_design!r} only applies to the ojm-based representations")
         jm_kwargs = {"jm_design": jm_design}
     output_manager = OutputManager(output_dir="results", run_name=run_name)
     print(f"[TRAIN] Output run folder: {output_manager.run_dir}")
     run_start_time = time.time()
-    validation_set = build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg)
+    if batching:
+        validation_set, test_set = load_batching_splits(validation_size, validation_size)
+    else:
+        validation_set = build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg)
+        test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg)
     print(f"[TRAIN] Validation config | every={validation_freq} steps | instances={len(validation_set)} (representative subset)")
     _dbg(1, f"Loaded validation set from val/instances + val/solutions: {len(validation_set)} instance(s)")
 
@@ -99,6 +149,13 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     val_env = EnvClass(validation_set, mask_option, sel_k, **jm_kwargs)
     s = val_env.reset()
     metadata = s.metadata()
+
+    # Reference bar: the warm-start teacher (env.expert_action) on the same splits - a
+    # trained policy is only useful if it beats the rule it was warm-started from.
+    teacher_val = run_expert(EnvClass(validation_set, mask_option, sel_k, **jm_kwargs), validation_set)
+    teacher_test = run_expert(EnvClass(test_set, mask_option, sel_k, **jm_kwargs), test_set)
+    print(f"[TRAIN][TEACHER] validation avg_gap={teacher_val['avg_gap']:.4f} | q80_gap={teacher_val['q80_gap']:.4f} "
+          f"|| test avg_gap={teacher_test['avg_gap']:.4f} | q80_gap={teacher_test['q80_gap']:.4f}")
 
     #define e gera instancias de treino
     train_config = {
@@ -109,7 +166,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         "max_processing": max_processing
     }
 
-    instances = generate_train_instances(train_config)
+    instances = generate_train_instances(train_config, batching)
 
     #cria ambiente de treino
     env = EnvClass(instances, mask_option, sel_k, **jm_kwargs)
@@ -178,7 +235,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         #gera nova instancia de treino se estiver na altura de renovar o pool
         if step_number % new_freq == 0:
             print(f"[TRAIN] Refreshing training instances (step {step_number})...")
-            instances = generate_train_instances(train_config)
+            instances = generate_train_instances(train_config, batching)
             env = EnvClass(instances, mask_option, sel_k, **jm_kwargs)
             bopo_agent.env = env
             instance_order = []
@@ -234,6 +291,8 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
                     "heads": heads,
                     "gnn_type": gnn_type,
                     "jm_design": jm_design,
+                    "model_version": MODEL_VERSION,
+                    "seed": seed,
                     "all_val_results": val_metrics["all_gaps"],
                     "avg_gap": val_metrics["avg_gap"],
                     "smoothed_avg_gap": smoothed_avg_gap,
@@ -284,7 +343,6 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     test_all_gaps = None
     if best_model_path is not None:
         print(f"[TRAIN] Evaluating best checkpoint ({best_model_path}) on the held-out test split...")
-        test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg)
         test_env = EnvClass(test_set, mask_option, sel_k, **jm_kwargs)
         bopo_agent.load(best_model_path)
         test_metrics = run_validation(bopo_agent, test_env, test_set, dbg_fn=_dbg,
@@ -326,6 +384,11 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         "test_avg_gap": test_avg_gap,
         "test_std_gap": test_std_gap,
         "test_q80_gap": test_q80_gap,
+        "teacher_val_avg_gap": teacher_val["avg_gap"],
+        "teacher_val_q80_gap": teacher_val["q80_gap"],
+        "teacher_test_avg_gap": teacher_test["avg_gap"],
+        "teacher_test_q80_gap": teacher_test["q80_gap"],
+        "model_version": MODEL_VERSION,
         "actor_param_count": actor_param_count,
         "best_difference": float(best_difference),
         "total_runtime_sec": float(time.time() - run_start_time),
@@ -340,17 +403,30 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
 
     return best_difference
 
+def is_batching_instance_file(filename):
+    """Batching instances are JSON dicts (src/batch_generator.py); plain FJSP ones are .fjs text."""
+    return filename.lower().endswith(".json")
+
+
+def load_test_instance(file_path):
+    if is_batching_instance_file(file_path):
+        with open(file_path, 'r') as file:
+            instance = json.load(file)
+        missing = [k for k in ("jobs", "operations", "family", "capacities", "delta") if k not in instance]
+        if missing:
+            raise ValueError(f"{file_path} is not a batching instance (missing {missing})")
+        return instance
+    with open(file_path, 'r') as file:
+        jobs, operations, info, maximum = get_data(parse(file.read()))
+    return {"jobs": jobs, "operations": operations, "maximum": maximum, "num_machines": info["machinesNb"]}
+
+
 def test_model(model_name, folder, filename, models_file="models/model_params.json", representation="oo"):
 
     start_time = [time.time()]
     folder_path = folder
-    test_instances = []
-    
     file_path = os.path.join(folder_path, filename)
-    with open(file_path, 'r') as file:
-        contents = file.read()
-        jobs, operations, info, maximum = get_data(parse(contents))
-        test_instances.append({"jobs": jobs, "operations": operations, "maximum": maximum, "num_machines": info["machinesNb"]})
+    test_instances = [load_test_instance(file_path)]
 
     models = [model_name]
 
@@ -366,6 +442,13 @@ def test_model(model_name, folder, filename, models_file="models/model_params.js
             model_results = []
             param = [p for p in model_params if p["name"]==m][0]
             model_rep = param.get("representation", representation)
+            if (model_rep in BATCHING_REPRESENTATIONS) != is_batching_instance_file(filename):
+                # a batching model cannot read a plain .fjs file (no families), and a plain
+                # model would ignore the batching and solve a different problem - see
+                # test.py, which only pairs models with instances of their own kind
+                raise ValueError(f"Model {m} ({model_rep}) does not match instance {filename}: "
+                                 f"batching representations {BATCHING_REPRESENTATIONS} need batching "
+                                 f"(.json) instances, the others need .fjs instances")
             _, ModelEnvClass, ModelBOPOClass = _resolve_representation_modules(model_rep)
             # metadata must come from an env built with this model's own mask_option/sel_k —
             # those change the graph's feature dimensions, so reusing metadata from a
@@ -374,8 +457,10 @@ def test_model(model_name, folder, filename, models_file="models/model_params.js
             jm_kwargs = {} if jm_design == "baseline" else {"jm_design": jm_design}
             test_env = ModelEnvClass(test_instances, param["mask_option"], param["sel_k"], **jm_kwargs)
             metadata = test_env.reset().metadata()
+            # checkpoints from before MODEL_VERSION 2 use the original GAT architecture
             t_ppo_agent = ModelBOPOClass(0.001, test_env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],
-                                          gnn_type=param.get("gnn_type", "gat"), **jm_kwargs)
+                                          gnn_type=param.get("gnn_type", "gat"),
+                                          gat_legacy=param.get("model_version", 1) < MODEL_VERSION, **jm_kwargs)
             # preTrained weights directory
             t_ppo_agent.load(os.path.join(models_dir, m))
 

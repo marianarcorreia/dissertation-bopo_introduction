@@ -14,7 +14,29 @@ _DBG = int(os.environ.get("FJSP_DEBUG", "0")) #
 #define the debug print function that checks the global debug level before printing. It takes a level and any number of arguments, and only prints if the global debug level is greater than or equal to the specified level. The printed message is prefixed with "[ENV]" to indicate that it comes from the environment code.
 def _dbg(level, *args, **kwargs): #1 =env lifecycle  2=+step detail  3=+graph tensors
         if _DBG >= level:
-                print("[ENV]", *args, **kwargs) 
+                print("[ENV]", *args, **kwargs)
+
+
+def normalize_columns(t):
+    """Min-max scale every column of t to [-1, 1] independently. A single scalar min/max
+    over all columns would let the absolute-time columns (~1-1000) set the range and
+    flatten the 0-1 ratio columns to a near-constant (measured std 0.002-0.007)."""
+    if t.numel() == 0:
+        return t.float()
+    mins = t.min(dim=0, keepdim=True).values
+    maxs = t.max(dim=0, keepdim=True).values
+    return (2 * (t - mins) / (maxs - mins + 1e-7) - 1).float()
+
+
+def select_with_tiebreak(primary, secondary, mask):
+    """Index of the unmasked entry with the smallest primary value; ties are broken by the
+    smallest secondary value, then by the lowest index."""
+    primary = primary.clone().float()
+    primary[mask] = float("inf")
+    tied = primary == primary.min()
+    secondary = secondary.clone().float()
+    secondary[~tied] = float("inf")
+    return int(torch.argmin(secondary).item())
 #define the fjssp environment class that inherits from gym.Env. This class implements the logic for the Flexible Job Shop Scheduling Problem, including the state representation, action space, reward calculation, and episode management. The environment uses a heterogeneous graph to represent the state of the scheduling problem, with nodes for jobs, operations, and machines, and edges to represent their relationships and constraints.
 class FJSSPEnv(gym.Env):
     def get_prev_op(self, o_id): #given an operation id, this method returns the previous operation in the same job, or None if it is the first operation. It loops through the list of jobs to find which job contains the given operation id, and then checks its position in that job to determine the previous operation.
@@ -271,17 +293,19 @@ class FJSSPEnv(gym.Env):
         self.state['job', 'exec', 'machine'].edge_attr = attr.clone()
 
     def expert_action(self):
-        """Earliest-completion-time dispatch rule: among the currently unmasked
-        (machine, job) candidates, pick the one with the smallest priority value under
-        the same criterion used to build the action mask (self._last_mask_matrix from
-        calculate_mask()). Used as the teacher for BOPO's warm-start behavior-cloning
-        phase (src/bopo_utils.py:run_behavior_cloning)."""
+        """Dispatch rule used as the teacher for BOPO's warm-start behavior-cloning phase
+        (src/bopo_utils.py:run_behavior_cloning): among the unmasked (machine, job)
+        candidates, pick the smallest value of the mask criterion (earliest start for
+        mask_option=0, earliest completion otherwise). Ties - 71% of decisions with
+        mask_option=0 - are broken by the other of the two times, which the network sees
+        as columns 2-3 of the refreshed action edges, instead of by edge-list position,
+        which it cannot see (that made the teacher largely impossible to imitate)."""
         edge_index = self.state['machine', 'exec', 'job'].edge_index
         machine_idx, job_idx = edge_index[0], edge_index[1]
-        values = self._last_mask_matrix[job_idx, machine_idx].clone()
-        mask = self.state['machine', 'exec', 'job'].mask
-        values[mask] = float("inf")
-        return int(torch.argmin(values).item())
+        start = self.job_start_machines[job_idx, machine_idx]
+        completion = start + self.current_job_proc[job_idx, machine_idx]
+        primary, secondary = (start, completion) if self.mask_option == 0 else (completion, start)
+        return select_with_tiebreak(primary, secondary, self.state['machine', 'exec', 'job'].mask)
 
     def calculate_next_state(self):
         #atualiza a ft 2 das maq. - tempo livre relativo ao mínimo
@@ -435,19 +459,11 @@ class FJSSPEnv(gym.Env):
             maxs = x.max(dim=0, keepdim=True).values
             state[node_type].x = (2 * (x - mins) / (maxs - mins + 1e-7) - 1).float()
 
-        state[('operation', 'exec', 'machine')].edge_attr = (2*(state[('operation', 'exec', 'machine')].edge_attr -  state[('operation', 'exec', 'machine')].edge_attr.min())/(state[('operation', 'exec', 'machine')].edge_attr.max() - state[('operation', 'exec', 'machine')].edge_attr.min() + 1e-7 )-1).float()
-        state[('machine', 'exec', 'operation')].edge_attr = (2*(state[('machine', 'exec', 'operation')].edge_attr -  state[('machine', 'exec', 'operation')].edge_attr.min())/(state[('machine', 'exec', 'operation')].edge_attr.max() - state['machine', 'exec', 'operation'].edge_attr.min() + 1e-7 )-1).float()
-        if self.jm_design == "baseline":
-            state[('machine', 'exec', 'job')].edge_attr = (2*(state[('machine', 'exec', 'job')].edge_attr - state[('machine', 'exec', 'job')].edge_attr.min())/(state[('machine', 'exec', 'job')].edge_attr.max() - state[('machine', 'exec', 'job')].edge_attr.min() + 1e-7 )-1).float()
-        else:
-            # per column: the columns mix absolute times with a 0-1 ratio, and a single
-            # scalar min/max (as above) would flatten the ratio column to a constant
-            for edge_type in (('machine', 'exec', 'job'), ('job', 'exec', 'machine')):
-                e = state[edge_type].edge_attr
-                if e.numel() == 0:
-                    continue
-                mins = e.min(dim=0, keepdim=True).values
-                maxs = e.max(dim=0, keepdim=True).values
-                state[edge_type].edge_attr = (2 * (e - mins) / (maxs - mins + 1e-7) - 1).float()
+        # per column: the columns mix absolute times with 0-1 ratios (see normalize_columns)
+        edge_types = [('operation', 'exec', 'machine'), ('machine', 'exec', 'operation'), ('machine', 'exec', 'job')]
+        if self.jm_design != "baseline":
+            edge_types.append(('job', 'exec', 'machine'))
+        for edge_type in edge_types:
+            state[edge_type].edge_attr = normalize_columns(state[edge_type].edge_attr)
         return state
     

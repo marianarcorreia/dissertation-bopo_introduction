@@ -222,6 +222,40 @@ def get_test_dataset(sample_size=20, instances_dir="val/instances", solutions_di
     return load_fixed_dataset(test_path)
 
 
+def load_batching_splits(val_size=20, test_size=20, path="data/batching/batching_dataset.json"):
+    """
+    Fixed, disjoint validation/test split of the solved batching dataset (built by
+    src/generate_batching_dataset.py). Entries already carry "name" and "score" (the CP-SAT
+    reference makespan) plus family/capacities/delta. Instances are interleaved (even/odd
+    positions of the name-sorted list), as in generate_fixed_splits(), so both splits span
+    the same range of instance sizes.
+    """
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"Batching dataset not found: {path} (run python -m src.generate_batching_dataset)")
+    dataset = sorted(load_fixed_dataset(path), key=lambda e: e["name"])
+    if val_size + test_size > len(dataset):
+        raise ValueError(f"Requested {val_size}+{test_size} instances but {path} has {len(dataset)}")
+    return dataset[0::2][:val_size], dataset[1::2][:test_size]
+
+
+def run_expert(env, dataset):
+    """Gap of the env's own dispatch rule (env.expert_action(), the warm-start teacher) on
+    every instance of dataset, in the same format as run_validation()."""
+    gaps = []
+    for i in range(len(dataset)):
+        env.reset(sel_index=i)
+        done = False
+        while not done:
+            _, _, done, _ = env.step(env.expert_action())
+        gaps.append(float(env.mk / float(dataset[i]["score"]) - 1.0))
+    return {
+        "avg_gap": float(np.mean(gaps)),
+        "std_gap": float(np.std(gaps)),
+        "q80_gap": float(np.percentile(gaps, 80)),
+        "all_gaps": gaps,
+    }
+
+
 def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_fn=None, print_fn=print):
     all_val_results = []
     with torch.no_grad():

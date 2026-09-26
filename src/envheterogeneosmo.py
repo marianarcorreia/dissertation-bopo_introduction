@@ -7,6 +7,8 @@ import numpy as np
 import torch
 from torch_geometric.data import HeteroData
 
+from src.env import select_with_tiebreak
+
 gym = importlib.import_module("gymnasium")
 
 _DBG = int(os.environ.get("FJSP_DEBUG", "0"))
@@ -197,14 +199,16 @@ class FJSPEnvMO(gym.Env):
         (machine, operation) candidates, pick the one whose job has the smallest
         priority value under the same criterion used to build the action mask
         (self._last_mask_matrix from calculate_mask()). Used as the teacher for BOPO's
-        warm-start behavior-cloning phase (src/bopo_utils.py:run_behavior_cloning)."""
+        warm-start behavior-cloning phase (src/bopo_utils.py:run_behavior_cloning).
+        Ties are broken by the other of start/completion time instead of by edge-list
+        position, which the network cannot see (see src/env.py:select_with_tiebreak)."""
         edge_index = self.state["machine", "exec", "operation"].edge_index
         machine_idx, op_idx = edge_index[0], edge_index[1]
         job_idx = self._op_to_job[op_idx]
-        values = self._last_mask_matrix[job_idx, machine_idx].clone()
-        mask = self.state["machine", "exec", "operation"].mask
-        values[mask] = float("inf")
-        return int(torch.argmin(values).item())
+        start = self.job_start_machines[job_idx, machine_idx]
+        completion = start + self.current_job_proc[job_idx, machine_idx]
+        primary, secondary = (start, completion) if self.mask_option == 0 else (completion, start)
+        return select_with_tiebreak(primary, secondary, self.state["machine", "exec", "operation"].mask)
 
     def calculate_next_state(self):
         self.state["machine"].x[:, 2] = self.state["machine"].x[:, 0] - torch.min(self.state["machine"].x[:, 0])

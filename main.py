@@ -6,24 +6,14 @@ if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(__file__))
 from datetime import datetime
 
-from src.train import train
+from src.train import train, expand_representations, REPRESENTATION_CHOICES, JM_DESIGN_CHOICES
 from src.utils import open_dashboard
-
-ALL_REPRESENTATIONS = ["oo", "om", "ojm"]
 
 
 def _resolve_representations(values):
-    """Expand 'all' into every representation and de-duplicate, preserving order."""
-    reps = []
-    for v in values:
-        v = v.lower().strip()
-        if v == "all":
-            for r in ALL_REPRESENTATIONS:
-                if r not in reps:
-                    reps.append(r)
-        elif v not in reps:
-            reps.append(v)
-    return reps
+    """Expand 'all' (oo, om, ojm) and 'batching' (ojmb_node, ojmb_edge, ojmb_base) and
+    de-duplicate, preserving order."""
+    return expand_representations(values)
 
 
 def parse_args():
@@ -48,9 +38,13 @@ def parse_args():
         "--representation",
         nargs="+",
         default=["oo"],
-        choices=["oo", "om", "ojm", "all"],
+        choices=list(REPRESENTATION_CHOICES),
         help="Graph representation(s) to use: oo (operation-only), om (operation-machine), "
-             "ojm (operation-job-machine). Pass several values, or 'all', to run every "
+             "ojm (operation-job-machine), and for the FJSP with parallel batching (trained on "
+             "batching instances, validated on data/batching): ojmb_node (ojm + family node), "
+             "ojmb_edge (ojm + operation-operation batch edge) and ojmb_base (plain ojm graph, "
+             "the comparison baseline). 'all' runs oo, om and ojm; 'batching' runs the three "
+             "batching ones. Pass several values, or a group name, to run every "
              "representation in one invocation. Used by train and optuna modes; test mode "
              "evaluates whichever models are listed in --models-file regardless of this flag.",
     )
@@ -67,6 +61,23 @@ def parse_args():
         help="[train] GNN backbone used by the actor: 'gat' (GATv2Conv, attention-based), "
              "'gin' (GINEConv, sum-aggregation with edge features) or 'transformer' "
              "(TransformerConv, multi-head query/key/value attention with edge features).",
+    )
+    parser.add_argument(
+        "--jm-design",
+        default="auto",
+        choices=list(JM_DESIGN_CHOICES),
+        help="[train/optuna] Job-machine action edges of the ojm-based representations: 'auto' "
+             "(default: 'edges' for ojm and the batching ones, 'baseline' for oo/om), 'baseline' "
+             "(features written once when the edge is created), 'edges' (rebuilt after every "
+             "decision with one fixed layout) or 'attn' ('edges' + attention scorer).",
+    )
+    parser.add_argument(
+        "--seeds",
+        type=int,
+        nargs="+",
+        default=None,
+        help="[train] Train every representation once per seed (run name suffix _s<seed>). "
+             "Default: a single run without a fixed seed.",
     )
     test_group = parser.add_argument_group("test mode")
     test_group.add_argument("--models-file", default="models/model_params.json",
@@ -118,11 +129,16 @@ def parse_args():
 
 def run_train(args):
     reps = _resolve_representations(args.representation)
+    seeds = args.seeds if args.seeds else [None]
     multi = len(reps) > 1
-    for rep in reps:
-        run_name = f"{args.run_name}_{rep}" if multi else args.run_name
-        print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type}")
-        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type)
+    for seed in seeds:
+        for rep in reps:
+            run_name = f"{args.run_name}_{rep}" if multi else args.run_name
+            if seed is not None:
+                run_name += f"_s{seed}"
+            print(f"[MAIN] Training representation={rep} | seed={seed} | run_name={run_name} | gnn_type={args.gnn_type}")
+            train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
+                  jm_design=args.jm_design, seed=seed)
 
 
 def run_test(args):
@@ -153,6 +169,7 @@ def run_optuna(args):
         smoke=args.smoke,
         representations=reps,
         gnn_type=args.gnn_type,
+        jm_design=args.jm_design,
     )
     param_cli.run_tuning(optuna_args)
 

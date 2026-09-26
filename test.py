@@ -8,7 +8,7 @@ from multiprocessing import Pool
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(__file__))
 
-from src.train import test_model
+from src.train import test_model, is_batching_instance_file, BATCHING_REPRESENTATIONS
 from src.utils import OutputManager, open_dashboard
 
 
@@ -129,7 +129,11 @@ def run_tests(
         filenames.sort()
 
         for file_name in filenames:
-            models = [(v["name"], current_folder, file_name, models_file) for v in model_params]
+            # batching instances (.json) only go to batching models and .fjs files only to
+            # plain FJSP models - the two solve different problems (see test_model)
+            batching_file = is_batching_instance_file(file_name)
+            models = [(v["name"], current_folder, file_name, models_file) for v in model_params
+                      if (v.get("representation") in BATCHING_REPRESENTATIONS) == batching_file]
             if not models:
                 continue
 

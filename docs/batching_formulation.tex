@@ -1,0 +1,425 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+% ---------------------------------------------------------------------------
+% Notation macros
+% ---------------------------------------------------------------------------
+\newcommand{\Jset}{\mathcal{J}}
+\newcommand{\Oset}{\mathcal{O}}
+\newcommand{\Mset}{\mathcal{M}}
+\newcommand{\Fset}{\mathcal{F}}
+\newcommand{\Bset}{\mathcal{B}}
+\newcommand{\Eset}{\mathcal{E}}
+\newcommand{\Vset}{\mathcal{V}}
+\newcommand{\job}{\operatorname{job}}
+\newcommand{\cat}{\,\Vert\,}
+\newcommand{\R}{\mathbb{R}}
+
+\title{Representing the Batching Constraint in a Heterogeneous\\
+Graph for the Flexible Job Shop Problem}
+\author{Mariana Correia}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Base problem and graph}
+\label{sec:base}
+
+\subsection{Flexible Job Shop Problem}
+Let $\Jset=\{1,\dots,n\}$ be the set of jobs and $\Mset=\{1,\dots,m\}$ the set of
+machines. Each job $j\in\Jset$ is an ordered sequence of $n_j$ operations
+$\Oset_j=(O_{j,1},\dots,O_{j,n_j})$, and $\Oset=\bigcup_{j}\Oset_j$.
+For an operation $o=O_{j,k}$ define
+\begin{equation}
+  \job(o)=j, \qquad \kappa(o)=k,
+\end{equation}
+where $\kappa(o)$ is the \emph{order index} of $o$ inside its job.
+Operation $o$ can be processed on any machine of its eligible set
+$\Mset_o\subseteq\Mset$, with processing time $p_{o,\mu}>0$ for $\mu\in\Mset_o$
+(and $p_{o,\mu}=0 \Leftrightarrow \mu\notin\Mset_o$).
+
+\subsection{Heterogeneous graph}
+Following Echeverria (2025), the state is a heterogeneous graph
+$G=(\Vset,\Eset)$ with
+$\Vset=\Vset_J\cup\Vset_O\cup\Vset_M$ (job, operation and machine nodes) and the
+relations
+\begin{itemize}
+  \item $(\text{operation},\textsf{belongs},\text{job})$: $o\to\job(o)$;
+  \item $(\text{operation},\textsf{prec},\text{operation})$: $O_{j,k+1}\to O_{j,k}$, plus self-loops;
+  \item $(\text{operation},\textsf{exec},\text{machine})$ and its reverse: $o\leftrightarrow\mu$ for $\mu\in\Mset_o$, each carrying an attribute vector $\mathbf{a}_{o\mu}\in\R^5$;
+  \item $(\text{job},\textsf{listens},\text{job})$ and $(\text{machine},\textsf{listens},\text{machine})$: fully connected.
+\end{itemize}
+The node features are $\mathbf{x}_j\in\R^4$, $\mathbf{x}_o\in\R^2$ and $\mathbf{x}_\mu\in\R^3$.
+
+% ===========================================================================
+\section{FJSP with batching}
+\label{sec:batching}
+
+\subsection{Families}
+Let $\Fset=\{1,\dots,|\Fset|\}$ be a set of \emph{families} and
+$\varphi:\Oset\to\Fset$ the \emph{family map}. Operations of the same family have
+similar characteristics and may be processed together in a \emph{batch}. Let
+\begin{equation}
+  \Oset^f=\{o\in\Oset:\varphi(o)=f\}.
+\end{equation}
+
+\begin{table}[h]
+\centering
+\caption{Family parameters.}
+\label{tab:family}
+\begin{tabular}{>{$}l<{$} l}
+\toprule
+\text{Symbol} & Meaning \\
+\midrule
+B_f\in\mathbb{N}           & maximum number of operations in a batch of family $f$ \\
+\Delta\in\mathbb{N}        & maximum order difference inside a batch ($\Delta=2$) \\
+\Mset_f=\bigcap_{o\in\Oset^f}\Mset_o & machines eligible for family $f$ (may contain several machines) \\
+\bar p_{f,\mu}=\max_{o\in\Oset^f}p_{o,\mu} & upper bound on the batch processing time of $f$ on $\mu$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two rules define which operations may be processed together:
+\begin{align}
+  |\Oset^f\cap\Oset_j| &\le 1 && \forall f\in\Fset,\ \forall j\in\Jset,
+  \tag{F1}\label{eq:F1}\\
+  |\kappa(o)-\kappa(o')| &\le \Delta && \forall o,o' \text{ in the same batch},
+  \tag{F2}\label{eq:F2}
+\end{align}
+with $\Delta=2$. Rule~\eqref{eq:F1} is a property of the instance: a family
+contains at most one operation from each job. Rule~\eqref{eq:F2} is the
+\emph{order difference} constraint and formalises ``similar characteristics''.
+Two operations can share a batch only if their positions in their jobs' routings
+differ by at most $\Delta$. A family may contain operations that are further apart
+than $\Delta$, but those operations can never be in the same batch.
+Rule~\eqref{eq:F2} is enforced in the model by~\eqref{eq:B2a}. The family defines
+which operations are candidates for batching and the order difference restricts
+which candidates are compatible. For this reason the family feature and the
+batching constraint are introduced together.
+
+\subsection{Mixed-integer formulation}
+For each family $f$, let $\Bset_f=\{1,\dots,|\Oset^f|\}$ be the index set of
+\emph{potential batches}, and $\Bset=\bigcup_f\Bset_f$. Every batch $b\in\Bset_f$
+has family $f(b)=f$. Let $L$ be a sufficiently large constant, for example
+$L=\sum_{o}\max_\mu p_{o,\mu}$.
+Batching is \emph{parallel}: the operations of a batch are processed
+simultaneously on one machine, and the batch lasts as long as its longest
+operation. No setup time is considered.
+
+\paragraph{Decision variables.}
+\begin{itemize}
+  \item $x_{o,b}\in\{0,1\}$: operation $o$ is assigned to batch $b$, defined only for $b\in\Bset_{\varphi(o)}$;
+  \item $u_b\in\{0,1\}$: batch $b$ is used;
+  \item $y_{b,\mu}\in\{0,1\}$: batch $b$ is processed on machine $\mu\in\Mset_{f(b)}$;
+  \item $z_{b,b'}\in\{0,1\}$: batch $b$ precedes batch $b'$ if both are on the same machine;
+  \item $S_b, C_b, p_b\ge 0$: start, completion and processing time of batch $b$;
+  \item $S_o, C_o\ge 0$: start and completion time of operation $o$;
+  \item $C_{\max}\ge 0$: makespan.
+\end{itemize}
+
+\paragraph{Model.}
+\begin{align}
+  \min\ & C_{\max} \label{eq:obj}\\[2pt]
+  \text{s.t.}\
+  & \sum_{b\in\Bset_{\varphi(o)}} x_{o,b} = 1
+    && \forall o\in\Oset \tag{B1}\label{eq:B1}\\
+  & x_{o,b}=0 \quad \text{if } \varphi(o)\neq f(b)
+    && \forall o\in\Oset,\ b\in\Bset \tag{B2}\label{eq:B2}\\
+  & x_{o,b}+x_{o',b} \le 1
+    && \forall b,\ o,o'\in\Oset^{f(b)}:|\kappa(o)-\kappa(o')|>\Delta \tag{B2a}\label{eq:B2a}\\
+  & \sum_{o\in\Oset^{f(b)}} x_{o,b} \le B_{f(b)}\,u_b,\qquad x_{o,b}\le u_b
+    && \forall b\in\Bset,\ o\in\Oset^{f(b)} \tag{B3}\label{eq:B3}\\
+  & \sum_{\mu\in\Mset_{f(b)}} y_{b,\mu} = u_b,\qquad y_{b,\mu}=0\ \ \forall\mu\notin\Mset_{f(b)}
+    && \forall b\in\Bset \tag{B4}\label{eq:B4}\\
+  & p_b \ge p_{o,\mu}\,\bigl(x_{o,b}+y_{b,\mu}-1\bigr)
+    && \forall b,\ o\in\Oset^{f(b)},\ \mu\in\Mset_{f(b)} \tag{B4a}\label{eq:B4a}\\
+  & C_b = S_b + p_b
+    && \forall b\in\Bset \tag{B5}\label{eq:B5}\\
+  & S_b - L(1-x_{o,b}) \le S_o \le S_b + L(1-x_{o,b})
+    && \forall o,\ b\in\Bset_{\varphi(o)} \tag{B5a}\label{eq:B5a}\\
+  & C_b - L(1-x_{o,b}) \le C_o \le C_b + L(1-x_{o,b})
+    && \forall o,\ b\in\Bset_{\varphi(o)} \tag{B5b}\label{eq:B5b}\\
+  & S_{O_{j,k+1}} \ge C_{O_{j,k}}
+    && \forall j\in\Jset,\ k<n_j \tag{B6}\label{eq:B6}\\
+  & S_{b'} \ge C_b - L\bigl(3-y_{b,\mu}-y_{b',\mu}-z_{b,b'}\bigr)
+    && \forall b<b',\ \mu\in\Mset \tag{B7}\label{eq:B7}\\
+  & S_{b} \ge C_{b'} - L\bigl(2-y_{b,\mu}-y_{b',\mu}+z_{b,b'}\bigr)
+    && \forall b<b',\ \mu\in\Mset \tag{B7'}\label{eq:B7b}\\
+  & C_{\max}\ge C_b
+    && \forall b\in\Bset. \label{eq:cmax}
+\end{align}
+
+\paragraph{Interpretation.}
+\begin{itemize}
+  \item \eqref{eq:B1}--\eqref{eq:B2}: every operation belongs to exactly one batch, and every batch contains only one family.
+  \item \eqref{eq:B2a}: order difference. Two operations whose order indices differ by more than $\Delta=2$ cannot be in the same batch. Every batch $b$ therefore satisfies $\max_{o\in b}\kappa(o)-\min_{o\in b}\kappa(o)\le\Delta$.
+  \item \eqref{eq:B3}: batch capacity. Unused batches are empty.
+  \item \eqref{eq:B4}: a family may have several eligible machines ($|\Mset_f|\ge1$), and every used batch is assigned to exactly one of them. This is the flexibility of the FJSP, lifted to the batch level.
+  \item \eqref{eq:B4a}: parallel batching. The batch processing time is the longest processing time among its members on the selected machine, $p_b=\max_{o\in b}p_{o,\mu}$. Minimising $C_{\max}$ drives $p_b$ down to this maximum.
+  \item \eqref{eq:B5}--\eqref{eq:B5b}: all operations of a batch start together and finish together when the longest one finishes.
+  \item \eqref{eq:B6}: routing precedence inside each job.
+  \item \eqref{eq:B7}--\eqref{eq:B7b}: batches that share a machine do not overlap.
+\end{itemize}
+By \eqref{eq:F1} and \eqref{eq:B2}, a batch never contains two operations of the same
+job, so the simultaneity constraints \eqref{eq:B5a}--\eqref{eq:B5b} never conflict
+with the precedence constraint \eqref{eq:B6} inside a batch. Without batching
+($B_f=1$ for all $f$), the model reduces to the classical FJSP.
+
+% ===========================================================================
+\section{Family feature on the existing nodes}
+\label{sec:familyfeature}
+
+The family index is a label that only has meaning inside one instance: family~3 of
+one instance has nothing in common with family~3 of another. Feeding the index to
+the network, as a number or as a learned embedding, would therefore carry no
+transferable information. Which operations share a family is instead encoded
+\emph{structurally}, by the family node (Representation~A) or by the batch edges
+(Representation~B). The existing node features are extended with numeric
+descriptors of the family:
+\begin{align}
+  \text{Operation node:}\quad &
+  \mathbf{x}'_o = \Bigl[\ \mathbf{x}_o \cat \mathbb{1}[\varphi(o)\neq\varnothing] \cat \tfrac{\kappa(o)}{n_{\job(o)}}\ \Bigr],
+  \label{eq:xop}\\
+  \text{Job node:}\quad &
+  \mathbf{x}'_j(t) = \Bigl[\ \mathbf{x}_j(t) \cat \mathbb{1}[\varphi(o_j^t)\neq\varnothing] \cat B_{\varphi(o_j^t)} \cat \pi_j(t)\ \Bigr],
+  \label{eq:xjob}
+\end{align}
+where $\mathbb{1}[\varphi(o)\neq\varnothing]$ indicates that $o$ belongs to a
+family, $o_j^t$ is the next unscheduled operation of job $j$ at decision step $t$,
+$B_{\varphi(o_j^t)}$ is its capacity ($1$ if it has no family), and
+\begin{equation}
+  \pi_j(t)=\min\Bigl(B_{\varphi(o_j^t)}-1,\ \bigl|\{j'\neq j:\ \varphi(o_{j'}^t)=\varphi(o_j^t),\
+  |\kappa(o_{j'}^t)-\kappa(o_j^t)|\le\Delta,\ \Mset_{o_{j'}^t}\cap\Mset_{o_j^t}\neq\emptyset,\
+  r_{j'}\le s_j\}\bigr|\Bigr)
+\end{equation}
+is the number of other jobs that would join the batch if job $j$ were dispatched at
+its earliest start $s_j$ ($r_{j'}$ is the ready time of job $j'$). It follows exactly
+the batch completion rule of Section~\ref{sec:mdp}. The operation's family is static. The job's family is dynamic and changes
+as the job advances through its routing. The normalised order index in
+\eqref{eq:xop} gives the network the information it needs to reason about the
+order difference~\eqref{eq:F2}.
+
+% ===========================================================================
+\section{Representation A: family (batch) node type}
+\label{sec:repA}
+
+A fourth node type is added:
+\begin{equation}
+  \Vset=\Vset_J\cup\Vset_O\cup\Vset_M\cup\Vset_F,\qquad |\Vset_F|=|\Fset|.
+\end{equation}
+Node $f\in\Vset_F$ represents the open batch of family $f$.
+
+\paragraph{Node features.}
+\begin{equation}
+  \mathbf{x}_f(t)=\Bigl[\ B_f \cat \bar p_f \cat \tfrac{|\Mset_f|}{m} \cat \tfrac{n_f(t)}{B_f} \cat \tfrac{\kappa^{\max}_f(t)-\kappa^{\min}_f(t)}{\Delta} \cat \tfrac{r_f(t)}{|\Oset^f|}\ \Bigr],
+  \label{eq:xfam}
+\end{equation}
+with
+\begin{equation}
+  \bar p_f=\frac{1}{|\Mset_f|}\sum_{\mu\in\Mset_f}\bar p_{f,\mu},\qquad
+  R_f(t)=\{o_j^t\in\Oset^f:\ r_j\le t_f\},\qquad
+  n_f(t)=|R_f(t)|,
+\end{equation}
+where $t_f=\min_{j:\,o_j^t\in\Oset^f} s_j$ is the earliest time a batch of $f$
+can start, so $R_f(t)$ holds the members that could share that batch under the
+completion rule of Section~\ref{sec:mdp},
+where $\kappa^{\min}_f(t),\kappa^{\max}_f(t)$ are the smallest and largest order
+indices in $R_f(t)$ and $r_f(t)$ is the number of members not yet scheduled. The
+components are the maximum number of operations, the batch processing time (the
+longest processing time, averaged over the eligible machines), the eligible
+machines, the current fill level, the current order spread and the fraction of
+the family still to be scheduled. The family is identified by the node itself,
+so no identifier feature is needed (Section~\ref{sec:familyfeature}). The fill
+level $n_f(t)/B_f$ is dynamic, and $1-n_f(t)/B_f$ is the remaining capacity. An
+order spread above $1$ means that not all ready operations can share one batch
+because of~\eqref{eq:F2}.
+
+\paragraph{New relations.}
+\begin{align}
+  \Eset_{OF} &= \{(o,\varphi(o)) : o\in\Oset\}
+  && (\text{operation},\textsf{in\_family},\text{family}) \text{ and reverse } \textsf{has},\\
+  \Eset_{FM} &= \{(f,\mu) : f\in\Fset,\ \mu\in\Mset_f\}
+  && (\text{family},\textsf{batch\_exec},\text{machine}) \text{ and reverse},
+\end{align}
+plus a self-loop $(\text{family},\textsf{self},\text{family})$ on every family node,
+so that a family node keeps its own state after all its operations have been
+scheduled. When the last member of a family is scheduled, its
+\textsf{batch\_exec} edges are removed.
+Each $(f,\mu)\in\Eset_{FM}$ carries the machine-specific batch information. It uses
+the same dimension as the existing \textsf{exec} edges:
+\begin{equation}
+  \mathbf{a}_{f\mu}=\Bigl[\ \bar p_{f,\mu},\ \frac{\bar p_{f,\mu}}{\sum_{\mu'\in\Mset_f}\bar p_{f,\mu'}},\ 0,\ 0,\ 0\ \Bigr]\in\R^5,
+\end{equation}
+
+\paragraph{Size.} $|\Eset_{OF}|=|\Oset|$ and $|\Eset_{FM}|=\sum_f|\Mset_f|\le|\Fset|\,m$. The graph grows linearly.
+
+% ===========================================================================
+\section{Representation B: batch edge type}
+\label{sec:repB}
+
+No node type is added. Batch compatibility is encoded directly between operations
+by a new relation $(\text{operation},\textsf{batch},\text{operation})$:
+\begin{equation}
+  \Eset_{OO}^{\mathrm{batch}}=\Bigl\{(o,o')\in\Oset^2:\
+  \varphi(o)=\varphi(o'),\ \job(o)\neq\job(o'),\
+  |\kappa(o)-\kappa(o')|\le\Delta,\
+  \Mset_o\cap\Mset_{o'}\neq\emptyset\Bigr\}.
+  \label{eq:Ebatch}
+\end{equation}
+The relation is symmetric. It has no self-loops, because every operation already
+has one in the \textsf{prec} relation. The condition $|\kappa(o)-\kappa(o')|\le\Delta$ applies the order
+difference~\eqref{eq:F2} directly in the graph. Operations of the same family that
+are more than $\Delta=2$ positions apart are not connected, so the network never
+receives a message suggesting an infeasible batch. A batch is feasible
+under~\eqref{eq:F2} exactly when its operations form a clique in
+$\Eset_{OO}^{\mathrm{batch}}$.
+
+\paragraph{Edge features.}
+\begin{equation}
+  \mathbf{a}_{oo'}=\Bigl[\
+  \tfrac{|\kappa(o)-\kappa(o')|}{\Delta},\
+  \tfrac{|\Mset_o\cap\Mset_{o'}|}{|\Mset_o\cup\Mset_{o'}|},\
+  \tfrac{1}{|\Mset_o\cap\Mset_{o'}|}\textstyle\sum_{\mu\in\Mset_o\cap\Mset_{o'}}\max(p_{o,\mu},p_{o',\mu}),\
+  B_{\varphi(o)},\ 0\ \Bigr]\in\R^5.
+\end{equation}
+The components are the order distance, the machine overlap (Jaccard index), the
+processing time of the pair if batched in parallel (the longer of the two), and
+the capacity. A zero is appended so that all attributed edge types have the same
+dimension. The family has no node of its own in this representation, so its
+batch-level parameters are also appended to the operation features:
+\begin{equation}
+  \mathbf{x}''_o=\Bigl[\ \mathbf{x}'_o \cat B_{\varphi(o)} \cat \bar p_{\varphi(o)}\ \Bigr].
+\end{equation}
+
+\paragraph{Size.}
+$|\Eset_{OO}^{\mathrm{batch}}|\le\sum_f|\Oset^f|\,(|\Oset^f|-1)$, which is
+quadratic in the family size. By \eqref{eq:F1}, $|\Oset^f|\le n$, so the relation
+has at most $|\Fset|\,n^2$ edges.
+
+% ===========================================================================
+\section{Graph attention message passing}
+\label{sec:gat}
+
+Both representations use the same heterogeneous GAT layer. For every relation
+$r=(\tau_s,\rho,\tau_d)$ and edge $(u,v)$ of type $r$, the layer computes
+(GATv2 with edge attributes):
+\begin{align}
+  e^{r}_{uv} &= \mathbf{a}_r^{\top}\,\mathrm{LeakyReLU}\bigl(\mathbf{W}^{r}_{s}\mathbf{h}_u+\mathbf{W}^{r}_{d}\mathbf{h}_v+\mathbf{W}^{r}_{e}\mathbf{a}_{uv}\bigr), \label{eq:gat1}\\
+  \alpha^{r}_{uv} &= \frac{\exp(e^{r}_{uv})}{\sum_{w\in\mathcal{N}_r(v)}\exp(e^{r}_{wv})}, \label{eq:gat2}\\
+  \mathbf{h}^{r}_{v} &= \sum_{u\in\mathcal{N}_r(v)}\alpha^{r}_{uv}\,\mathbf{W}^{r}_{s}\mathbf{h}_u, \label{eq:gat3}\\
+  \mathbf{h}^{(l+1)}_{v} &= \sigma\Bigl(\operatorname*{AGG}_{r:\ \tau_d(r)=\operatorname{type}(v)}\mathbf{h}^{r}_{v}\Bigr), \label{eq:gat4}
+\end{align}
+where the term $\mathbf{W}^{r}_{e}\mathbf{a}_{uv}$ is omitted for relations
+without edge attributes, AGG is a sum or mean over relations, and multi-head
+outputs are concatenated.
+
+\begin{itemize}
+  \item \textbf{Representation A:} information reaches a machine from an operation in two hops (operation $\to$ family $\to$ machine). The attention $\alpha^{\textsf{has}}_{of}$ lets the family node weigh its candidate members, and machines receive batch-level times through $\mathbf{a}_{f\mu}$.
+  \item \textbf{Representation B:} batching information is exchanged in one hop (operation $\leftrightarrow$ operation). The attention coefficient $\alpha^{\textsf{batch}}_{oo'}$ directly scores how suitable it is to batch $o$ with $o'$.
+\end{itemize}
+
+% ===========================================================================
+\section{Consequences for the decision process}
+\label{sec:mdp}
+
+Both representations keep the action space of the operation--job--machine graph.
+The policy scores the $(\text{machine},\textsf{exec},\text{job})$ edges and selects
+one pair $a_t=(\mu,j)$. The two representations therefore differ \emph{only} in
+the graph given to the network, which makes their comparison fair and lets the
+same agent be used for both.
+
+The selected pair opens a batch $b_t$ for the current operation $o=o_j^t$ on
+machine $\mu$, starting at
+\begin{equation}
+  S_{b_t}=\max\bigl(\text{free time of }\mu,\ \text{ready time of } j\bigr).
+\end{equation}
+If $o$ belongs to a family $f$, the environment completes the batch with other
+jobs $j'$ whose current operation $o'=o_{j'}^t$ satisfies
+\begin{equation}
+  \varphi(o')=f,\quad \mu\in\Mset_{o'},\quad \text{ready time of } j'\le S_{b_t},
+\end{equation}
+adding them in order of earliest ready time while
+\begin{equation}
+  |b_t|\le B_f,\qquad \max_{o\in b_t}\kappa(o)-\min_{o\in b_t}\kappa(o)\le\Delta .
+\end{equation}
+A candidate joins only if it is already ready, so joining never delays the batch.
+The batch then occupies $\mu$ during
+$[S_{b_t},\ S_{b_t}+\max_{o\in b_t}p_{o,\mu}]$ (parallel batching), and all of
+its jobs advance to their next operation.
+
+\paragraph{Action-edge features.} After every decision each
+$(\text{machine},\textsf{exec},\text{job})$ edge $(\mu,j)$ is rebuilt with
+\begin{equation}
+  \mathbf{a}_{\mu j}=\bigl[\ p_{b},\ \tfrac{p_{o_j^t,\mu}}{\sum_{\mu'}p_{o_j^t,\mu'}},\ s_{j\mu},\ s_{j\mu}+p_{b},\ s_{j\mu}-\text{free time of }\mu\ \bigr],
+\end{equation}
+where $s_{j\mu}$ is the earliest start of $o_j^t$ on $\mu$. In Representations~A
+and~B, $p_b$ is the processing time of the batch the action would dispatch (its
+longest member), i.e.\ what the action actually costs. The baseline uses the
+individual time $p_{o_j^t,\mu}$, so its graph carries no batching information.
+
+\paragraph{Warm start.} The mask and the dispatch rule used as the warm-start
+teacher are those of the operation--job--machine graph: earliest start time, with
+ties broken by the earliest completion time. Both quantities are visible to the
+network as columns of $\mathbf{a}_{\mu j}$, so the teacher can actually be imitated.
+
+% ===========================================================================
+\section{Comparison}
+\label{sec:comparison}
+
+To measure what each representation contributes, both are compared with a
+\emph{baseline}. The baseline solves the same batching problem with the same
+action space and batch completion rule (Section~\ref{sec:mdp}), but on the
+unchanged operation--job--machine graph of Section~\ref{sec:base}. It has no
+family node, no batch edges and none of the family features of
+Section~\ref{sec:familyfeature}, so the network cannot see which operations can
+be batched. Any improvement of Representation~A or~B over the baseline can
+therefore be attributed to how the batching information is represented.
+
+\begin{table}[h]
+\centering
+\caption{Comparison of the two representations.}
+\label{tab:comparison}
+\begin{tabular}{l p{5.2cm} p{5.2cm}}
+\toprule
+ & A: family node & B: batch edge \\
+\midrule
+New types        & 1 node type, 2 relations (+ reverses) & 1 relation \\
+Number of edges  & $\mathcal{O}\bigl(|\Oset|+\sum_f|\Mset_f|\bigr)$ (linear) & $\mathcal{O}\bigl(\sum_f|\Oset^f|^2\bigr)$ (quadratic in family size) \\
+Order difference $\Delta$ & visible through the order spread feature & built into the edge set \\
+Batch parameters & stored once on the family node and its edges & duplicated on operation nodes and edges \\
+Hops op $\to$ machine & 2 (via family) & 1 (via \textsf{exec}) \\
+Action & (machine, job) + batch completion rule & (machine, job) + batch completion rule \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ===========================================================================
+\section{Illustrative example}
+\label{sec:example}
+
+Consider $n=3$ jobs with four operations each, $m=2$ machines, $B_1=B_2=2$ and
+$\Delta=2$. Two families are shown:
+\[
+  \Oset^1=\{O_{1,1},\,O_{2,2},\,O_{3,4}\},\qquad
+  \Oset^2=\{O_{1,3},\,O_{2,3}\}.
+\]
+The remaining operations are singleton families. Assume all operations in these
+families are eligible on both machines, and let $p_{O_{1,1},1}=5$ and $p_{O_{2,2},1}=8$.
+\begin{itemize}
+  \item \eqref{eq:F1} holds: each family has at most one operation per job.
+  \item Order difference in $\Oset^1$: $|1-2|=1\le2$ and $|2-4|=2\le2$ are compatible, but $|1-4|=3>2$, so $O_{1,1}$ and $O_{3,4}$ can never share a batch. By~\eqref{eq:B2a}, the feasible batches of size two are $\{O_{1,1},O_{2,2}\}$ and $\{O_{2,2},O_{3,4}\}$.
+  \item In $\Oset^2$, $|3-3|=0$, so $\{O_{1,3},O_{2,3}\}$ is feasible.
+  \item Parallel batching: if $\{O_{1,1},O_{2,2}\}$ runs on machine 1, then $p_b=\max(5,8)=8$ and both operations finish at $S_b+8$.
+  \item Representation A adds two family nodes and $|\Eset_{OF}|=5$ edges, one per operation. It also adds edges to the two machines from each family.
+  \item Representation B adds the directed edges $O_{1,1}\leftrightarrow O_{2,2}$ and $O_{2,2}\leftrightarrow O_{3,4}$ in family 1 (not $O_{1,1}\leftrightarrow O_{3,4}$), plus $O_{1,3}\leftrightarrow O_{2,3}$ in family 2. That is 6 edges, excluding self-loops.
+\end{itemize}
+
+\end{document}

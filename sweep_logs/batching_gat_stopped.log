@@ -1,0 +1,64 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+======================================================================
+[PARAM] Hyperparameter tuning runner (Optuna)
+[PARAM] Representations : ['OJMB_NODE', 'OJMB_EDGE', 'OJMB_BASE']
+[PARAM] Trials          : 5
+[PARAM] Max episodes    : 200
+[PARAM] Objective       : min(last_val_gap_Q80)
+[PARAM] Storage         : sqlite:///D:/Dissertação/dissertation-bopo_introduction/optuna_batching.db
+======================================================================
+[I 2026-09-26 15:13:54,905] A new study created in RDB with name: fjsp_tuning_ojmb_node
+[PARAM] Starting Optuna study for OJMB_NODE | gnn_type=gat | study_name=fjsp_tuning_ojmb_node | trials=5 | max_episodes=200 | objective=min(last_val_gap_Q80)
+[PARAM] Critical params (OJMB_NODE): ['lr', 'hidden_channels', 'batch_size', 'num_layers', 'heads', 'n_cases', 'new_freq', 'K', 'use_greedy', 'mask_option', 'sel_k']
+[PARAM][OJMB_NODE] Trial 0 | gnn_type=gat | episodes=200 | lr=7.97e-04 | hidden=256 | layers=2 | heads=4 | K=16 | use_greedy=True | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-26 15:13:55
+[TRAIN] Hyperparams | max_steps=200 | new_freq=100
+[TRAIN]             | n_cases=40 | B=128 | K=16 | use_greedy=True | lr=0.0007965261308120511 (decaying to 1.59e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=2 | heads=4
+[TRAIN]             | logp_norm=mean | exclude_greedy_from_loss=True
+[TRAIN] Representation | ojmb_node | GNN | gat | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\optuna_ojmb_node_gat_1790432032\trial_0
+[TRAIN] Validation config | every=10 steps | instances=20 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=10 | bc_loss=2.8491 | decisions=35
+[TRAIN][WARMSTART] step 10/100 | instance=23 | bc_loss=3.1974 | decisions=51
+[TRAIN][WARMSTART] step 15/100 | instance=35 | bc_loss=2.7178 | decisions=45
+[TRAIN][WARMSTART] step 20/100 | instance=8 | bc_loss=3.1306 | decisions=55
+[TRAIN][WARMSTART] step 25/100 | instance=23 | bc_loss=3.1061 | decisions=51
+[TRAIN][WARMSTART] step 30/100 | instance=12 | bc_loss=2.4775 | decisions=48
+[TRAIN][WARMSTART] step 35/100 | instance=0 | bc_loss=2.8059 | decisions=43
+[TRAIN][WARMSTART] step 40/100 | instance=0 | bc_loss=2.7579 | decisions=43
+[TRAIN][WARMSTART] step 45/100 | instance=23 | bc_loss=2.9622 | decisions=51
+[TRAIN][WARMSTART] step 50/100 | instance=30 | bc_loss=2.3060 | decisions=49
+[TRAIN][WARMSTART] step 55/100 | instance=14 | bc_loss=2.9697 | decisions=54
+[TRAIN][WARMSTART] step 60/100 | instance=21 | bc_loss=2.7312 | decisions=48
+[TRAIN][WARMSTART] step 65/100 | instance=24 | bc_loss=2.9591 | decisions=49
+[TRAIN][WARMSTART] step 70/100 | instance=31 | bc_loss=2.9369 | decisions=41
+[TRAIN][WARMSTART] step 75/100 | instance=0 | bc_loss=2.7139 | decisions=43
+[TRAIN][WARMSTART] step 80/100 | instance=6 | bc_loss=2.7363 | decisions=49
+[TRAIN][WARMSTART] step 85/100 | instance=15 | bc_loss=2.5714 | decisions=46
+[TRAIN][WARMSTART] step 90/100 | instance=10 | bc_loss=2.3178 | decisions=35
+[TRAIN][WARMSTART] step 95/100 | instance=18 | bc_loss=2.8792 | decisions=41
+[TRAIN][WARMSTART] step 100/100 | instance=34 | bc_loss=2.5467 | decisions=45
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 200 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/200 | 15:20:48
+[TRAIN] Step 1 | Loss=0.702001 | Best makespan in group=602.00
+[TRAIN] Step 2/200 | 15:23:30
+[TRAIN] Step 2 | Loss=0.568841 | Best makespan in group=516.00
+[TRAIN] Step 3/200 | 15:25:13
+[TRAIN] Step 3 | Loss=0.631929 | Best makespan in group=501.00
+[TRAIN] Step 4/200 | 15:27:54
+[TRAIN] Step 4 | Loss=0.666360 | Best makespan in group=538.00
+[TRAIN] Step 5/200 | 15:29:39
+[TRAIN] Step 5 | Loss=0.618622 | Best makespan in group=625.00
+[TRAIN] Step 6/200 | 15:31:19
+[TRAIN] Step 6 | Loss=1.077928 | Best makespan in group=530.00
+[TRAIN] Step 7/200 | 15:33:19

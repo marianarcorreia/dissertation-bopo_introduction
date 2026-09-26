@@ -1,0 +1,571 @@
+{
+  "status": "FEASIBLE",
+  "makespan": 384,
+  "best_bound": 351,
+  "wall_time": 30.040410400000003,
+  "num_batches": 45,
+  "num_multi_op_batches": 10,
+  "final_schedule": [
+    {
+      "job": 0,
+      "operation": 0,
+      "op_id": 0,
+      "family": 13,
+      "batch": 24,
+      "machine": 5,
+      "start": 0,
+      "end": 98
+    },
+    {
+      "job": 0,
+      "operation": 1,
+      "op_id": 1,
+      "family": 12,
+      "batch": 22,
+      "machine": 5,
+      "start": 98,
+      "end": 121
+    },
+    {
+      "job": 0,
+      "operation": 2,
+      "op_id": 2,
+      "family": 8,
+      "batch": 17,
+      "machine": 3,
+      "start": 235,
+      "end": 309
+    },
+    {
+      "job": 0,
+      "operation": 3,
+      "op_id": 3,
+      "family": -1,
+      "batch": 25,
+      "machine": 3,
+      "start": 309,
+      "end": 327
+    },
+    {
+      "job": 0,
+      "operation": 4,
+      "op_id": 4,
+      "family": 5,
+      "batch": 10,
+      "machine": 5,
+      "start": 330,
+      "end": 372
+    },
+    {
+      "job": 1,
+      "operation": 0,
+      "op_id": 5,
+      "family": -1,
+      "batch": 26,
+      "machine": 3,
+      "start": 0,
+      "end": 83
+    },
+    {
+      "job": 1,
+      "operation": 1,
+      "op_id": 6,
+      "family": 5,
+      "batch": 11,
+      "machine": 2,
+      "start": 91,
+      "end": 136
+    },
+    {
+      "job": 1,
+      "operation": 2,
+      "op_id": 7,
+      "family": 8,
+      "batch": 18,
+      "machine": 0,
+      "start": 141,
+      "end": 200
+    },
+    {
+      "job": 1,
+      "operation": 3,
+      "op_id": 8,
+      "family": 0,
+      "batch": 0,
+      "machine": 5,
+      "start": 206,
+      "end": 262
+    },
+    {
+      "job": 1,
+      "operation": 4,
+      "op_id": 9,
+      "family": 9,
+      "batch": 19,
+      "machine": 1,
+      "start": 262,
+      "end": 306
+    },
+    {
+      "job": 2,
+      "operation": 0,
+      "op_id": 10,
+      "family": 10,
+      "batch": 20,
+      "machine": 0,
+      "start": 0,
+      "end": 49
+    },
+    {
+      "job": 2,
+      "operation": 1,
+      "op_id": 11,
+      "family": -1,
+      "batch": 27,
+      "machine": 1,
+      "start": 56,
+      "end": 132
+    },
+    {
+      "job": 2,
+      "operation": 2,
+      "op_id": 12,
+      "family": 3,
+      "batch": 7,
+      "machine": 2,
+      "start": 136,
+      "end": 235
+    },
+    {
+      "job": 2,
+      "operation": 3,
+      "op_id": 13,
+      "family": 8,
+      "batch": 17,
+      "machine": 3,
+      "start": 235,
+      "end": 309
+    },
+    {
+      "job": 2,
+      "operation": 4,
+      "op_id": 14,
+      "family": 2,
+      "batch": 4,
+      "machine": 1,
+      "start": 309,
+      "end": 371
+    },
+    {
+      "job": 2,
+      "operation": 5,
+      "op_id": 15,
+      "family": 6,
+      "batch": 13,
+      "machine": 1,
+      "start": 371,
+      "end": 384
+    },
+    {
+      "job": 3,
+      "operation": 0,
+      "op_id": 16,
+      "family": 13,
+      "batch": 24,
+      "machine": 5,
+      "start": 0,
+      "end": 98
+    },
+    {
+      "job": 3,
+      "operation": 1,
+      "op_id": 17,
+      "family": -1,
+      "batch": 28,
+      "machine": 5,
+      "start": 121,
+      "end": 181
+    },
+    {
+      "job": 3,
+      "operation": 2,
+      "op_id": 18,
+      "family": -1,
+      "batch": 29,
+      "machine": 5,
+      "start": 181,
+      "end": 205
+    },
+    {
+      "job": 3,
+      "operation": 3,
+      "op_id": 19,
+      "family": 12,
+      "batch": 23,
+      "machine": 2,
+      "start": 235,
+      "end": 256
+    },
+    {
+      "job": 3,
+      "operation": 4,
+      "op_id": 20,
+      "family": -1,
+      "batch": 30,
+      "machine": 4,
+      "start": 268,
+      "end": 285
+    },
+    {
+      "job": 3,
+      "operation": 5,
+      "op_id": 21,
+      "family": -1,
+      "batch": 31,
+      "machine": 0,
+      "start": 285,
+      "end": 363
+    },
+    {
+      "job": 4,
+      "operation": 0,
+      "op_id": 22,
+      "family": 13,
+      "batch": 24,
+      "machine": 5,
+      "start": 0,
+      "end": 98
+    },
+    {
+      "job": 4,
+      "operation": 1,
+      "op_id": 23,
+      "family": 12,
+      "batch": 22,
+      "machine": 5,
+      "start": 98,
+      "end": 121
+    },
+    {
+      "job": 4,
+      "operation": 2,
+      "op_id": 24,
+      "family": 4,
+      "batch": 9,
+      "machine": 4,
+      "start": 121,
+      "end": 204
+    },
+    {
+      "job": 4,
+      "operation": 3,
+      "op_id": 25,
+      "family": 3,
+      "batch": 8,
+      "machine": 0,
+      "start": 205,
+      "end": 285
+    },
+    {
+      "job": 4,
+      "operation": 4,
+      "op_id": 26,
+      "family": 5,
+      "batch": 12,
+      "machine": 5,
+      "start": 285,
+      "end": 330
+    },
+    {
+      "job": 4,
+      "operation": 5,
+      "op_id": 27,
+      "family": 7,
+      "batch": 15,
+      "machine": 4,
+      "start": 336,
+      "end": 382
+    },
+    {
+      "job": 5,
+      "operation": 0,
+      "op_id": 28,
+      "family": -1,
+      "batch": 32,
+      "machine": 1,
+      "start": 0,
+      "end": 56
+    },
+    {
+      "job": 5,
+      "operation": 1,
+      "op_id": 29,
+      "family": -1,
+      "batch": 33,
+      "machine": 0,
+      "start": 56,
+      "end": 78
+    },
+    {
+      "job": 5,
+      "operation": 2,
+      "op_id": 30,
+      "family": 7,
+      "batch": 16,
+      "machine": 4,
+      "start": 83,
+      "end": 120
+    },
+    {
+      "job": 5,
+      "operation": 3,
+      "op_id": 31,
+      "family": -1,
+      "batch": 34,
+      "machine": 3,
+      "start": 162,
+      "end": 225
+    },
+    {
+      "job": 5,
+      "operation": 4,
+      "op_id": 32,
+      "family": -1,
+      "batch": 35,
+      "machine": 5,
+      "start": 262,
+      "end": 284
+    },
+    {
+      "job": 5,
+      "operation": 5,
+      "op_id": 33,
+      "family": 11,
+      "batch": 21,
+      "machine": 3,
+      "start": 327,
+      "end": 383
+    },
+    {
+      "job": 6,
+      "operation": 0,
+      "op_id": 34,
+      "family": -1,
+      "batch": 36,
+      "machine": 4,
+      "start": 12,
+      "end": 82
+    },
+    {
+      "job": 6,
+      "operation": 1,
+      "op_id": 35,
+      "family": 1,
+      "batch": 2,
+      "machine": 3,
+      "start": 83,
+      "end": 155
+    },
+    {
+      "job": 6,
+      "operation": 2,
+      "op_id": 36,
+      "family": -1,
+      "batch": 37,
+      "machine": 3,
+      "start": 155,
+      "end": 162
+    },
+    {
+      "job": 6,
+      "operation": 3,
+      "op_id": 37,
+      "family": -1,
+      "batch": 38,
+      "machine": 4,
+      "start": 204,
+      "end": 268
+    },
+    {
+      "job": 6,
+      "operation": 4,
+      "op_id": 38,
+      "family": -1,
+      "batch": 39,
+      "machine": 4,
+      "start": 285,
+      "end": 336
+    },
+    {
+      "job": 7,
+      "operation": 0,
+      "op_id": 39,
+      "family": -1,
+      "batch": 40,
+      "machine": 2,
+      "start": 1,
+      "end": 17
+    },
+    {
+      "job": 7,
+      "operation": 1,
+      "op_id": 40,
+      "family": -1,
+      "batch": 41,
+      "machine": 0,
+      "start": 90,
+      "end": 108
+    },
+    {
+      "job": 7,
+      "operation": 2,
+      "op_id": 41,
+      "family": 2,
+      "batch": 5,
+      "machine": 1,
+      "start": 133,
+      "end": 187
+    },
+    {
+      "job": 7,
+      "operation": 3,
+      "op_id": 42,
+      "family": 1,
+      "batch": 3,
+      "machine": 1,
+      "start": 187,
+      "end": 259
+    },
+    {
+      "job": 7,
+      "operation": 4,
+      "op_id": 43,
+      "family": 7,
+      "batch": 15,
+      "machine": 4,
+      "start": 336,
+      "end": 382
+    },
+    {
+      "job": 7,
+      "operation": 5,
+      "op_id": 44,
+      "family": -1,
+      "batch": 42,
+      "machine": 4,
+      "start": 382,
+      "end": 384
+    },
+    {
+      "job": 8,
+      "operation": 0,
+      "op_id": 45,
+      "family": 10,
+      "batch": 20,
+      "machine": 0,
+      "start": 0,
+      "end": 49
+    },
+    {
+      "job": 8,
+      "operation": 1,
+      "op_id": 46,
+      "family": 5,
+      "batch": 11,
+      "machine": 2,
+      "start": 91,
+      "end": 136
+    },
+    {
+      "job": 8,
+      "operation": 2,
+      "op_id": 47,
+      "family": 3,
+      "batch": 7,
+      "machine": 2,
+      "start": 136,
+      "end": 235
+    },
+    {
+      "job": 8,
+      "operation": 3,
+      "op_id": 48,
+      "family": 2,
+      "batch": 6,
+      "machine": 2,
+      "start": 261,
+      "end": 321
+    },
+    {
+      "job": 8,
+      "operation": 4,
+      "op_id": 49,
+      "family": 0,
+      "batch": 1,
+      "machine": 2,
+      "start": 330,
+      "end": 384
+    },
+    {
+      "job": 9,
+      "operation": 0,
+      "op_id": 50,
+      "family": -1,
+      "batch": 43,
+      "machine": 4,
+      "start": 0,
+      "end": 12
+    },
+    {
+      "job": 9,
+      "operation": 1,
+      "op_id": 51,
+      "family": -1,
+      "batch": 44,
+      "machine": 2,
+      "start": 17,
+      "end": 77
+    },
+    {
+      "job": 9,
+      "operation": 2,
+      "op_id": 52,
+      "family": 6,
+      "batch": 14,
+      "machine": 2,
+      "start": 77,
+      "end": 91
+    },
+    {
+      "job": 9,
+      "operation": 3,
+      "op_id": 53,
+      "family": 4,
+      "batch": 9,
+      "machine": 4,
+      "start": 121,
+      "end": 204
+    },
+    {
+      "job": 9,
+      "operation": 4,
+      "op_id": 54,
+      "family": 9,
+      "batch": 19,
+      "machine": 1,
+      "start": 262,
+      "end": 306
+    },
+    {
+      "job": 9,
+      "operation": 5,
+      "op_id": 55,
+      "family": 11,
+      "batch": 21,
+      "machine": 3,
+      "start": 327,
+      "end": 383
+    }
+  ],
+  "check_errors": []
+}

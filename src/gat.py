@@ -12,9 +12,15 @@ def _dbg(level, *args, **kwargs):
 
 #GAT
 class GAT(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2):
+    """legacy=True rebuilds the original architecture (8-dim input projection, conv
+    layers stacked with no activation in between) so checkpoints trained with it still
+    load - see model_version in train.py/test_model. The default projects the input to
+    hidden_channels and applies tanh between conv layers, so stacked layers no longer
+    collapse into a single (near-)linear map of the 8 projected features."""
+    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2, legacy = False):
         super().__init__()
-        self.lin1 = Linear(-1, 8) #camada linear inicial, -1 porque significa que se infere automaticamente o tamanho de entrada, e 8 apenas pq dava.
+        self.legacy = legacy
+        self.lin1 = Linear(-1, 8 if legacy else hidden_channels) #camada linear inicial, -1 porque significa que se infere automaticamente o tamanho de entrada
         self.s = torch.nn.Softmax(dim=0) #softmax para as atenções
         self.tanh = nn.Tanh() #função de ativação
         self.num_layers = num_layers
@@ -26,10 +32,12 @@ class GAT(torch.nn.Module):
 
     def forward(self, x, edge_index, edge_attr_dict):
         _dbg(3, f"  GAT.forward | x.shape={x.shape}")
-        x = self.lin1(x) #features projetadas para a dimensão 8
+        x = self.lin1(x) #features projetadas para a dimensão de entrada
         x = self.tanh(x) #função de ativação - introduz não linearidade e mantem valores entre -1 e 1
-        for conv in self.convs:
+        for i, conv in enumerate(self.convs):
             x = conv(x, edge_index, edge_attr_dict)
+            if not self.legacy and i < len(self.convs) - 1:
+                x = self.tanh(x) #não linearidade entre camadas
         #ativação final - após todas as camadas de conv. Embeding adequados para serem usados pelo ator.
         x = self.tanh(x)
         _dbg(3, f"  GAT.forward done | out.shape={x.shape}")

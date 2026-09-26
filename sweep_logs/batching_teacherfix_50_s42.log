@@ -1,0 +1,35 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-09-26 21:37:41
+[MAIN] mode=train
+[MAIN] run_name=batching_teacherfix_50steps
+[MAIN] representation(s)=['ojmb_node', 'ojmb_edge']
+[MAIN] gnn_type=gat
+============================================================
+[MAIN] Training representation=ojmb_node | seed=42 | run_name=batching_teacherfix_50steps_ojmb_node_s42 | gnn_type=gat
+============================================================
+[TRAIN] Training started at: 2026-09-26 21:37:42
+[TRAIN] Hyperparams | max_steps=50 | new_freq=500
+[TRAIN]             | n_cases=100 | B=64 | K=16 | use_greedy=True | lr=0.0005 (decaying to 1.00e-04)
+[TRAIN]             | warm_start_steps=200 | checkpoint_smooth_window=3 | seed=42
+[TRAIN]             | hidden_channels=128 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=mean | exclude_greedy_from_loss=True
+[TRAIN] Representation | ojmb_node | GNN | gat | jm_design | edges
+[TRAIN] Device | cuda:0 (NVIDIA GeForce GTX 1650 Ti)
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\batching_teacherfix_50steps_ojmb_node_s42
+[TRAIN] Validation config | every=20 steps | instances=20 (representative subset)
+[TRAIN][TEACHER] validation avg_gap=0.3088 | q80_gap=0.4844 || test avg_gap=0.2976 | q80_gap=0.3712
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 200 step(s)...
+[TRAIN][WARMSTART] step 10/200 | instance=13 | bc_loss=3.4704 | decisions=49
+[TRAIN][WARMSTART] step 20/200 | instance=79 | bc_loss=2.9033 | decisions=40
+[TRAIN][WARMSTART] step 30/200 | instance=73 | bc_loss=3.2490 | decisions=48
+[TRAIN][WARMSTART] step 40/200 | instance=66 | bc_loss=3.0277 | decisions=52
+[TRAIN][WARMSTART] step 50/200 | instance=85 | bc_loss=2.4613 | decisions=45
+[TRAIN][WARMSTART] step 60/200 | instance=10 | bc_loss=1.5333 | decisions=44
+[TRAIN][WARMSTART] step 70/200 | instance=8 | bc_loss=2.2109 | decisions=37
+[TRAIN][WARMSTART] step 80/200 | instance=79 | bc_loss=1.7673 | decisions=40
+[TRAIN][WARMSTART] step 90/200 | instance=66 | bc_loss=2.0839 | decisions=52
+[TRAIN][WARMSTART] step 100/200 | instance=13 | bc_loss=1.6850 | decisions=49

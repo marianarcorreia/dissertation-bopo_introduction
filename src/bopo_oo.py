@@ -33,12 +33,12 @@ else:
     _dbg(1, "Device set to: cpu")
 
 class ActorModel(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat'):
+    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat', gat_legacy = False):
         super().__init__()
         _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
         #modelo gnn homogeneo, apenas processa um tipo de no e de aresta
         if gnn_type == 'gat':
-            self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+            self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads, legacy=gat_legacy)
         elif gnn_type == 'gin':
             self.gnn = GINModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
         elif gnn_type == 'transformer':
@@ -72,10 +72,10 @@ class ActorModel(torch.nn.Module):
 
 
 class Policy(nn.Module):
-    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat'):
+    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat', gat_legacy = False):
         super(Policy, self).__init__()
         _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
-        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type)
+        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type, gat_legacy=gat_legacy)
         self.metadata = metadata
         self.soft = torch.nn.Softmax(dim=0)
 
@@ -147,7 +147,7 @@ class BOPO:
     def __init__(self, lr, env, metadata, hidden_channels=128, num_layers=2, heads=3,
                  B=16, K=8, use_greedy=True, gnn_type='gat',
                  logp_norm='mean', exclude_greedy_from_loss=True,
-                 memory_efficient=True, grad_chunk=256):
+                 memory_efficient=True, grad_chunk=256, gat_legacy=False):
         _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type} | logp_norm={logp_norm} | exclude_greedy_from_loss={exclude_greedy_from_loss}")
 
         self.env = env
@@ -164,7 +164,7 @@ class BOPO:
         self.memory_efficient = memory_efficient
         self.grad_chunk = grad_chunk
 
-        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type).to(device)
+        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type, gat_legacy=gat_legacy).to(device)
         self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
 
     #inferência de uma única trajetória (usada por test_model/run_validation) - mantém a

@@ -1,10 +1,17 @@
-"""Optuna tuner entrypoint for FJSP representations (OO, OM, OJM).
+"""Optuna tuner entrypoint for FJSP representations (OO, OM, OJM) and for the FJSP with
+parallel batching (OJMB_NODE, OJMB_EDGE, OJMB_BASE - see src/env_batching.py).
 
 Usage:
         python param.py
         python param.py --representations OO OM OJM --trials 25 --max-episodes 400
         python param.py --representations OJM --trials 30 --storage sqlite:///optuna.db
+        python param.py --representations batching --trials 30 --storage sqlite:///optuna.db
         python param.py --smoke --representations OO OM OJM
+
+Group names: 'all' = oo, om, ojm; 'batching' = ojmb_node, ojmb_edge, ojmb_base.
+Batching representations use the same search space as OJM, train on batching instances
+(src/batch_generator.py) and validate/test on the fixed split of
+data/batching/batching_dataset.json (built by src/generate_batching_dataset.py).
 
 What this script does:
         1. Creates one Optuna study per selected representation.
@@ -52,8 +59,10 @@ from typing import Dict, List, Optional
 import numpy as np
 import optuna
 
-from src.train import train
+from src.train import train, expand_representations, BATCHING_REPRESENTATIONS, REPRESENTATION_CHOICES, JM_DESIGN_CHOICES
 from src.utils import open_dashboard, generate_fixed_splits
+
+BATCHING_DATASET = Path("data/batching/batching_dataset.json")
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -90,9 +99,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--smoke", action="store_true",
                         help="Quick end-to-end test mode with minimal workload.")
     parser.add_argument("--representations", nargs="+", default=["oo", "om", "ojm"],
-                        help="Representations to tune, any of: oo, om, ojm (default: all three).")
+                        type=str.lower, choices=list(REPRESENTATION_CHOICES),
+                        help="Representations to tune: oo, om, ojm, ojmb_node, ojmb_edge, ojmb_base, "
+                             "or the groups 'all' (oo, om, ojm) and 'batching' (the three batching "
+                             "ones). Default: oo om ojm.")
     parser.add_argument("--gnn-type", default="gat", choices=["gat", "gin", "transformer"],
                         help="GNN backbone used by the actor for every trial (default: gat).")
+    parser.add_argument("--jm-design", default="auto", choices=list(JM_DESIGN_CHOICES),
+                        help="Job-machine action edges of the ojm-based representations "
+                             "(default auto: 'edges' for ojm/batching, 'baseline' for oo/om).")
     parser.add_argument("--no-dashboard", action="store_true",
                         help="Do not auto-launch/open the results dashboard when tuning finishes.")
     return parser.parse_args()
@@ -112,13 +127,29 @@ def _normalize_storage_url(storage: Optional[str]) -> Optional[str]:
 
 # ── prerequisites ─────────────────────────────────────────────────────────────
 
-def ensure_prerequisites(validation_size: int, rebuild_validation_set: bool) -> None:
+def ensure_prerequisites(validation_size: int, rebuild_validation_set: bool,
+                         reps: Optional[List[str]] = None) -> None:
     os.makedirs("results", exist_ok=True)
     os.makedirs("candidate_models", exist_ok=True)
 
     model_params_path = Path("candidate_models/model_params.json")
     if not model_params_path.exists():
         model_params_path.write_text("[]")
+
+    reps = list(reps) if reps is not None else ["oo", "om", "ojm"]
+    if any(r in BATCHING_REPRESENTATIONS for r in reps):
+        # fixed by construction (see src.utils.load_batching_splits) - nothing to rebuild here
+        if not BATCHING_DATASET.exists():
+            raise FileNotFoundError(
+                f"{BATCHING_DATASET} not found - build it first with "
+                "`python -m src.generate_batching_dataset --n-cases 40 --time-limit 30 --seed 0`."
+            )
+        n = len(json.loads(BATCHING_DATASET.read_text()))
+        if 2 * validation_size > n:
+            raise ValueError(f"--validation-size={validation_size} needs {2 * validation_size} batching "
+                             f"instances (validation + test) but {BATCHING_DATASET} has {n}.")
+    if all(r in BATCHING_REPRESENTATIONS for r in reps):
+        return
 
     val_path = Path("val/validation_dataset.json")
     test_path = Path("val/test_dataset.json")
@@ -308,6 +339,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
             run_name         = run_name,
             representation   = rep,
             gnn_type         = gnn_type,
+            jm_design        = getattr(args, "jm_design", "auto"),
         )
 
         q80 = last_val_q80(run_name)
@@ -361,7 +393,7 @@ def run_tuning(args: Optional[argparse.Namespace] = None) -> List[Dict]:
     if args is None:
         args = parse_args()
     args.storage = _normalize_storage_url(args.storage)
-    reps = [r.lower().strip() for r in args.representations]
+    reps = expand_representations(args.representations)
 
     print("=" * 70)
     print("[PARAM] Hyperparameter tuning runner (Optuna)")
@@ -372,7 +404,7 @@ def run_tuning(args: Optional[argparse.Namespace] = None) -> List[Dict]:
     print(f"[PARAM] Storage         : {args.storage or 'in-memory (not persistent)'}")
     print("=" * 70)
 
-    ensure_prerequisites(args.validation_size, args.rebuild_validation_set)
+    ensure_prerequisites(args.validation_size, args.rebuild_validation_set, reps)
 
     output_dir = Path("results") / "optuna"
     output_dir.mkdir(parents=True, exist_ok=True)
