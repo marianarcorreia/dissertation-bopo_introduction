@@ -22,6 +22,7 @@ def _cache_data(**kwargs):
         return _identity
     return st.cache_data(**kwargs)
 
+RUN_GROUP_DIRS = ("blocking",)  # folders of results/ that group runs instead of being one
 RESULTS_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "results")
 )
@@ -88,14 +89,22 @@ def _detect_run_type(path: str) -> str:
 def list_all_runs() -> list[dict]:
     """Return a list of metadata dicts for every subfolder in results/, plus a
     synthetic entry for any legacy `results_*.json` test-score files sitting
-    directly in results/ (predating the per-run-folder OutputManager layout)."""
+    directly in results/ (predating the per-run-folder OutputManager layout).
+    Runs of the blocking representations live one level deeper, in results/blocking/
+    (src/train.py:output_paths), and are listed as 'blocking/<run>'."""
     runs = []
     if not os.path.isdir(RESULTS_DIR):
         return runs
 
     loose_files = _test_score_files(RESULTS_DIR)
+    entries = []
     for folder in sorted(os.listdir(RESULTS_DIR)):
         path = os.path.join(RESULTS_DIR, folder)
+        if folder in RUN_GROUP_DIRS and os.path.isdir(path):
+            entries += [(f"{folder}/{sub}", os.path.join(path, sub)) for sub in sorted(os.listdir(path))]
+        else:
+            entries.append((folder, path))
+    for folder, path in entries:
         if not os.path.isdir(path):
             continue
         run_type = _detect_run_type(path)

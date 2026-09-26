@@ -60,7 +60,7 @@ from typing import Dict, List, Optional
 import numpy as np
 import optuna
 
-from src.train import train
+from src.train import output_paths, train
 from src.utils import open_dashboard, generate_fixed_splits
 
 
@@ -217,28 +217,29 @@ def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
 
 # ── objective helpers ─────────────────────────────────────────────────────────
 
-def _run_path(run_name: str) -> Path:
-    """Resolve the output directory for a run_name that may be 'study/trial_N'."""
-    return Path("results") / run_name
+def _run_path(run_name: str, rep: str = "") -> Path:
+    """Resolve the output directory for a run_name that may be 'study/trial_N' (blocking
+    representations write under results/blocking/, see src/train.py:output_paths)."""
+    return Path(output_paths(rep)["results"]) / run_name
 
 
-def read_run_summary(run_name: str) -> Dict:
-    direct = _run_path(run_name) / "run_summary.json"
+def read_run_summary(run_name: str, rep: str = "") -> Dict:
+    direct = _run_path(run_name, rep) / "run_summary.json"
     if direct.exists():
         return json.loads(direct.read_text())
     raise FileNotFoundError(f"No run_summary.json found at: {direct}")
 
 
-def read_validation_history(run_name: str) -> List[Dict]:
+def read_validation_history(run_name: str, rep: str = "") -> List[Dict]:
     """Return the validation_history.json list for the given run, or [] if missing."""
-    direct = _run_path(run_name) / "validation_history.json"
+    direct = _run_path(run_name, rep) / "validation_history.json"
     if direct.exists():
         return json.loads(direct.read_text())
     return []
 
 
-def last_val_q80(run_name: str) -> float:
-    history = read_validation_history(run_name)
+def last_val_q80(run_name: str, rep: str = "") -> float:
+    history = read_validation_history(run_name, rep)
     if not history:
         raise RuntimeError(f"Validation history is empty for run: {run_name}")
     last_entry = history[-1]
@@ -319,11 +320,11 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
             gnn_type         = gnn_type,
         )
 
-        q80 = last_val_q80(run_name)
+        q80 = last_val_q80(run_name, rep)
 
         # Also read summary for ancillary attrs
         try:
-            summary = read_run_summary(run_name)
+            summary = read_run_summary(run_name, rep)
         except FileNotFoundError:
             summary = {}
 

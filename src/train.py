@@ -56,6 +56,27 @@ os.makedirs('models', exist_ok=True)
 
 #cria lista de instancias sinteticas com base na configuração
 BLOCKING_REPRESENTATIONS = ("ojmb", "ojmd", "ojm_blk")
+# The blocking representations solve a different problem on different instances, so their
+# runs and models are kept apart: results/blocking/, candidate_models/blocking/ and
+# models/blocking/ (each with its own model_params.json). The others keep the original folders.
+BLOCKING_SUBDIR = "blocking"
+
+
+def output_paths(representation):
+    """Folders for a representation's results, candidate checkpoints and best models."""
+    sub = BLOCKING_SUBDIR if representation.lower().strip() in BLOCKING_REPRESENTATIONS else ""
+    paths = {
+        "results": os.path.join("results", sub) if sub else "results",
+        "candidate_models": os.path.join("candidate_models", sub) if sub else "candidate_models",
+        "models": os.path.join("models", sub) if sub else "models",
+    }
+    for key in ("candidate_models", "models"):
+        os.makedirs(paths[key], exist_ok=True)
+        params = os.path.join(paths[key], "model_params.json")
+        if not os.path.exists(params):
+            with open(params, "w") as f:
+                f.write("[]")
+    return paths
 
 
 def _dataset_paths(rep_name):
@@ -112,7 +133,9 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         if rep_name not in ("ojm",) + BLOCKING_REPRESENTATIONS:
             raise ValueError(f"jm_design={jm_design!r} only applies to the ojm representation")
         jm_kwargs = {"jm_design": jm_design}
-    output_manager = OutputManager(output_dir="results", run_name=run_name)
+    paths = output_paths(rep_name)
+    candidate_params_path = os.path.join(paths["candidate_models"], "model_params.json")
+    output_manager = OutputManager(output_dir=paths["results"], run_name=run_name)
     print(f"[TRAIN] Output run folder: {output_manager.run_dir}")
     run_start_time = time.time()
     validation_set = build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg, **_dataset_paths(rep_name))
@@ -252,7 +275,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
 
                 name = str(int(random.uniform(10**10, 10**15)))
                 print(f"[TRAIN] Validation improved | smoothed_avg_gap={best_avg_gap:.4f} (raw={validation_avg_gap:.4f}) | saving candidate: {name}.pth")
-                with open('candidate_models/model_params.json', 'r') as infile:
+                with open(candidate_params_path, 'r') as infile:
                     model_params = json.load(infile)
 
                 model_params.append({
@@ -276,12 +299,12 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
                     "episode": step_number,
                 })
 
-                with open('candidate_models/model_params.json', 'w') as outfile:
+                with open(candidate_params_path, 'w') as outfile:
                     json.dump(model_params, outfile)
 
-                best_model_path = "candidate_models/" + name + ".pth"
+                best_model_path = os.path.join(paths["candidate_models"], name + ".pth")
                 bopo_agent.save(best_model_path)
-                shutil.copy(best_model_path, "models/" + name + ".pth")
+                shutil.copy(best_model_path, os.path.join(paths["models"], name + ".pth"))
 
         episode_entry = {
             "episode": step_number,

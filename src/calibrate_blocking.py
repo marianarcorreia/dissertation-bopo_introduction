@@ -122,7 +122,7 @@ def stage2(n, seed, top, time_limit, max_swaps):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n", 1)[0])
     parser.add_argument("--stage", type=int, choices=(1, 2), required=True)
     parser.add_argument("--n", type=int, default=10, help="instances per setting")
     parser.add_argument("--seed", type=int, default=2026)

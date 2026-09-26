@@ -10,19 +10,24 @@ from src.train import train
 from src.utils import open_dashboard
 
 ALL_REPRESENTATIONS = ["oo", "om", "ojm"]
+# blocking FJSP with finite buffers (src/env_blocking.py): buffers as a new node type (ojmb),
+# as dummy machines (ojmd), and the plain OJM graph on the same blocking problem (ojm_blk)
+BLOCKING_REPRESENTATIONS = ["ojmb", "ojmd", "ojm_blk"]
+# 'all' keeps its original meaning (the three non-blocking representations): the blocking
+# ones solve a different problem on different instances, so they are grouped separately
+REPRESENTATION_GROUPS = {"all": ALL_REPRESENTATIONS, "blocking": BLOCKING_REPRESENTATIONS}
+DEFAULT_REPRESENTATIONS = ["oo"]
 
 
 def _resolve_representations(values):
-    """Expand 'all' into every representation and de-duplicate, preserving order."""
+    """Expand 'all' / 'blocking' into their representations and de-duplicate, preserving
+    order. None (no --representation given) means the default."""
     reps = []
-    for v in values:
+    for v in values or DEFAULT_REPRESENTATIONS:
         v = v.lower().strip()
-        if v == "all":
-            for r in ALL_REPRESENTATIONS:
-                if r not in reps:
-                    reps.append(r)
-        elif v not in reps:
-            reps.append(v)
+        for r in REPRESENTATION_GROUPS.get(v, [v]):
+            if r not in reps:
+                reps.append(r)
     return reps
 
 
@@ -47,12 +52,14 @@ def parse_args():
     parser.add_argument(
         "--representation",
         nargs="+",
-        default=["oo"],
-        choices=["oo", "om", "ojm", "all"],
+        default=None,
+        choices=ALL_REPRESENTATIONS + BLOCKING_REPRESENTATIONS + list(REPRESENTATION_GROUPS),
         help="Graph representation(s) to use: oo (operation-only), om (operation-machine), "
-             "ojm (operation-job-machine). Pass several values, or 'all', to run every "
-             "representation in one invocation. Used by train and optuna modes; test mode "
-             "evaluates whichever models are listed in --models-file regardless of this flag.",
+             "ojm (operation-job-machine); blocking FJSP: ojmb (buffer node type), ojmd (buffers "
+             "as dummy machines), ojm_blk (plain OJM graph on the blocking problem). Pass several "
+             "values, 'all' (oo om ojm) or 'blocking' (ojmb ojmd ojm_blk). Default: oo. "
+             "[test] Only the models of these representations in --models-file are evaluated "
+             "(default: every model); blocking and non-blocking models cannot be mixed.",
     )
     parser.add_argument(
         "--max-episodes",
@@ -69,15 +76,18 @@ def parse_args():
              "(TransformerConv, multi-head query/key/value attention with edge features).",
     )
     test_group = parser.add_argument_group("test mode")
-    test_group.add_argument("--models-file", default="models/model_params.json",
-                             help="[test] Path to model_params.json.")
+    test_group.add_argument("--models-file", default=None,
+                             help="[test] Path to model_params.json (default: models/model_params.json, "
+                                  "or models/blocking/model_params.json with --representation blocking).")
     test_group.add_argument("--source-folder", default="val",
                              help="[test] Base folder containing test subfolders "
                                   "(e.g. val, data/test, data/benchmarks).")
-    test_group.add_argument("--folders", default="instances",
-                             help="[test] Comma-separated subfolder names inside --source-folder.")
-    test_group.add_argument("--output-dir", default="results",
-                             help="[test] Folder where result JSON files are written.")
+    test_group.add_argument("--folders", default=None,
+                             help="[test] Comma-separated subfolder names inside --source-folder "
+                                  "(default: instances, or blocking_test_instances for blocking models).")
+    test_group.add_argument("--output-dir", default=None,
+                             help="[test] Folder where result JSON files are written "
+                                  "(default: results, or results/blocking for blocking models).")
     test_group.add_argument("--output-prefix", default="results",
                              help="[test] Prefix used in output file names.")
     test_group.add_argument("--workers", type=int, default=0,
@@ -135,6 +145,7 @@ def run_test(args):
         output_dir=args.output_dir,
         output_prefix=args.output_prefix,
         workers=args.workers,
+        representations=_resolve_representations(args.representation) if args.representation else None,
     )
 
 
@@ -166,7 +177,7 @@ if __name__ == "__main__":
     print(f"[MAIN] Run started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"[MAIN] mode={args.mode}")
     print(f"[MAIN] run_name={args.run_name}")
-    if args.mode in ("train", "optuna"):
+    if args.mode in ("train", "optuna") or args.representation:
         print(f"[MAIN] representation(s)={_resolve_representations(args.representation)}")
     if args.mode in ("train", "optuna"):
         print(f"[MAIN] gnn_type={args.gnn_type}")

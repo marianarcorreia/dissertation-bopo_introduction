@@ -8,7 +8,7 @@ from multiprocessing import Pool
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(__file__))
 
-from src.train import test_model
+from src.train import BLOCKING_REPRESENTATIONS, test_model
 from src.utils import OutputManager, open_dashboard
 
 
@@ -21,8 +21,9 @@ def parse_args():
     )
     parser.add_argument(
         "--models-file",
-        default="models/model_params.json",
-        help="Path to model_params.json.",
+        default=None,
+        help="Path to model_params.json (default: models/model_params.json, or "
+             "models/blocking/model_params.json when --representation selects blocking models).",
     )
     parser.add_argument(
         "--source-folder",
@@ -31,13 +32,15 @@ def parse_args():
     )
     parser.add_argument(
         "--folders",
-        default="instances",
-        help="Comma-separated subfolder names inside source-folder.",
+        default=None,
+        help="Comma-separated subfolder names inside source-folder (default: instances, or "
+             "blocking_test_instances for blocking models).",
     )
     parser.add_argument(
         "--output-dir",
-        default="results",
-        help="Folder where result JSON files are written.",
+        default=None,
+        help="Folder where result JSON files are written (default: results, or results/blocking "
+             "for blocking models).",
     )
     parser.add_argument(
         "--output-prefix",
@@ -51,11 +54,53 @@ def parse_args():
         help="Parallel workers. 0 means one worker per model.",
     )
     parser.add_argument(
+        "--representation",
+        nargs="+",
+        default=None,
+        help="Only evaluate the models of these representations (default: every model in "
+             "--models-file). Blocking (ojmb, ojmd, ojm_blk) and non-blocking models cannot be mixed.",
+    )
+    parser.add_argument(
         "--no-dashboard",
         action="store_true",
         help="Do not auto-launch/open the results dashboard when the run finishes.",
     )
     return parser.parse_args()
+
+
+def expand_representations(representations):
+    """'all' -> oo om ojm, 'blocking' -> ojmb ojmd ojm_blk; None stays None (no filter)."""
+    if not representations:
+        return None
+    groups = {"all": ("oo", "om", "ojm"), "blocking": BLOCKING_REPRESENTATIONS}
+    return {r for v in representations for r in groups.get(v.lower(), (v.lower(),))}
+
+
+def default_test_paths(representations):
+    """Blocking models live in models/blocking/, are tested on the blocking test instances and
+    write to results/blocking/ (see src/train.py:output_paths); everything else as before."""
+    wanted = expand_representations(representations)
+    if wanted and wanted <= set(BLOCKING_REPRESENTATIONS):
+        return {"models_file": "models/blocking/model_params.json",
+                "folders": "blocking_test_instances", "output_dir": "results/blocking"}
+    return {"models_file": "models/model_params.json", "folders": "instances", "output_dir": "results"}
+
+
+def select_models(model_params, representations=None):
+    """Models to evaluate: those of the given representations (all if None). The score of an
+    instance is the best makespan over these models, so they must all solve the same problem:
+    a blocking makespan and a non-blocking one cannot be compared."""
+    wanted = expand_representations(representations)
+    if wanted:
+        model_params = [p for p in model_params if p.get("representation", "oo") in wanted]
+    blocking = {p.get("representation", "oo") in BLOCKING_REPRESENTATIONS for p in model_params}
+    if len(blocking) > 1:
+        raise ValueError("--models-file mixes blocking (ojmb/ojmd/ojm_blk) and non-blocking models; "
+                         "select one group with --representation.")
+    if blocking == {True}:
+        print("[TEST] Blocking models: evaluate them on blocking instances, e.g. "
+              "--source-folder val --folders blocking_test_instances")
+    return model_params
 
 
 def multi_run_wrapper(args):
@@ -91,23 +136,33 @@ def _safe_name(value):
 
 def run_tests(
     run_name="test_run",
-    models_file="models/model_params.json",
+    models_file=None,
     source_folder="val",
-    folders="instances",
-    output_dir="results",
+    folders=None,
+    output_dir=None,
     output_prefix="results",
     workers=0,
+    representations=None,
 ):
     """Programmatic entry point for testing (used by both this script's CLI and
     main.py). Returns the OutputManager's run_dir for the completed run."""
     start = time.time()
+    defaults = default_test_paths(representations)
+    models_file = models_file or defaults["models_file"]
+    folders = folders or defaults["folders"]
+    output_dir = output_dir or defaults["output_dir"]
+    print(f"[TEST] models_file={models_file} | folders={folders} | output_dir={output_dir}")
 
     output_manager = OutputManager(output_dir=output_dir, run_name=run_name)
     print(f"[TEST] run_name={run_name}")
     print(f"[TEST] Output run folder: {output_manager.run_dir}")
 
     with open(models_file, "r") as infile:
-        model_params = json.load(infile)
+        model_params = select_models(json.load(infile), representations)
+    if not model_params:
+        raise ValueError(f"No model in {models_file} matches representation(s) {representations}. "
+                         f"Training lists its checkpoints in candidate_models/[blocking/]model_params.json; "
+                         f"copy the chosen entries into {models_file} or pass --models-file.")
 
     folder_paths = _parse_folders(folders)
     if not folder_paths:
@@ -129,7 +184,10 @@ def run_tests(
         filenames.sort()
 
         for file_name in filenames:
-            models = [(v["name"], current_folder, file_name, models_file) for v in model_params]
+            # representation passed explicitly so test_model builds the right env even for
+            # entries saved without a "representation" key
+            models = [(v["name"], current_folder, file_name, models_file, v.get("representation", "oo"))
+                      for v in model_params]
             if not models:
                 continue
 
@@ -180,6 +238,7 @@ if __name__ == "__main__":
         output_dir=args.output_dir,
         output_prefix=args.output_prefix,
         workers=args.workers,
+        representations=args.representation,
     )
 
     if not args.no_dashboard:

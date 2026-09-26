@@ -154,15 +154,15 @@ class FJSPEnvBlocking(FJSSPEnv):
         self.num_blocked = 0  # completions that found the output buffer full (machine blocked)
         self.status = [FUTURE] * N
         self.assigned = [-1] * N
-        self.start = [None] * N
-        self.end = [None] * N
+        self.start: list[float | None] = [None] * N
+        self.end: list[float | None] = [None] * N
         self.entry = [0.0] * N
-        self.routed_at = [None] * N  # time the part entered its machine's input buffer
-        self.depart = [None] * N     # time the part left its machine (later than end if held)
-        self.in_queue = [[] for _ in range(M)]
-        self.out_queue = [[] for _ in range(M)]
-        self.running = [None] * M
-        self.held = [None] * M
+        self.routed_at: list[float | None] = [None] * N  # time the part entered its machine's input buffer
+        self.depart: list[float | None] = [None] * N     # time the part left its machine (later than end if held)
+        self.in_queue: list[list[int]] = [[] for _ in range(M)]
+        self.out_queue: list[list[int]] = [[] for _ in range(M)]
+        self.running: list[int | None] = [None] * M
+        self.held: list[int | None] = [None] * M
         self.busy_time = [0.0] * M
         self.job_next = [0] * self.num_jobs
         self.job_done = [False] * self.num_jobs
@@ -212,8 +212,8 @@ class FJSPEnvBlocking(FJSSPEnv):
     def _free_output_slot(self, m):
         """A slot of m's output buffer became free: a part held on m (if any) moves into it,
         which unblocks m."""
-        if self.held[m] is not None and len(self.out_queue[m]) < self.out_cap:
-            o = self.held[m]
+        o = self.held[m]
+        if o is not None and len(self.out_queue[m]) < self.out_cap:
             self.held[m] = None
             self.depart[o] = self.t
             self.status[o] = OUTBUF
@@ -222,6 +222,7 @@ class FJSPEnvBlocking(FJSSPEnv):
 
     def _finish(self, m):
         o = self.running[m]
+        assert o is not None
         self.running[m] = None
         j = self.op_job[o]
         self.depart[o] = self.t
@@ -247,11 +248,12 @@ class FJSPEnvBlocking(FJSSPEnv):
                 return
             if self._any_legal():
                 return
-            running = [m for m in range(self.num_machines) if self.running[m] is not None]
-            if running:
-                self.t = min(self.end[self.running[m]] for m in running)
-                for m in running:
-                    if self.end[self.running[m]] <= self.t:
+            ends = {m: e for m, o in enumerate(self.running)
+                    if o is not None and (e := self.end[o]) is not None}
+            if ends:
+                self.t = min(ends.values())
+                for m, e in ends.items():
+                    if e <= self.t:
                         self._finish(m)
                 continue
             # nothing processing and no legal routing: circular blocking
@@ -265,8 +267,8 @@ class FJSPEnvBlocking(FJSSPEnv):
         Ties between equally short cycles: smallest total processing time of the moved parts."""
         succ = {}
         for a in range(self.num_machines):
-            if self.held[a] is not None:
-                o = self.held[a]
+            o = self.held[a]
+            if o is not None:
                 nxt = self.jobs[self.op_job[o]][self.op_pos[o] + 1]
                 succ[a] = [int(b) for b in np.nonzero(self.proc[nxt])[0]]
         best, best_key = None, None
@@ -296,6 +298,7 @@ class FJSPEnvBlocking(FJSSPEnv):
             cost = 0.0
             for i, a in enumerate(cycle):
                 o = self.held[a]
+                assert o is not None
                 nxt = self.jobs[self.op_job[o]][self.op_pos[o] + 1]
                 cost += float(self.proc[nxt, cycle[(i + 1) % len(cycle)]])
             key = (len(cycle), cost)
@@ -309,6 +312,7 @@ class FJSPEnvBlocking(FJSSPEnv):
         moved = []
         for a in cycle:  # every machine of the cycle releases its held part...
             o = self.held[a]
+            assert o is not None
             self.held[a] = None
             self.depart[o] = self.t
             self.status[o] = GONE
@@ -357,6 +361,7 @@ class FJSPEnvBlocking(FJSSPEnv):
             o = self.running[m]
             if o is not None:
                 free = self.end[o]
+                assert free is not None
                 proj_end[o] = free
             for o in self.in_queue[m]:
                 free += float(self.proc[o, m])
@@ -424,7 +429,8 @@ class FJSPEnvBlocking(FJSSPEnv):
             ready = 0.0
             if k > 0:
                 prev = self.jobs[j][k - 1]
-                ready = self.end[prev] if self.end[prev] is not None else proj_end.get(prev, self.t)
+                end = self.end[prev]
+                ready = end if end is not None else proj_end.get(prev, self.t)
             job_x[j, 1] = ready
             job_x[j, 2] = len(self.jobs[j]) - k
             job_x[j, 3] = self.all_pendings[self.jobs[j][k]]
@@ -495,6 +501,7 @@ class FJSPEnvBlocking(FJSSPEnv):
         elif self.blocking_repr == "dummy":
             self._add_dummy_machines(data, idx)
         self.state = data
+        self._legal_matrix = legal
         self.calculate_mask(legal)
 
     _DYNAMIC_FIELDS = ("t", "status", "assigned", "start", "end", "entry", "routed_at", "depart",
@@ -609,9 +616,11 @@ class FJSPEnvBlocking(FJSSPEnv):
         dummy_loops = torch.arange(M, 3 * M).repeat(2, 1)
         data['machine', 'listens', 'machine'].edge_index = torch.cat([listens, dummy_loops], dim=1)
 
-    def calculate_mask(self, legal=None):
+    def calculate_mask(self, legal: torch.Tensor | None = None):
         """Same per-job top-sel_k rule as src/env.py, restricted to the routings that the
-        buffers currently allow."""
+        buffers currently allow (legal defaults to the matrix of the last _build_state)."""
+        if legal is None:
+            legal = self._legal_matrix
         if self.mask_option == 0:
             mask_matrix = self.job_start_machines.clone()
         else:
