@@ -1,3 +1,4 @@
+import contextlib
 from typing import Optional
 import torch
 import torch.nn as nn
@@ -8,7 +9,7 @@ import random
 import os
 from torch.nn.parameter import UninitializedBuffer, UninitializedParameter
 
-from src.bopo_utils import bopo_group_loss, summarize_action_entropy, compute_actor_grad_norm
+from src.bopo_utils import bopo_group_loss, summarize_action_entropy, compute_actor_grad_norm, masked_chosen_logprobs, memory_efficient_update
 from src.gat import GAT
 from src.gine import GINModel
 from src.transformer import TransformerModel
@@ -130,10 +131,21 @@ class Policy(nn.Module):
         return torch.stack(actions), torch.stack(logprobs), torch.stack(entropies), valid_counts
 
 
+    def chosen_logprobs(self, batched_state, actions):
+        """log-prob of the given action of every graph in a batch, with gradient (used by the
+        memory-efficient update, src/bopo_utils.py:memory_efficient_update). actions[g] is an
+        index among graph g's own ('machine','exec','operation') edges."""
+        store = batched_state[('machine', 'exec', 'operation')]
+        graph = batched_state["machine"].batch[store.edge_index[0]]
+        mask = store.mask
+        return masked_chosen_logprobs(self.actor(batched_state).T[0], graph, mask, actions)
+
+
 class BOPO:
     def __init__(self, lr, env, metadata, hidden_channels=128, num_layers=2, heads=3,
                  B=16, K=8, use_greedy=True, gnn_type='gat',
-                 logp_norm='mean', exclude_greedy_from_loss=True):
+                 logp_norm='mean', exclude_greedy_from_loss=True,
+                 memory_efficient=True, grad_chunk=256):
         _dbg(1, f"BOPO.__init__ | lr={lr} | B={B} | K={K} | use_greedy={use_greedy} | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type} | logp_norm={logp_norm} | exclude_greedy_from_loss={exclude_greedy_from_loss}")
 
         self.env = env
@@ -145,6 +157,10 @@ class BOPO:
             raise ValueError(f"logp_norm must be 'mean' or 'sum', got {logp_norm!r}")
         self.logp_norm = logp_norm
         self.exclude_greedy_from_loss = exclude_greedy_from_loss
+        # memory_efficient (default): two-pass update with the same gradient as the original one
+        # (src/bopo_utils.py:memory_efficient_update); False restores the single-pass update
+        self.memory_efficient = memory_efficient
+        self.grad_chunk = grad_chunk
 
         self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type).to(device)
         self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
@@ -162,7 +178,9 @@ class BOPO:
     #passo a passo mas fazendo UM forward pass do GNN em batch por passo (uma cópia por
     #env.step, como o ambiente já suportava para uma única trajetória). O gradiente é
     #mantido ao longo de todo o rollout - a SROLoss usa diretamente estas log-probs.
-    def sample_group(self, instance_index):
+    def sample_group(self, instance_index, record=False):
+        """record=True: sampled without gradients; also returns, per rollout, the list of
+        (normalised state, chosen action) needed to recompute the log-probs later."""
         env_cls = type(self.env)
         rollout_envs = [env_cls(self.env.instances, self.env.mask_option, self.env.sel_k) for _ in range(self.B)]
         states = [e.reset(sel_index=instance_index) for e in rollout_envs]
@@ -173,6 +191,8 @@ class BOPO:
         rounds = 0
         all_entropies = []
         all_valid_counts = []
+        trajectories: list = [[] for _ in range(self.B)]
+        grad_context = torch.no_grad() if record else contextlib.nullcontext()
 
         while active:
             norm_states = [self.env.normalize_state(states[i]).to(device) for i in active]
@@ -183,10 +203,13 @@ class BOPO:
                 greedy_flags = [False] * len(active)
                 greedy_flags[active.index(0)] = True
 
-            actions, logprobs, entropies, valid_counts = self.policy.act_batch(batched, greedy_flags)
+            with grad_context:
+                actions, logprobs, entropies, valid_counts = self.policy.act_batch(batched, greedy_flags)
 
             still_active = []
             for j, i in enumerate(active):
+                if record:
+                    trajectories[i].append((norm_states[j], int(actions[j])))
                 lp = logprobs[j]
                 prev = logp_sum[i]
                 logp_sum[i] = lp if prev is None else prev + lp
@@ -218,11 +241,17 @@ class BOPO:
             logp_total = logp_total / torch.tensor(logp_count, dtype=logp_total.dtype, device=logp_total.device)
         entropy_stats = summarize_action_entropy(all_entropies, all_valid_counts)
         _dbg(2, f"  sample_group | instance={instance_index} | rounds={rounds} | makespans min/mean/max={float(makespans.min()):.2f}/{float(makespans.mean()):.2f}/{float(makespans.max()):.2f}")
+        if record:
+            return logp_total, makespans, rounds, entropy_stats, trajectories, logp_count
         return logp_total, makespans, rounds, entropy_stats
 
     #um passo de treino do BOPO: amostra o grupo de B soluções, auto-rotula pares
     #(melhor vs. K-1 piores) e otimiza a SROLoss (loss de ranking, sem critic/vantagem).
     def update(self, instance_index):
+        if self.memory_efficient:
+            loss_val, best_ms, rounds, stats = memory_efficient_update(self, instance_index)
+            _dbg(1, f"BOPO.update() done (memory-efficient) | instance={instance_index} | loss={loss_val:.6f} | best_makespan={best_ms:.2f} | rounds={rounds}")
+            return loss_val, best_ms, rounds, stats
         logp_total, makespans, rounds, entropy_stats = self.sample_group(instance_index)
 
         # rollout 0 is the greedy one whenever use_greedy (see sample_group)

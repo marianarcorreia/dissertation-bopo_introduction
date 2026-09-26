@@ -239,3 +239,70 @@ def summarize_action_entropy(entropies, valid_counts):
         "action_entropy_max_entropy_normalized": mean(normalized),
         "action_entropy_effective_action_count": mean(effective_counts),
     }
+
+
+def masked_chosen_logprobs(logits, graph, mask, actions):
+    """log pi(action_g | state_g) for every graph g of a PyG batch, with gradient - the same
+    masked softmax as each Policy.act_batch(), computed for all graphs at once.
+
+    Args:
+        logits: (N,) action scores of the whole batch (one per action node or action edge).
+        graph: (N,) index of the graph each score belongs to (scores of one graph are
+            contiguous, as PyG batches them).
+        mask: (N,) True = action not allowed.
+        actions: per graph, the index of the chosen action among that graph's own actions.
+    """
+    num_graphs = len(actions)
+    logits = logits.masked_fill(mask, float("-inf"))
+    g_max = torch.full((num_graphs,), float("-inf"), device=logits.device)
+    g_max = g_max.scatter_reduce(0, graph, logits.detach(), reduce="amax")
+    g_sum = torch.zeros(num_graphs, device=logits.device).index_add(0, graph, torch.exp(logits - g_max[graph]))
+    log_norm = g_max + torch.log(g_sum)
+    counts = torch.bincount(graph, minlength=num_graphs)
+    offsets = torch.cumsum(counts, 0) - counts
+    chosen = offsets + torch.tensor(actions, device=logits.device)
+    return logits[chosen] - log_norm
+
+
+def memory_efficient_update(agent, instance_index):
+    """BOPO update with the same gradient as the standard one, without keeping the autograd
+    graph of all B rollouts x every decision in memory at once (13-23 GB on the blocking
+    instances, ~2.5 GB with this). Works for every representation: the agent only needs
+    sample_group(instance_index, record=True) and policy.chosen_logprobs(batch, actions).
+
+    The loss L depends on the parameters only through the trajectory log-likelihoods
+    logp_i, so dL/dtheta = sum_i (dL/dlogp_i) * dlogp_i/dtheta:
+      1. sample the B trajectories without gradients, recording (state, action) pairs;
+      2. evaluate the loss on the detached logp_i to get the weights dL/dlogp_i;
+      3. recompute logp_i with gradients in chunks of agent.grad_chunk decisions and
+         backpropagate sum_i weight_i * logp_i chunk by chunk (gradients accumulate).
+    Sampling draws the same random numbers as the standard update and nothing changes the
+    parameters between the passes, so trajectories are identical and the gradient equal up
+    to floating-point summation order (verified against the original implementation).
+    """
+    from torch_geometric.data import Batch
+
+    logp_total, makespans, rounds, entropy_stats, trajectories, logp_count = agent.sample_group(instance_index, record=True)
+
+    greedy_idx = 0 if agent.use_greedy else None
+    logp_leaf = logp_total.detach().clone().requires_grad_(True)
+    loss, loss_stats = bopo_group_loss(logp_leaf, makespans, agent.K, greedy_idx, agent.exclude_greedy_from_loss)
+    entropy_stats.update(loss_stats)
+    (weights,) = torch.autograd.grad(loss, logp_leaf)
+    if agent.logp_norm == "mean":  # logp_total was divided by each rollout's decision count
+        weights = weights / torch.tensor(logp_count, dtype=weights.dtype, device=weights.device)
+
+    items = [(float(weights[i]), state, action)
+             for i, trajectory in enumerate(trajectories) if float(weights[i]) != 0.0
+             for state, action in trajectory]
+    agent.optimizer.zero_grad()
+    for start in range(0, len(items), agent.grad_chunk):
+        chunk = items[start:start + agent.grad_chunk]
+        logp = agent.policy.chosen_logprobs(Batch.from_data_list([s for _, s, _ in chunk]),
+                                            [a for _, _, a in chunk])
+        w = torch.tensor([w for w, _, _ in chunk], dtype=logp.dtype, device=logp.device)
+        (w * logp).sum().backward()
+    entropy_stats["actor_grad_norm"] = compute_actor_grad_norm(agent.policy.actor)
+    agent.optimizer.step()
+    return float(loss.item()), float(makespans.min().item()), rounds, entropy_stats
+
