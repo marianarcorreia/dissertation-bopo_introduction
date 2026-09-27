@@ -78,6 +78,17 @@ def test_bounds_and_scores():
     bottleneck = {"jobs": [[0], [1], [2], [3]], "operations": [[3, 0], [3, 0], [3, 0], [0, 1]]}
     assert lower_bound(bottleneck) == 9.0
     assert lower_bound(bottleneck, exhaustive_up_to=0) == 9.0  # eligibility sets only
+    # the same 3 operations in one family batched 3 at a time: one 3-long batch is enough
+    batched = dict(bottleneck, family=[0, 0, 0, -1], capacities=[3])
+    assert lower_bound(batched) == 3.0
+
+
+def test_steps_grouped_by_decision():
+    # the last two entries are one decision (batch 1): one violating decision out of 2
+    sched = [dict(TOY_OK[0], batch=0), dict(TOY_OK[1], batch=1), dict(TOY_OK[2], batch=1, end=9)]
+    c = check_schedule(TOY, sched, step_key="batch")
+    assert c["n_steps"] == 2 and c["n_violating_steps"] == 1 and c["violation_rate_per_step"] == 0.5
+    assert check_schedule(TOY, sched)["n_steps"] == 3
     assert math.isclose(relative_error(6, 5), 0.2) and relative_error(6, None) is None
     assert scheduling_score(10, 5, True) == 0.5 and scheduling_score(10, 5, False) == 0.0
     m = schedule_metrics(TOY, TOY_OK)
