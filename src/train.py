@@ -24,13 +24,22 @@ from src.batch_generator import generate_batching_instance_list
 # + batch edge (ojmb_edge), or unchanged as the comparison baseline (ojmb_base).
 # Trained and validated on batching instances (data/batching) instead of plain FJSP ones.
 BATCHING_REPRESENTATIONS = ("ojmb_node", "ojmb_edge", "ojmb_base")
+# FJSP with batching AND transport (docs/transport_formulation.tex): every batching
+# representation (node / edge / base) crossed with every transport one - t0 (none), tf
+# (features), te (auxiliary edges). Trained and validated on transport instances (data/transport).
+TRANSPORT_REPRESENTATIONS = tuple(f"ojmb_{b}_{t}" for b in ("node", "edge", "base") for t in ("t0", "tf", "te"))
+TRANSPORT_DATASET = "data/transport/batching_dataset.json"
+# everything that runs on the batching env (json instances, batch per decision)
+BATCHED_REPRESENTATIONS = BATCHING_REPRESENTATIONS + TRANSPORT_REPRESENTATIONS
 FJSP_REPRESENTATIONS = ("oo", "om", "ojm")
 # Group names accepted wherever representations are listed (main.py, param.py).
-REPRESENTATION_GROUPS = {"all": FJSP_REPRESENTATIONS, "batching": BATCHING_REPRESENTATIONS}
-REPRESENTATION_CHOICES = FJSP_REPRESENTATIONS + BATCHING_REPRESENTATIONS + tuple(REPRESENTATION_GROUPS)
+REPRESENTATION_GROUPS = {"all": FJSP_REPRESENTATIONS, "batching": BATCHING_REPRESENTATIONS,
+                         "transport": TRANSPORT_REPRESENTATIONS}
+REPRESENTATION_CHOICES = (FJSP_REPRESENTATIONS + BATCHING_REPRESENTATIONS + TRANSPORT_REPRESENTATIONS
+                          + tuple(REPRESENTATION_GROUPS))
 
 
-OJM_BASED_REPRESENTATIONS = ("ojm",) + BATCHING_REPRESENTATIONS
+OJM_BASED_REPRESENTATIONS = ("ojm",) + BATCHED_REPRESENTATIONS
 JM_DESIGN_CHOICES = ("auto", "baseline", "edges", "attn")
 # Version of the actor architecture written into model_params (see GAT(legacy=...)):
 # entries without it were trained with the original 8-dim, no-inter-layer-activation GAT.
@@ -73,6 +82,9 @@ def _resolve_representation_modules(representation: str):
         "ojmb_edge": ("src.env_batching", "FJSPBatchEdgeEnv", "src.bopo", "BOPO"),
         "ojmb_base": ("src.env_batching", "FJSPBatchBaseEnv", "src.bopo", "BOPO"),
     }
+    from src.env_batching import TRANSPORT_ENVS
+    for name, class_name in TRANSPORT_ENVS.items():
+        rep_map[name] = ("src.env_batching", class_name, "src.bopo", "BOPO")
     if rep not in rep_map:
         raise ValueError(f"Unsupported representation '{representation}'. Use one of: {', '.join(rep_map)}")
 
@@ -88,10 +100,10 @@ os.makedirs('candidate_models', exist_ok=True)
 os.makedirs('models', exist_ok=True)
 
 #cria lista de instancias sinteticas com base na configuração
-def generate_train_instances(train_config, batching=False):
-    _dbg(1, f"generate_train_instances | config={train_config} | batching={batching}")
+def generate_train_instances(train_config, batching=False, transport_rho=None):
+    _dbg(1, f"generate_train_instances | config={train_config} | batching={batching} | transport_rho={transport_rho}")
     if batching:
-        return generate_batching_instance_list(**train_config)
+        return generate_batching_instance_list(**train_config, transport_rho=transport_rho)
     list_instances = generate_instance_list(**train_config)
     instances = []
     for instance in list_instances:
@@ -127,7 +139,8 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     print(f"[TRAIN] Problem size | jobs=[{j_min},{j_max}] | machines=[{m_min},{m_max}] | ops_per_job=[5,{op_max}] | max_proc={max_processing}")
     print("=" * 60)
     rep_name, EnvClass, BOPOClass = _resolve_representation_modules(representation)
-    batching = rep_name in BATCHING_REPRESENTATIONS
+    batching = rep_name in BATCHED_REPRESENTATIONS
+    transport = rep_name in TRANSPORT_REPRESENTATIONS
     # only passed when set, so om/oo envs (which don't take it) are built exactly as before
     jm_kwargs = {}
     if jm_design != "baseline":
@@ -138,7 +151,8 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     print(f"[TRAIN] Output run folder: {output_manager.run_dir}")
     run_start_time = time.time()
     if batching:
-        validation_set, test_set = load_batching_splits(validation_size, validation_size)
+        validation_set, test_set = load_batching_splits(
+            validation_size, validation_size, **({"path": TRANSPORT_DATASET} if transport else {}))
     else:
         validation_set = build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg)
         test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg)
@@ -166,7 +180,9 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         "max_processing": max_processing
     }
 
-    instances = generate_train_instances(train_config, batching)
+    # training instances use the same transport scale as the validation / test dataset
+    transport_rho = validation_set[0]["transport_rho"] if transport else None
+    instances = generate_train_instances(train_config, batching, transport_rho)
 
     #cria ambiente de treino
     env = EnvClass(instances, mask_option, sel_k, **jm_kwargs)
@@ -235,7 +251,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         #gera nova instancia de treino se estiver na altura de renovar o pool
         if step_number % new_freq == 0:
             print(f"[TRAIN] Refreshing training instances (step {step_number})...")
-            instances = generate_train_instances(train_config, batching)
+            instances = generate_train_instances(train_config, batching, transport_rho)
             env = EnvClass(instances, mask_option, sel_k, **jm_kwargs)
             bopo_agent.env = env
             instance_order = []
@@ -408,6 +424,21 @@ def is_batching_instance_file(filename):
     return filename.lower().endswith(".json")
 
 
+def instance_kind(file_path):
+    """'fjsp' (.fjs), 'batching' (.json without a layout) or 'transport' (.json with one)."""
+    if not is_batching_instance_file(file_path):
+        return "fjsp"
+    with open(file_path, 'r') as file:
+        return "transport" if "coords" in json.load(file) else "batching"
+
+
+def representation_kind(representation):
+    """The instance kind a representation solves (see instance_kind)."""
+    if representation in TRANSPORT_REPRESENTATIONS:
+        return "transport"
+    return "batching" if representation in BATCHING_REPRESENTATIONS else "fjsp"
+
+
 def load_test_instance(file_path):
     if is_batching_instance_file(file_path):
         with open(file_path, 'r') as file:
@@ -442,13 +473,13 @@ def test_model(model_name, folder, filename, models_file="models/model_params.js
             model_results = []
             param = [p for p in model_params if p["name"]==m][0]
             model_rep = param.get("representation", representation)
-            if (model_rep in BATCHING_REPRESENTATIONS) != is_batching_instance_file(filename):
-                # a batching model cannot read a plain .fjs file (no families), and a plain
-                # model would ignore the batching and solve a different problem - see
-                # test.py, which only pairs models with instances of their own kind
-                raise ValueError(f"Model {m} ({model_rep}) does not match instance {filename}: "
-                                 f"batching representations {BATCHING_REPRESENTATIONS} need batching "
-                                 f"(.json) instances, the others need .fjs instances")
+            if representation_kind(model_rep) != instance_kind(file_path):
+                # a batching model cannot read a plain .fjs file (no families), a plain model
+                # would ignore the batching, and transport and batching-only models solve
+                # different problems - see test.py, which only pairs models with instances of
+                # their own kind
+                raise ValueError(f"Model {m} ({model_rep}, {representation_kind(model_rep)}) does not match "
+                                 f"instance {filename} ({instance_kind(file_path)})")
             _, ModelEnvClass, ModelBOPOClass = _resolve_representation_modules(model_rep)
             # metadata must come from an env built with this model's own mask_option/sel_k —
             # those change the graph's feature dimensions, so reusing metadata from a

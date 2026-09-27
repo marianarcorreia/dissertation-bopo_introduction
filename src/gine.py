@@ -23,7 +23,7 @@ class GINEConvSafe(GINEConv):
 
 #GIN
 class GINModel(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2):
+    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2, edge_dim = 5):
         super().__init__()
         self.lin1 = Linear(-1, 8) #camada linear inicial, -1 porque significa que se infere automaticamente o tamanho de entrada, e 8 apenas pq dava.
         self.tanh = nn.Tanh() #função de ativação
@@ -50,7 +50,7 @@ class GINModel(torch.nn.Module):
                 nn.ReLU(),
                 nn.Linear(width, width),
             )
-            conv = GINEConvSafe(mlp, edge_dim=5, train_eps=True) #edge_dim=5 -> features das arestas, projetadas para in_dim dentro do GINEConv
+            conv = GINEConvSafe(mlp, edge_dim=edge_dim, train_eps=True) #edge_dim=5 -> features das arestas, projetadas para in_dim dentro do GINEConv
             self.convs.append(conv)
             # GINEConv's message aggregation defaults to unnormalized SUM (unlike GAT/
             # TransformerConv's softmax-normalized attention), so a node's embedding

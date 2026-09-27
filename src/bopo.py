@@ -36,16 +36,16 @@ else:
 #maquina->job candidata. Sem baseline/valor de estado, porque a loss do BOPO (SROLoss)
 #compara diretamente a log-likelihood de trajetórias completas, em vez de usar uma vantagem.
 class ActorModel(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat', jm_design = 'baseline', gat_legacy = False):
+    def __init__(self, hidden_channels, out_channels, metadata, num_layers = 2, heads = 3, gnn_type = 'gat', jm_design = 'baseline', gat_legacy = False, edge_dim = 5):
         super().__init__()
         _dbg(1, f"  ActorModel.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
         #modelo gnn homogeneo, apenas processa um tipo de no e de aresta
         if gnn_type == 'gat':
-            self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads, legacy=gat_legacy)
+            self.gnn = GAT(hidden_channels, out_channels, num_layers=num_layers, heads=heads, legacy=gat_legacy, edge_dim=edge_dim)
         elif gnn_type == 'gin':
-            self.gnn = GINModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+            self.gnn = GINModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads, edge_dim=edge_dim)
         elif gnn_type == 'transformer':
-            self.gnn = TransformerModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads)
+            self.gnn = TransformerModel(hidden_channels, out_channels, num_layers=num_layers, heads=heads, edge_dim=edge_dim)
         else:
             raise ValueError(f"Unknown gnn_type: {gnn_type!r} (expected 'gat', 'gin' or 'transformer')")
         #to_hetero converte o modelo homogeneo para um modelo heterogeneo
@@ -83,11 +83,11 @@ class ActorModel(torch.nn.Module):
 
 
 class Policy(nn.Module):
-    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat', jm_design = 'baseline', gat_legacy = False):
+    def __init__(self, metadata, hidden_channels=128, num_layers=2, heads = 3, gnn_type = 'gat', jm_design = 'baseline', gat_legacy = False, edge_dim = 5):
         super(Policy, self).__init__()
         _dbg(1, f"Policy.__init__ | hidden={hidden_channels} | layers={num_layers} | heads={heads} | gnn_type={gnn_type}")
         self.gnn_type = gnn_type
-        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type, jm_design=jm_design, gat_legacy=gat_legacy)
+        self.actor = ActorModel(hidden_channels, 32, metadata, num_layers, heads, gnn_type=gnn_type, jm_design=jm_design, gat_legacy=gat_legacy, edge_dim=edge_dim)
         self.metadata = metadata
         self.soft = torch.nn.Softmax(dim=0)
 
@@ -181,7 +181,9 @@ class BOPO:
         self.memory_efficient = memory_efficient
         self.grad_chunk = grad_chunk
 
-        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type, jm_design=jm_design, gat_legacy=gat_legacy).to(device)
+        # attributed edge width of the env's graph: 5, or 6 with transport (src/env_batching.py)
+        self.policy = Policy(metadata, hidden_channels, num_layers, heads, gnn_type=gnn_type, jm_design=jm_design,
+                             gat_legacy=gat_legacy, edge_dim=getattr(env, "EDGE_DIM", 5)).to(device)
         self.optimizer = torch.optim.Adam(self.policy.actor.parameters(), lr=lr)
 
     #inferência de uma única trajetória (usada por test_model/run_validation) - mantém a

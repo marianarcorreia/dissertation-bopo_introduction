@@ -43,8 +43,11 @@ def parse_args():
              "ojm (operation-job-machine), and for the FJSP with parallel batching (trained on "
              "batching instances, validated on data/batching): ojmb_node (ojm + family node), "
              "ojmb_edge (ojm + operation-operation batch edge) and ojmb_base (plain ojm graph, "
-             "the comparison baseline). 'all' runs oo, om and ojm; 'batching' runs the three "
-             "batching ones. Pass several values, or a group name, to run every "
+             "the comparison baseline). With batching AND transport (trained on transport "
+             "instances, validated on data/transport): ojmb_<node|edge|base>_<t0|tf|te>, i.e. every "
+             "batching representation with no transport information (t0), transport features (tf) "
+             "or transport edges (te). 'all' runs oo, om and ojm; 'batching' runs the three "
+             "batching ones; 'transport' runs the nine transport ones. Pass several values, or a group name, to run every "
              "representation in one invocation. Used by train and optuna modes; test mode "
              "evaluates whichever models are listed in --models-file regardless of this flag.",
     )

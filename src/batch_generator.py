@@ -19,6 +19,8 @@ Families are built so that they respect the formulation:
 """
 import random
 
+from src.transport import add_layout
+
 
 def _proc_times_around(mean, machines, num_machines, proc_min, proc_max, dev):
     low = max(proc_min, round(mean * (1 - dev)))
@@ -40,12 +42,17 @@ def generate_batching_instance(
     family_size_range=(2, 4),
     capacity_range=(2, 3),
     proc_dev=0.2,
+    transport_rho=None,
 ):
     """
     :param ops_per_job: list with the number of operations of every job
     :param family_ratio: target fraction of operations that belong to a family
     :param family_size_range: (min, max) number of operations in a family (bounded by n_jobs, F1)
     :param capacity_range: (min, max) batch capacity B_f
+    :param transport_rho: None = no transport. Otherwise machines and depot get random
+        positions with expected transport time ~ rho x mean processing time
+        (src/transport.py, docs/transport_formulation.tex). Drawn last, so the rest of the
+        instance is the same as without transport for the same random state.
     """
     proc_min = 1
     jobs = []
@@ -108,7 +115,7 @@ def generate_batching_instance(
             operations[o] = _proc_times_around(mean, machines, n_machines, proc_min, max_processing, proc_dev)
 
     maximum = max(max(row) for row in operations)
-    return {
+    instance = {
         "jobs": jobs,
         "operations": operations,
         "maximum": maximum,
@@ -117,6 +124,9 @@ def generate_batching_instance(
         "capacities": capacities,
         "delta": delta,
     }
+    if transport_rho is not None:
+        add_layout(instance, transport_rho)
+    return instance
 
 
 def generate_batching_instance_list(

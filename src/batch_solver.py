@@ -13,8 +13,15 @@ Model (per family f with members O^f, potential batches B_f = one per member):
   job precedence                                                    (B6)
   no overlap of batch intervals on each machine                     (B7)
 Operations with family -1 are singleton families with capacity 1.
+
+Transport (docs/transport_formulation.tex, (T-a)-(T-d)), when the instance has a layout
+(src/transport.py): z[o,mu] <=> operation o runs on machine mu, and consecutive operations
+of a job on machines mu != nu are separated by the transport time tau[mu][nu]; the first
+operation of a job cannot start before the transport from the depot.
 """
 from ortools.sat.python import cp_model
+
+from src.transport import depot_index, has_transport, transport_matrix
 
 
 def _groups(instance):
@@ -43,8 +50,14 @@ def solve_batching(instance, time_limit=30.0, workers=8, seed=0):
         for k, o in enumerate(job):
             op_job[o], op_kappa[o] = j, k + 1
 
-    horizon = sum(max(row) for row in ops)
+    tau = transport_matrix(instance)
+    depot = depot_index(instance)
+    transport = has_transport(instance) and bool(tau.any())
+    horizon = sum(max(row) for row in ops) + (n_ops * int(tau.max()) if transport else 0)
     model = cp_model.CpModel()
+    # z[o][mu]: operation o runs on machine mu (transport only)
+    z = [{mu: model.new_bool_var(f"z_{o}_{mu}") for mu in range(n_mach) if ops[o][mu] > 0}
+         for o in range(n_ops)] if transport else None
 
     op_start = [model.new_int_var(0, horizon, f"S_o{o}") for o in range(n_ops)]
     op_end = [model.new_int_var(0, horizon, f"C_o{o}") for o in range(n_ops)]
@@ -89,6 +102,10 @@ def solve_batching(instance, time_limit=30.0, workers=8, seed=0):
                 machine_intervals[mu].append(itv)
                 presences[mu] = pres
             model.add(sum(presences.values()) == used)                                 # (B4)
+            if transport:                                                               # (T-a)
+                for i in range(b, n):
+                    for mu, pres in presences.items():
+                        model.add_bool_or([x[i][b].Not(), pres.Not(), z[members[i]][mu]])
             model.add(start == 0).only_enforce_if(used.Not())
             model.add(end == 0).only_enforce_if(used.Not())
             for i in range(b, n):                                                       # (B5)
@@ -100,6 +117,18 @@ def solve_batching(instance, time_limit=30.0, workers=8, seed=0):
     for job in jobs:                                                                    # (B6)
         for a, c in zip(job[:-1], job[1:]):
             model.add(op_start[c] >= op_end[a])
+    if transport:
+        for o in range(n_ops):                                                          # (T-b)
+            model.add_exactly_one(z[o].values())
+        for job in jobs:
+            for nu, lit in z[job[0]].items():                                           # (T-d)
+                if tau[depot][nu] > 0:
+                    model.add(op_start[job[0]] >= int(tau[depot][nu])).only_enforce_if(lit)
+            for a, c in zip(job[:-1], job[1:]):                                         # (T-c)
+                for mu, za in z[a].items():
+                    for nu, zc in z[c].items():
+                        if mu != nu and tau[mu][nu] > 0:
+                            model.add(op_start[c] >= op_end[a] + int(tau[mu][nu])).only_enforce_if([za, zc])
     for mu in range(n_mach):                                                            # (B7)
         if len(machine_intervals[mu]) > 1:
             model.add_no_overlap(machine_intervals[mu])
@@ -188,10 +217,17 @@ def check_schedule(instance, schedule):
         if ends.pop() - starts.pop() != max(ops[o][m] for o in ids):
             errors.append(f"batch {bid}: duration is not the longest member time")
 
+    tau = transport_matrix(instance)
+    depot = depot_index(instance)
     for job in jobs:
+        first = by_op[job[0]]
+        if first["start"] < tau[depot][first["machine"]]:
+            errors.append(f"op {job[0]} starts before arriving from the depot")
         for a, c in zip(job[:-1], job[1:]):
             if by_op[c]["start"] < by_op[a]["end"]:
                 errors.append(f"precedence violated between op {a} and op {c}")
+            elif by_op[c]["start"] < by_op[a]["end"] + tau[by_op[a]["machine"]][by_op[c]["machine"]]:
+                errors.append(f"transport violated between op {a} and op {c}")
 
     per_machine = {}
     for bid, members in batches.items():

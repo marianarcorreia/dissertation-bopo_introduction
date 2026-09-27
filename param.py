@@ -59,7 +59,8 @@ from typing import Dict, List, Optional
 import numpy as np
 import optuna
 
-from src.train import train, expand_representations, BATCHING_REPRESENTATIONS, REPRESENTATION_CHOICES, JM_DESIGN_CHOICES
+from src.train import (train, expand_representations, BATCHING_REPRESENTATIONS, BATCHED_REPRESENTATIONS,
+                       TRANSPORT_REPRESENTATIONS, TRANSPORT_DATASET, REPRESENTATION_CHOICES, JM_DESIGN_CHOICES)
 from src.utils import open_dashboard, generate_fixed_splits
 
 BATCHING_DATASET = Path("data/batching/batching_dataset.json")
@@ -137,18 +138,22 @@ def ensure_prerequisites(validation_size: int, rebuild_validation_set: bool,
         model_params_path.write_text("[]")
 
     reps = list(reps) if reps is not None else ["oo", "om", "ojm"]
-    if any(r in BATCHING_REPRESENTATIONS for r in reps):
+    for group, dataset, extra in ((BATCHING_REPRESENTATIONS, BATCHING_DATASET, ""),
+                                  (TRANSPORT_REPRESENTATIONS, Path(TRANSPORT_DATASET),
+                                   " --transport-rho 0.3 --out data/transport")):
+        if not any(r in group for r in reps):
+            continue
         # fixed by construction (see src.utils.load_batching_splits) - nothing to rebuild here
-        if not BATCHING_DATASET.exists():
+        if not dataset.exists():
             raise FileNotFoundError(
-                f"{BATCHING_DATASET} not found - build it first with "
-                "`python -m src.generate_batching_dataset --n-cases 40 --time-limit 30 --seed 0`."
+                f"{dataset} not found - build it first with "
+                f"`python -m src.generate_batching_dataset --n-cases 40 --time-limit 30 --seed 0{extra}`."
             )
-        n = len(json.loads(BATCHING_DATASET.read_text()))
+        n = len(json.loads(dataset.read_text()))
         if 2 * validation_size > n:
             raise ValueError(f"--validation-size={validation_size} needs {2 * validation_size} batching "
-                             f"instances (validation + test) but {BATCHING_DATASET} has {n}.")
-    if all(r in BATCHING_REPRESENTATIONS for r in reps):
+                             f"instances (validation + test) but {dataset} has {n}.")
+    if all(r in BATCHED_REPRESENTATIONS for r in reps):
         return
 
     val_path = Path("val/validation_dataset.json")

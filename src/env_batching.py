@@ -27,13 +27,38 @@ encoded structurally (family node / batch edges) and by numeric descriptors.
 Instances must carry "family", "capacities" and "delta" (see src/batch_generator.py).
 Every episode records the schedule in env.schedule, in the format checked by
 src.batch_solver.check_schedule.
+
+Transport (docs/transport_formulation.tex). When the instance has a shop-floor layout
+("coords", "depot", see src/transport.py), a job must travel from the machine of its last
+operation (the depot at the start) to the machine of the next one, which takes the Manhattan
+distance tau. This is part of the problem, so every env applies it: a job's arrival at machine
+mu is a_{j,mu} = end of its last operation + tau[location][mu], an operation starts no earlier
+than its arrival, a partner joins a batch only if it has arrived by the batch start, and after
+a batch its members are located at its machine. Without a layout tau = 0 and nothing changes.
+How the transport is shown to the network is a second, independent choice, TRANSPORT_REP:
+  None    the three batching-only envs above (unchanged; batching features keep their
+          transport-free definition)
+  "none"  T-0: no transport information in the graph (the start times on the action edges
+          still include it)
+  "feat"  T-F: machine and job-location coordinates, incoming transport on the operations,
+          tau on the machine 'listens' edges and a 6th action-edge column tau[location][mu]
+  "edge"  T-E: relations ('machine','transport','machine'), ('job','at','machine') +
+          ('machine','hosts','job'), ('job','reach','machine') and
+          ('operation','transfer','operation'), with transport times as attributes
+The nine combinations are registered below as "ojmb_<node|edge|base>_<t0|tf|te>". They use
+EDGE_DIM = 6 (every attributed edge type is zero-padded to it in normalize_state).
+With transport, the batching features that assumed one ready time per job (pi_j on the job,
+the fill level and spread of the family node) are evaluated at the machine where the job
+(or the family) can start earliest.
 """
 import numpy as np
 import torch
 from src.env import FJSSPEnv, _dbg, normalize_columns, select_with_tiebreak, remove_operation_nodes
+from src.transport import locations, transfer_times, transport_matrix
 
 SENTINEL = 10000
-EDGE_DIM = 5  # every attributed edge type must match GATv2Conv(edge_dim=5) in src/gat.py
+EDGE_DIM = 5  # attributed edge width of the batching-only envs (GATv2Conv(edge_dim=5) in src/gat.py)
+TRANSPORT_EDGE_DIM = 6  # the transport envs add one action-edge column
 
 
 def _empty_edges():
@@ -47,11 +72,72 @@ def _keep_edges(store, keep):
             store[key] = store[key][keep]
 
 
+def _pad(attr, width):
+    if attr.shape[1] >= width:
+        return attr
+    return torch.cat([attr, attr.new_zeros((attr.shape[0], width - attr.shape[1]))], dim=1)
+
+
 class _FJSPBatchEnv(FJSSPEnv):
     BATCH_REP = None  # "node", "edge" or "base"
+    TRANSPORT_REP = None  # None (batching-only env), "none", "feat" or "edge"
+    EDGE_DIM = EDGE_DIM  # read by src/bopo.py:BOPO to size the GNN's edge projections
 
     # ------------------------------------------------------------------ instance / graph
     def generate_instance(self, instance):
+        self._generate_batching(instance)
+        self.tau = transport_matrix(instance)
+        self.depot = self.num_machines
+        self.has_transport = bool(self.tau.any())
+        if self.TRANSPORT_REP == "feat":
+            self._build_transport_features(instance)
+        elif self.TRANSPORT_REP == "edge":
+            self._build_transport_edges(instance)
+
+    def _build_transport_features(self, instance):
+        """T-F: coordinates on machine and job nodes, incoming transport on operation nodes,
+        tau on the machine 'listens' edges. Coordinates use one scale W for both axes and for
+        jobs and machines (see normalize_state); the job columns are filled per decision."""
+        pos = locations(instance).astype(np.float64)
+        pos -= pos.min(axis=0)
+        self.pos_scaled = torch.tensor(pos / max(pos.max(), 1.0), dtype=torch.float)
+        d = self.data
+        self.mach_coord_cols = [d["machine"].x.shape[1], d["machine"].x.shape[1] + 1]
+        d["machine"].x = torch.cat([d["machine"].x, self.pos_scaled[:self.num_machines]], dim=1)
+        self.job_coord_cols = [d["job"].x.shape[1], d["job"].x.shape[1] + 1]
+        d["job"].x = torch.cat([d["job"].x, torch.zeros((self.num_jobs, 2))], dim=1)
+        self.op_transfer_cols = [d["operation"].x.shape[1], d["operation"].x.shape[1] + 1]
+        d["operation"].x = torch.cat([d["operation"].x, torch.tensor(transfer_times(instance, self.tau))], dim=1)
+        listens = d["machine", "listens", "machine"]
+        src, dst = listens.edge_index
+        listens.edge_attr = torch.tensor(self.tau[src.numpy(), dst.numpy()], dtype=torch.float).unsqueeze(1)
+
+    def _build_transport_edges(self, instance):
+        """T-E: new relations whose attributes are transport times (no new node feature)."""
+        d = self.data
+        transfer = transfer_times(instance, self.tau)
+        pairs, tf_edges, tf_attr = set(), [], []
+        for job in self.jobs:
+            for a, c in zip(job[:-1], job[1:]):
+                for mu in self.op_elig[a]:
+                    for nu in self.op_elig[c]:
+                        if mu != nu:
+                            pairs.update(((mu, nu), (nu, mu)))
+                tf_edges.append([c, a])  # successor -> predecessor, like 'prec'
+                tf_attr.append(list(transfer[c]))
+        pairs = sorted(pairs)
+        store = d["machine", "transport", "machine"]
+        store.edge_index = torch.LongTensor(pairs).T if pairs else _empty_edges()
+        store.edge_attr = torch.tensor([[float(self.tau[a][b])] for a, b in pairs], dtype=torch.float).reshape(-1, 1)
+        store = d["operation", "transfer", "operation"]
+        store.edge_index = torch.LongTensor(tf_edges).T if tf_edges else _empty_edges()
+        store.edge_attr = torch.tensor(tf_attr, dtype=torch.float).reshape(-1, 2)
+        d["job", "at", "machine"].edge_index = _empty_edges()  # every job starts at the depot
+        d["machine", "hosts", "job"].edge_index = _empty_edges()
+        d["job", "reach", "machine"].edge_index = _empty_edges()  # filled with the action edges
+        d["job", "reach", "machine"].edge_attr = torch.zeros((0, 1))
+
+    def _generate_batching(self, instance):
         super().generate_instance(instance)
         n_ops = self.num_operations
         self.family = list(instance.get("family", [-1] * n_ops))
@@ -181,10 +267,24 @@ class _FJSPBatchEnv(FJSSPEnv):
             lst.sort(key=lambda c: (c[0], c[1]))
         return cands
 
+    def _arrival(self, j, mach):
+        """Time job j arrives at machine mach: end of its last operation plus the transport
+        from where it is (the depot before its first operation)."""
+        return float(self.operations_ends[j]) + float(self.tau[self.job_loc[j]][mach])
+
+    def _start_machine(self, j):
+        """mu*_j: the machine where job j's current operation can start earliest (ties: earliest
+        completion, then lowest index), with that start."""
+        start = self.job_start_machines[j].tolist()
+        proc = self.current_job_proc[j].tolist()
+        mach = min(range(self.num_machines), key=lambda m: (start[m], start[m] + proc[m], m))
+        return mach, start[mach]
+
     def _batch_members(self, sel_job, mach, start, cands=None):
         """Jobs dispatched together when sel_job is dispatched on mach at start: sel_job plus
-        ready (ready time <= start) same-family jobs eligible on mach, added by earliest ready
-        time while the capacity B_f and the order difference delta allow."""
+        same-family jobs eligible on mach that are ready there by start (arrived, with
+        transport), added by earliest ready/arrival time while the capacity B_f and the order
+        difference delta allow."""
         o = self.current_operations[sel_job]
         f = self.family[o]
         members = [sel_job]
@@ -194,7 +294,11 @@ class _FJSPBatchEnv(FJSSPEnv):
             cands = self._family_candidates()
         cap = self.capacities[f]
         k_min = k_max = self.op_kappa[o]
-        for ready, j, o2, k in cands.get(f, ()):
+        cand = cands.get(f, ())
+        if self.has_transport:  # readiness depends on the machine: order by arrival at mach
+            cand = sorted(((self._arrival(j, mach), j, o2, k) for _, j, o2, k in cand),
+                          key=lambda c: (c[0], c[1]))
+        for ready, j, o2, k in cand:
             if len(members) >= cap:
                 break
             if j == sel_job or ready > start or self.operations[o2][mach] <= 0:
@@ -212,13 +316,22 @@ class _FJSPBatchEnv(FJSSPEnv):
     def _ready_partners(self, j, cands=None, start=None):
         """Jobs that the batch rule (_batch_members) would add if job j were dispatched at
         its earliest start: same family, within delta positions, a shared eligible
-        machine, and ready by then. Capped at B_f - 1."""
+        machine, and ready by then. Capped at B_f - 1.
+        With transport, readiness depends on the machine, so this is evaluated exactly as the
+        batch rule would apply it at mu*_j (see _start_machine): partners eligible on mu*_j
+        that have arrived there by j's start on it."""
         o = self.current_operations[j]
         f = self.family[o]
         if f < 0:
             return 0
         if cands is None:
             cands = self._family_candidates()
+        if self.has_transport:
+            mach, start = self._start_machine(j)
+            count = sum(1 for _, j2, o2, k in cands.get(f, ())
+                        if j2 != j and abs(k - self.op_kappa[o]) <= self.delta
+                        and self.operations[o2][mach] > 0 and self._arrival(j2, mach) <= start)
+            return min(count, self.capacities[f] - 1)
         if start is None:
             start = self._earliest_start(j)
         count = 0
@@ -278,11 +391,67 @@ class _FJSPBatchEnv(FJSSPEnv):
         primary, secondary = (start, completion) if self.mask_option == 0 else (completion, start)
         return select_with_tiebreak(primary, secondary, self.state['machine', 'exec', 'job'].mask)
 
+    def _init_transport(self):
+        """Every job starts at the depot, so its first operation can start on machine m only
+        after the transport tau[depot][m]."""
+        self.job_loc = [self.depot] * self.num_jobs
+        if self.has_transport:
+            from_depot = torch.tensor(self.tau[self.depot][:self.num_machines], dtype=self.job_start_machines.dtype)
+            eligible = self.job_start_machines < SENTINEL
+            self.job_start_machines = torch.where(
+                eligible, torch.maximum(self.job_start_machines, from_depot.expand_as(self.job_start_machines)),
+                self.job_start_machines)
+
+    def _update_transport_state(self):
+        """Dynamic part of the transport representations (after every decision)."""
+        if self.TRANSPORT_REP == "feat":
+            active = [j for j in range(self.num_jobs) if not self.job_done[j]]
+            if not active:
+                return
+            jx = self.state["job"].x
+            jx[active, self.job_coord_cols[0]:self.job_coord_cols[1] + 1] = self.pos_scaled[[self.job_loc[j] for j in active]]
+            # the current operation's incoming transport is now exact: from where the job is
+            oid = self.state["operation"].oid
+            node_of = torch.full((self.num_operations,), -1, dtype=torch.long)
+            node_of[oid] = torch.arange(oid.shape[0])
+            ox = self.state["operation"].x
+            for j in active:
+                o = self.current_operations[j]
+                taus = self.tau[self.job_loc[j]][sorted(self.op_elig[o])]
+                ox[node_of[o], self.op_transfer_cols[0]] = float(taus.min())
+                ox[node_of[o], self.op_transfer_cols[1]] = float(taus.mean())
+        elif self.TRANSPORT_REP == "edge":
+            at = [[j, self.job_loc[j]] for j in range(self.num_jobs)
+                  if not self.job_done[j] and self.job_loc[j] != self.depot]
+            at = torch.LongTensor(at).T if at else _empty_edges()
+            self.state["job", "at", "machine"].edge_index = at
+            self.state["machine", "hosts", "job"].edge_index = at.flip(0)
+
+    def calculate_mask(self):
+        super().calculate_mask()
+        if self.TRANSPORT_REP is None:
+            return
+        # transport of every action: tau[location of the job][machine]
+        mej = self.state['machine', 'exec', 'job']
+        mach, jobs = mej.edge_index
+        loc = torch.tensor(self.job_loc, dtype=torch.long)[jobs]
+        tau = torch.tensor(self.tau, dtype=torch.float)[loc, mach].unsqueeze(1)
+        if self.TRANSPORT_REP == "feat":  # 6th action-edge column
+            mej.edge_attr = torch.cat([mej.edge_attr[:, :EDGE_DIM], tau], dim=1)
+            if ('job', 'exec', 'machine') in self.state.edge_types:
+                self.state['job', 'exec', 'machine'].edge_attr = mej.edge_attr.clone()
+        elif self.TRANSPORT_REP == "edge":
+            reach = self.state['job', 'reach', 'machine']
+            reach.edge_index = mej.edge_index.flip(0)
+            reach.edge_attr = tau
+
     def calculate_next_state(self):
         if self.job_done is None:
             self.job_done = [False] * self.num_jobs
             self.fam_remaining = [len(m) for m in self.fam_members]
+            self._init_transport()
         super().calculate_next_state()
+        self._update_transport_state()
         if self.BATCH_REP == "base":
             return
 
@@ -307,8 +476,15 @@ class _FJSPBatchEnv(FJSSPEnv):
                 # members that could share the family's earliest possible batch: current
                 # operations whose job is ready by then (the rule of _batch_members)
                 current = cands.get(f, [])
-                t_f = min((earliest[j] for _, j, _, _ in current), default=0.0)
-                ready = [k for r, _, _, k in current if r <= t_f]
+                if self.has_transport and current:
+                    # readiness depends on the machine: evaluated at mu_f, where the family's
+                    # earliest batch can start
+                    t_f, mu_f = min((s, m) for m, s in (self._start_machine(j) for _, j, _, _ in current))
+                    ready = [k for _, j, o2, k in current
+                             if self.operations[o2][mu_f] > 0 and self._arrival(j, mu_f) <= t_f]
+                else:
+                    t_f = min((earliest[j] for _, j, _, _ in current), default=0.0)
+                    ready = [k for r, _, _, k in current if r <= t_f]
                 remaining = self.fam_remaining[f]
                 spread = (max(ready) - min(ready)) if ready else 0
                 fx[f] = torch.tensor([
@@ -326,7 +502,7 @@ class _FJSPBatchEnv(FJSSPEnv):
         sel_job, sel_mach = int(edge[1]), int(edge[0])
 
         prev_ms = float(torch.max(self.state["machine"].x[:, 0]))
-        start = max(float(self.state["machine"].x[sel_mach, 0]), float(self.operations_ends[sel_job]))
+        start = max(float(self.state["machine"].x[sel_mach, 0]), self._arrival(sel_job, sel_mach))
         members = self._batch_members(sel_job, sel_mach, start)
         proc = max(self.operations[self.current_operations[j]][sel_mach] for j in members)
         end = start + proc
@@ -351,6 +527,7 @@ class _FJSPBatchEnv(FJSSPEnv):
                 "batch": batch_id, "machine": sel_mach, "start": start, "end": end,
             })
             self.operations_ends[j] = end
+            self.job_loc[j] = sel_mach  # every member leaves from the batch's machine
             self.job_start_machines[j, :] = SENTINEL
             self.current_job_proc[j, :] = 0
 
@@ -373,15 +550,17 @@ class _FJSPBatchEnv(FJSSPEnv):
             for m in range(len(oper)):
                 t = oper[m]
                 if t != 0:
-                    calcu = t + max(self.operations_ends[j] - self.state["machine"].x[m, 0], 0)
+                    arrival = self._arrival(j, m)
+                    calcu = t + max(arrival - self.state["machine"].x[m, 0], 0)
                     total_gap += calcu
                     new_edges.append([m, j])
-                    feats.append([calcu, t / np.sum(oper), t + max(self.operations_ends[j], self.state["machine"].x[m, 0])])
-                    self.job_start_machines[j, m] = max(self.operations_ends[j], self.state["machine"].x[m, 0])
+                    feats.append([calcu, t / np.sum(oper), t + max(arrival, self.state["machine"].x[m, 0])])
+                    self.job_start_machines[j, m] = max(arrival, self.state["machine"].x[m, 0])
                     self.current_job_proc[j, m] = t
             for row in feats:
                 row.append(row[0] / total_gap)
                 row.append(0)
+                row += [0] * (mej.edge_attr.shape[1] - len(row))  # T-F: transport column
             new_feats += feats
         if new_edges:
             mej.edge_index = torch.cat([mej.edge_index, torch.LongTensor(new_edges).T], dim=1)
@@ -433,19 +612,41 @@ class _FJSPBatchEnv(FJSSPEnv):
                     _keep_edges(store, ~torch.isin(store.edge_index[col], finished))
         elif self.BATCH_REP == "edge":
             drop(('operation', 'batch', 'operation'))
+        if self.TRANSPORT_REP == "edge":
+            drop(('operation', 'transfer', 'operation'))
         self.state = remove_operation_nodes(self.state, nodes)
 
     def normalize_state(self, state):
+        coords = []
+        if self.TRANSPORT_REP == "feat":  # already on the shared scale W (see _build_transport_features)
+            # the coordinates are the last two columns of machine and job nodes; read from the
+            # state itself because BOPO normalises its rollout envs' states through self.env
+            for nt in ("machine", "job"):
+                width = state[nt].x.shape[1]
+                cols = [width - 2, width - 1]
+                coords.append((nt, cols, state[nt].x[:, cols].clone()))
         state = super().normalize_state(state)
-        if self.BATCH_REP == "base":
-            return state
+        edge_types = []
         if self.BATCH_REP == "node":
             state["family"].x = normalize_columns(state["family"].x)
-            edge_types = (('family', 'batch_exec', 'machine'), ('machine', 'batch_exec', 'family'))
-        else:
-            edge_types = (('operation', 'batch', 'operation'),)
+            edge_types += [('family', 'batch_exec', 'machine'), ('machine', 'batch_exec', 'family')]
+        elif self.BATCH_REP == "edge":
+            edge_types.append(('operation', 'batch', 'operation'))
+        if self.TRANSPORT_REP == "feat":
+            edge_types.append(('machine', 'listens', 'machine'))
+        elif self.TRANSPORT_REP == "edge":
+            edge_types += [('machine', 'transport', 'machine'), ('job', 'reach', 'machine'),
+                           ('operation', 'transfer', 'operation')]
         for et in edge_types:
             state[et].edge_attr = normalize_columns(state[et].edge_attr)
+        # per-type min-max would put job and machine coordinates in different frames, so the
+        # network could not relate a job's location to a machine: keep the shared scale
+        for nt, cols, raw in coords:
+            state[nt].x[:, cols] = 2 * raw - 1
+        if self.TRANSPORT_REP is not None:
+            for et in state.edge_types:
+                if "edge_attr" in state[et]:
+                    state[et].edge_attr = _pad(state[et].edge_attr, self.EDGE_DIM)
         return state
 
 
@@ -462,3 +663,20 @@ class FJSPBatchEdgeEnv(_FJSPBatchEnv):
 class FJSPBatchBaseEnv(_FJSPBatchEnv):
     """Baseline: batching problem on the plain ojm graph (no batching information)."""
     BATCH_REP = "base"
+
+
+# ---------------------------------------------------------------- batching x transport
+# "ojmb_<batching>_<transport>" -> env class, e.g. "ojmb_node_tf" = family node + T-F.
+_BATCH_NAMES = {"node": "Node", "edge": "Edge", "base": "Base"}
+_TRANSPORT_NAMES = {"t0": ("none", "T0"), "tf": ("feat", "TF"), "te": ("edge", "TE")}
+TRANSPORT_ENVS = {}
+for _b, _bn in _BATCH_NAMES.items():
+    for _t, (_rep, _tn) in _TRANSPORT_NAMES.items():
+        _name = f"FJSPBatch{_bn}Transport{_tn}Env"
+        _cls = type(_name, (_FJSPBatchEnv,), {
+            "BATCH_REP": _b, "TRANSPORT_REP": _rep, "EDGE_DIM": TRANSPORT_EDGE_DIM,
+            "__doc__": f"Batching representation '{_b}' with transport representation {_tn} "
+                       "(docs/transport_formulation.tex).",
+        })
+        globals()[_name] = _cls
+        TRANSPORT_ENVS[f"ojmb_{_b}_{_t}"] = _name

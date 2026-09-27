@@ -36,6 +36,9 @@ def main():
     p.add_argument("--family-ratio", type=float, default=0.6)
     p.add_argument("--family-size", type=int, nargs=2, default=(2, 4))
     p.add_argument("--capacity", type=int, nargs=2, default=(2, 3))
+    p.add_argument("--transport-rho", type=float, default=None,
+                   help="add a shop-floor layout with expected transport ~ rho x mean processing time "
+                        "(src/transport.py); use with --out data/transport")
     args = p.parse_args()
 
     random.seed(args.seed)
@@ -55,6 +58,7 @@ def main():
         family_ratio=args.family_ratio,
         family_size_range=tuple(args.family_size),
         capacity_range=tuple(args.capacity),
+        transport_rho=args.transport_rho,
     )
 
     dataset = []

@@ -18,6 +18,8 @@ ACTION_STORE = {
     "ojmb_node": ("machine", "exec", "job"),
     "ojmb_edge": ("machine", "exec", "job"),
     "ojmb_base": ("machine", "exec", "job"),
+    # batching x transport (docs/transport_formulation.tex): same action space
+    **{f"ojmb_{b}_{t}": ("machine", "exec", "job") for b in ("node", "edge", "base") for t in ("t0", "tf", "te")},
 }
 
 

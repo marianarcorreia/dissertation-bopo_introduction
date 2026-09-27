@@ -11,6 +11,8 @@ checks: subclass `Constraint` and pass the list to `check_schedule(...)` (or ext
 from collections import defaultdict
 from itertools import combinations
 
+from src.transport import job_lower_bound
+
 TOL = 1e-6
 
 
@@ -30,6 +32,9 @@ def lower_bound(instance, exhaustive_up_to=10):
     With parallel batching (instance "family" / "capacities"), up to B_f operations of family f
     share one batch lasting at least as long as each of them, so each one's work in (b) counts
     1 / B_f.
+    With transport (instance "coords" / "depot", src/transport.py), (a) is the shortest
+    depot -> ... -> last machine path of the job including transport times; transport does
+    not occupy machines, so (b) is unchanged. Without transport (a) is the same as before.
     Used as the reference for relative error when no CP-SAT solution exists (e.g. the
     unseen-size test sets), so relative error is always defined."""
     ops = instance["operations"]
@@ -38,7 +43,7 @@ def lower_bound(instance, exhaustive_up_to=10):
     family, capacities = instance.get("family"), instance.get("capacities")
     load = [p / capacities[f] if family and (f := family[o]) >= 0 else p for o, p in enumerate(min_proc)]
     eligible = [frozenset(m for m, p in enumerate(row) if p > 0) for row in ops]
-    best = max(sum(min_proc[o] for o in job) for job in instance["jobs"])
+    best = job_lower_bound(instance)
     if num_machines <= exhaustive_up_to:
         sets = [frozenset(s) for k in range(1, num_machines + 1) for s in combinations(range(num_machines), k)]
     else:

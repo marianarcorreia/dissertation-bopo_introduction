@@ -7,6 +7,7 @@ metric_schedule() maps it to the shared metrics format ("operation" = global id,
 kappa); a decision schedules a whole batch, so violation rates are counted per "batch".
 """
 from src.metrics.schedule import TOL, Completeness, Constraint, Eligibility, Precedence
+from src.transport import depot_index, transport_matrix
 
 
 def metric_schedule(schedule):
@@ -69,8 +70,32 @@ class BatchMachineCapacity(Constraint):
                    and float(r["start"]) < e - TOL and s < float(r["end"]) - TOL)
 
 
+class Transport(Constraint):
+    """The operation starts no earlier than its job arrives at the machine: the end of the
+    job's previous operation plus the transport time from that machine, or the transport
+    from the depot for a first operation (docs/transport_formulation.tex). Always satisfied
+    on instances without a layout. A missing previous operation is left to Precedence."""
+    name = "transport"
+
+    def check_step(self, instance, schedule, i):
+        rec = schedule[i]
+        job = instance["jobs"][int(rec["job"])]
+        op = int(rec["operation"])
+        if op not in job or "coords" not in instance:
+            return 0
+        tau = transport_matrix(instance)
+        m = int(rec["machine"])
+        if job.index(op) == 0:
+            return int(float(rec["start"]) < tau[depot_index(instance)][m] - TOL)
+        prev_op = job[job.index(op) - 1]
+        prev = next((r for r in schedule[:i] if int(r["operation"]) == prev_op), None)
+        if prev is None:
+            return 0
+        return int(float(rec["start"]) < float(prev["end"]) + tau[int(prev["machine"])][m] - TOL)
+
+
 BATCHING_CONSTRAINTS = (Completeness(), Eligibility(), BatchProcessingTime(), Precedence(),
-                        BatchMachineCapacity(), BatchComposition())
+                        BatchMachineCapacity(), BatchComposition(), Transport())
 
 
 def batch_stats(schedule):

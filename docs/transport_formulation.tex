@@ -1,0 +1,779 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+% ---------------------------------------------------------------------------
+% Notation macros (same as docs/batching_formulation.tex)
+% ---------------------------------------------------------------------------
+\newcommand{\Jset}{\mathcal{J}}
+\newcommand{\Oset}{\mathcal{O}}
+\newcommand{\Mset}{\mathcal{M}}
+\newcommand{\Fset}{\mathcal{F}}
+\newcommand{\Bset}{\mathcal{B}}
+\newcommand{\Eset}{\mathcal{E}}
+\newcommand{\Vset}{\mathcal{V}}
+\newcommand{\job}{\operatorname{job}}
+\newcommand{\cat}{\,\Vert\,}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\loc}{\ell}
+\emergencystretch=3em
+\newcommand{\crit}[1]{\par\smallskip\noindent\textbf{Critical note.}\ #1\par\smallskip}
+
+\title{Adding Transport Times to the FJSP with Batching:\\
+Formulation and Graph Representations}
+\author{Mariana Correia}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent This document extends \texttt{docs/batching\_formulation.tex}. It
+uses the same notation and refers to its equations as
+(F1)--(F2), (B1)--(B7'). Section~\ref{sec:critique} collects the critical
+assessment of the design and the open decisions.
+
+\tableofcontents
+
+% ===========================================================================
+\section{Transport constraint}
+\label{sec:problem}
+
+\subsection{Shop-floor layout}
+Every machine $\mu\in\Mset$ has a position $(X_\mu,Y_\mu)\in\Z_{\ge0}^2$ on the
+shop floor. Coordinates are measured in \emph{time units}, the same unit as the
+processing times $p_{o,\mu}$. There is also one load/unload station (depot),
+denoted $\mu=0$, with position $(X_0,Y_0)$. Let $\Mset_0=\Mset\cup\{0\}$.
+The transport time between two locations is their Manhattan distance:
+\begin{equation}
+  \tau_{\mu\nu}=|X_\mu-X_\nu|+|Y_\mu-Y_\nu|,\qquad \mu,\nu\in\Mset_0 .
+  \label{eq:tau}
+\end{equation}
+$\tau$ is a metric: $\tau_{\mu\mu}=0$, $\tau_{\mu\nu}=\tau_{\nu\mu}$ and
+$\tau_{\mu\nu}\le\tau_{\mu\kappa}+\tau_{\kappa\nu}$. Because of the triangle
+inequality, routing a job through an intermediate location never shortens its
+transport. Manhattan (rather than Euclidean) distance models material that moves
+along perpendicular aisles. With integer coordinates every $\tau_{\mu\nu}$ is an
+integer, which keeps the CP-SAT model exact.
+
+\subsection{Assumptions}
+\begin{enumerate}[label=(T\arabic*)]
+  \item \label{T:unlimited}\textbf{Unlimited transport capacity.} There are no
+    vehicles (AGVs, robots or operators) to schedule. Any number of jobs can be
+    transported at the same time. Transport is therefore a
+    \emph{machine-dependent time lag} between consecutive operations of a job.
+  \item \label{T:immediate}Transport starts as soon as the operation (or its
+    batch) finishes. Loading and unloading times are zero or are included in $\tau$.
+  \item \label{T:buffer}Buffers are unlimited. A machine becomes free when its
+    batch finishes, because the transport does not occupy it. A job that arrives
+    before its machine is free waits in the buffer.
+  \item \label{T:same}If two consecutive operations of a job run on the same
+    machine, no transport is needed ($\tau_{\mu\mu}=0$).
+  \item \label{T:depot}Every job starts at the depot. The transport from the
+    depot to the machine of its first operation is counted. The return of the
+    finished job to the depot is \emph{not} counted in the makespan (see
+    Section~\ref{sec:critique}, decision D2).
+  \item \label{T:batch}Batch members are transported \emph{individually}. After
+    a batch finishes on $\mu$, all of its members are located at $\mu$, and each
+    one travels to the machine of its own next operation.
+\end{enumerate}
+
+For an operation $o$ let $\mu(o)$ be the machine that processes it. The
+transport constraint replaces the routing precedence (B6) by
+\begin{equation}
+  S_{O_{j,k+1}}\ \ge\ C_{O_{j,k}}+\tau_{\mu(O_{j,k}),\,\mu(O_{j,k+1})},
+  \qquad
+  S_{O_{j,1}}\ \ge\ \tau_{0,\,\mu(O_{j,1})}.
+  \label{eq:transport}
+\end{equation}
+Consequently, a batch $b$ on machine $\mu$ cannot start before its last member
+has arrived:
+\begin{equation}
+  S_b\ \ge\ \max_{o\in b}\Bigl(C_{\mathrm{pred}(o)}+\tau_{\mu(\mathrm{pred}(o)),\,\mu}\Bigr),
+  \label{eq:batcharrival}
+\end{equation}
+where $\mathrm{pred}(o)$ is the previous operation of $\job(o)$, with $C=0$ and
+location $0$ for a first operation.
+
+% ===========================================================================
+\section{Mixed-integer formulation}
+\label{sec:milp}
+
+The batching model is kept unchanged. Only the machine of each operation and
+the transport lags are added.
+
+\paragraph{Additional variables.}
+$w_{o,\mu}\in\{0,1\}$: operation $o$ is processed on machine $\mu\in\Mset_o$.
+
+\paragraph{Additional constraints.}
+\begin{align}
+  & w_{o,\mu}\ \ge\ x_{o,b}+y_{b,\mu}-1
+    && \forall o\in\Oset,\ b\in\Bset_{\varphi(o)},\ \mu\in\Mset_{\varphi(o)}
+    \tag{T-a}\label{eq:Ta}\\
+  & \textstyle\sum_{\mu\in\Mset_o} w_{o,\mu}=1,\qquad w_{o,\mu}=0\ \ \forall\mu\notin\Mset_o
+    && \forall o\in\Oset
+    \tag{T-b}\label{eq:Tb}\\
+  & S_{O_{j,k+1}}\ \ge\ C_{O_{j,k}}+\tau_{\mu\nu}\bigl(w_{O_{j,k},\mu}+w_{O_{j,k+1},\nu}-1\bigr)
+    && \forall j,\ k<n_j,\ \mu\neq\nu
+    \tag{T-c}\label{eq:Tc}\\
+  & S_{O_{j,1}}\ \ge\ \textstyle\sum_{\nu\in\Mset_{O_{j,1}}}\tau_{0\nu}\,w_{O_{j,1},\nu}
+    && \forall j\in\Jset
+    \tag{T-d}\label{eq:Td}
+\end{align}
+In \eqref{eq:Tc}, $\mu\in\Mset_{O_{j,k}}$ and $\nu\in\Mset_{O_{j,k+1}}$.
+The big constant becomes
+$L=\sum_{o}\max_\mu p_{o,\mu}+\sum_j n_j\max_{\mu,\nu\in\Mset_0}\tau_{\mu\nu}$.
+
+\paragraph{Interpretation.}
+\begin{itemize}
+  \item \eqref{eq:Ta}--\eqref{eq:Tb}: by (B1) and (B4), exactly one batch $b$
+    contains $o$ and exactly one machine $\mu^\ast$ has $y_{b,\mu^\ast}=1$.
+    \eqref{eq:Ta} forces $w_{o,\mu^\ast}=1$ and \eqref{eq:Tb} forces all other
+    $w_{o,\mu}$ to $0$. So $w$ is exactly the machine of $o$, without a
+    bilinear term.
+  \item \eqref{eq:Tc}: if $O_{j,k}$ runs on $\mu$ and $O_{j,k+1}$ on $\nu$, the
+    bracket equals $1$ and the lag $\tau_{\mu\nu}$ is enforced. Otherwise the
+    bracket is $\le 0$ and the constraint is weaker than (B6), which is kept.
+    No big-$M$ is needed. The number of constraints is
+    $\sum_j\sum_{k<n_j}|\Mset_{O_{j,k}}|\,|\Mset_{O_{j,k+1}}|\le|\Oset|\,m^2$.
+  \item \eqref{eq:Td}: transport from the depot to the first machine.
+  \item \eqref{eq:batcharrival} does not need its own constraint. It follows
+    from (B5a), which sets $S_o=S_b$ for every member, together with \eqref{eq:Tc}.
+\end{itemize}
+With $\tau\equiv0$ (all machines and the depot at one point) the model reduces
+exactly to the batching model. This is also the main regression test for the
+implementation (Section~\ref{sec:impl}).
+
+\paragraph{CP-SAT version.}
+In \texttt{src/batch\_solver.py} each potential batch already has one presence
+literal per eligible machine. For every operation $o$ and machine $\mu$, a
+literal $z_{o,\mu}$ is created with
+$x_{o,b}\wedge y_{b,\mu}\Rightarrow z_{o,\mu}$ and
+$\sum_\mu z_{o,\mu}=1$. Then \eqref{eq:Tc} becomes
+\begin{center}\small
+\texttt{model.add(S[c] >= C[a] + tau[mu][nu])}\\
+\texttt{\ \ \ \ .only\_enforce\_if([z[a,mu], z[c,nu]])}
+\end{center}
+The horizon must include the transport term of $L$.
+
+% ===========================================================================
+\section{Consequences for the decision process}
+\label{sec:mdp}
+
+\subsection{State and dynamics}
+The environment keeps, for every active job $j$, its completion time $C_j$ (the
+end of its last scheduled operation, $0$ at the start) and its \emph{location}
+$\loc_j\in\Mset_0$ ($\loc_j=0$ at the start). The arrival time of job $j$ at
+machine $\mu$ and its earliest start there are
+\begin{equation}
+  a_{j\mu}=C_j+\tau_{\loc_j\mu},\qquad
+  s_{j\mu}=\max\bigl(F_\mu,\ a_{j\mu}\bigr),
+  \label{eq:arrival}
+\end{equation}
+where $F_\mu$ is the free time of $\mu$. Without transport, $a_{j\mu}=C_j$ for
+every $\mu$. With transport, \textbf{readiness depends on the machine}. This one
+change affects most of the batching machinery.
+
+\paragraph{Batch completion rule.} The selected pair $(\mu,j)$ opens a batch
+starting at $S_{b_t}=s_{j\mu}$. A candidate $j'$ now joins only if it has
+\emph{arrived at $\mu$} by then:
+\begin{equation}
+  \varphi(o_{j'}^t)=f,\quad \mu\in\Mset_{o_{j'}^t},\quad
+  a_{j'\mu}\le S_{b_t},
+\end{equation}
+together with the capacity and order-difference conditions, adding candidates in
+order of arrival time $a_{j'\mu}$ (previously: ready time). The property
+``joining never delays the batch'' is kept.
+
+\paragraph{Update after a decision.} For every member $j$ of the batch:
+$C_j\leftarrow S_{b_t}+p_{b_t}$ and $\loc_j\leftarrow\mu$. For every other job,
+$s_{j\mu}$ is updated through $F_\mu$ as before.
+
+\paragraph{Reward, mask and teacher.} The reward (makespan increase) is
+unchanged. The mask and the warm-start teacher keep their definitions (earliest
+start, tie-break earliest completion). Because they are computed from
+$s_{j\mu}$ in \eqref{eq:arrival}, they are \emph{transport-aware} in all
+representations, including the one without transport information.
+
+\subsection{Batching features under transport}
+The batching features of the batching document assume a machine-independent
+ready time $r_j$. They must be re-evaluated at a specific machine. Let
+\begin{equation}
+  \mu^\ast_j=\arg\min_{\mu\in\Mset_{o_j^t}} s_{j\mu}
+  \quad(\text{ties: smallest } s_{j\mu}+p_{o_j^t,\mu}),
+\end{equation}
+be the machine at which job $j$ can start earliest. Then
+\begin{multline}
+  \pi_j(t)=\min\Bigl(B_{\varphi(o_j^t)}-1,\ \bigl|\{j'\neq j:\ \varphi(o_{j'}^t)=\varphi(o_j^t),\
+  |\kappa(o_{j'}^t)-\kappa(o_j^t)|\le\Delta,\\
+  \mu^\ast_j\in\Mset_{o_{j'}^t},\
+  a_{j'\mu^\ast_j}\le s_{j\mu^\ast_j}\}\bigr|\Bigr).
+\end{multline}
+This matches the batch completion rule at $\mu^\ast_j$ exactly. The old condition
+$\Mset_{o_j^t}\cap\Mset_{o_{j'}^t}\neq\emptyset$ is replaced by the stricter
+$\mu^\ast_j\in\Mset_{o_{j'}^t}$. For the family node (Representation A), $t_f$ is
+the smallest $s_{j\mu^\ast_j}$ over the current members, $\mu_f$ the machine
+that achieves it, and $R_f(t)=\{o_{j'}^t\in\Oset^f:\ \mu_f\in\Mset_{o_{j'}^t},\
+a_{j'\mu_f}\le t_f\}$.
+
+Without transport ($\tau\equiv0$) readiness does not depend on the machine, and the
+original definitions of the batching document are kept unchanged. This keeps the
+batching-only environments, and the models already trained on them, exactly as
+they were.
+
+\crit{These features are now \emph{approximations}: they describe the batch at
+one machine ($\mu^\ast_j$ or $\mu_f$), while the policy may choose another.
+Exact per-machine values belong on per-machine edges. In Representation~A the
+\textsf{batch\_exec} edge $(f,\mu)$ has three unused (zero) columns, which could
+hold $n_{f\mu}(t)/B_f$ and the earliest batch start at $\mu$. That, however,
+changes the batching representation between the experiments with and without
+transport. For this reason it is recommended only as a later refinement.}
+
+\subsection{Action-edge features}
+The action edge $(\mu,j)$ keeps its five columns
+$[p_b,\ \text{rel.\ speed},\ s_{j\mu},\ s_{j\mu}+p_b,\ s_{j\mu}-F_\mu]$, now with the
+transport-aware $s_{j\mu}$ of \eqref{eq:arrival} and the batch rule above. A
+sixth column is added (Section~\ref{sec:repTF}):
+\begin{equation}
+  \mathbf{a}_{\mu j}=\bigl[\ p_b,\ \tfrac{p_{o_j^t,\mu}}{\sum_{\mu'}p_{o_j^t,\mu'}},\
+  s_{j\mu},\ s_{j\mu}+p_b,\ s_{j\mu}-F_\mu,\ \theta\,\tau_{\loc_j\mu}\ \bigr]\in\R^6,
+  \label{eq:actionedge}
+\end{equation}
+with $\theta=1$ in the feature representation and $\theta=0$ otherwise. Every
+attributed relation of the transport environments therefore has dimension $6$:
+the other relations are padded with zero columns. The edge width is a property
+of the environment (\texttt{EDGE\_DIM}), and the GNN reads it when it is built. The
+batching-only environments keep width $5$.
+Column 5, $s_{j\mu}-F_\mu$, now also counts machine idle time \emph{caused by
+transport}, i.e.\ the job has not yet arrived.
+
+% ===========================================================================
+\section{Transport information to represent}
+\label{sec:info}
+
+For the comparison to be fair, both representations carry the \emph{same}
+information and differ only in how it is encoded, as Representations A and B
+did for batching. Four pieces of information are identified:
+\begin{description}[style=nextline]
+  \item[I1 -- Layout.] Positions of the machines and distances between them (static).
+  \item[I2 -- Location.] Where each active job is now, $\loc_j$ (dynamic).
+  \item[I3 -- Immediate transport.] The transport each candidate action would
+    cause, $\tau_{\loc_j\mu}$ for $\mu\in\Mset_{o_j^t}$ (dynamic, job--machine pair).
+  \item[I4 -- Future transport.] The transport that the pending operations will
+    require, given their eligible machines (static for pending operations).
+\end{description}
+For I4, define for two consecutive operations $o=O_{j,k}$ and $o^+=O_{j,k+1}$
+\begin{equation}
+  \tau^{\min}_{o\to o^+}=\min_{\mu\in\Mset_o,\ \nu\in\Mset_{o^+}}\tau_{\mu\nu},\qquad
+  \tau^{\mathrm{avg}}_{o\to o^+}=\frac{1}{|\Mset_o|\,|\Mset_{o^+}|}
+  \sum_{\mu\in\Mset_o}\sum_{\nu\in\Mset_{o^+}}\tau_{\mu\nu}.
+  \label{eq:tauexp}
+\end{equation}
+$\tau^{\min}$ is the unavoidable transport (if all machines have distinct
+positions, it is positive exactly when the two operations share no eligible
+machine). $\tau^{\mathrm{avg}}$ is the transport
+expected under a machine choice that ignores the layout. For the first
+operation, $\Mset_o$ is replaced by $\{0\}$ (the depot).
+
+\begin{table}[h]
+\centering
+\caption{Where each piece of information lives in each transport representation.}
+\label{tab:info}
+\begin{tabular}{l p{4.3cm} p{4.3cm} l}
+\toprule
+ & T-F: features & T-E: auxiliary edges & T-0 \\
+\midrule
+I1 layout     & machine $(X_\mu,Y_\mu)$ + $\tau$ on \textsf{listens} edges & \textsf{transport} relation machine$\to$machine & -- \\
+I2 location   & job $(X_{\loc_j},Y_{\loc_j})$ & \textsf{at} relation job$\to$machine & -- \\
+I3 immediate  & 6th column of the action edge & \textsf{reach} relation job$\to$machine & implicit in $s_{j\mu}$ \\
+I4 future     & operation features $\tau^{\mathrm{in}}$ & \textsf{transfer} relation op$\to$op & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ===========================================================================
+\section{Transport representation T-0: none}
+\label{sec:repT0}
+
+The graph is the one of the chosen batching representation. There is no position,
+no location and no distance, and the sixth action-edge column is $0$. The
+environment, the mask and the teacher still apply the transport
+constraint~\eqref{eq:transport}.
+
+\crit{T-0 is \emph{not} blind to transport. The earliest start $s_{j\mu}$ on
+the action edges already includes $\tau_{\loc_j\mu}$, because the start time is
+a property of the action rather than of the representation. Hiding it (showing
+$\max(F_\mu,C_j)$ instead) would make the edges report start times that are
+wrong, and the teacher, which ranks by the true $s_{j\mu}$, could no longer be
+imitated. That is the problem already fixed for batching. The consequence is
+that T-F and T-E are measured against a baseline that already sees the
+\emph{current} effect of transport. What they add is I1, I2, I4 and the
+\emph{isolated} value of I3 (the start time mixes transport with machine
+availability). The expected gain is therefore smaller than for batching, and
+the hypothesis should be stated as: ``explicit transport information improves
+decisions whose consequences appear in \emph{later} transports''.}
+
+% ===========================================================================
+\section{Transport representation T-F: features}
+\label{sec:repTF}
+
+No node type and no relation is added. Transport information is stored as
+features of the existing nodes and edges.
+
+\paragraph{Machine node.}
+\begin{equation}
+  \mathbf{x}^{\mathrm{T}}_\mu=\bigl[\ \mathbf{x}_\mu \cat \tilde X_\mu \cat \tilde Y_\mu\ \bigr].
+\end{equation}
+
+\paragraph{Job node.} The position of the machine where the job currently is
+(the machine of its last processed operation, or the depot):
+\begin{equation}
+  \mathbf{x}^{\mathrm{T}}_j(t)=\bigl[\ \mathbf{x}_j(t) \cat \tilde X_{\loc_j} \cat \tilde Y_{\loc_j}\ \bigr].
+\end{equation}
+
+\paragraph{Operation node.} The transport \emph{into} the operation:
+\begin{equation}
+  \mathbf{x}^{\mathrm{T}}_o(t)=\bigl[\ \mathbf{x}_o \cat \tau^{\mathrm{in},\min}_o(t) \cat \tau^{\mathrm{in},\mathrm{avg}}_o(t)\ \bigr],
+\end{equation}
+where
+\begin{equation}
+  \tau^{\mathrm{in},\cdot}_o(t)=
+  \begin{cases}
+    \tau^{\cdot}_{\mathrm{pred}(o)\to o} & \text{if } \mathrm{pred}(o) \text{ is not scheduled},\\[2pt]
+    \min / \operatorname{avg}_{\nu\in\Mset_o}\tau_{\loc_{\job(o)}\nu} & \text{if } o \text{ is the current operation of its job},
+  \end{cases}
+\end{equation}
+with $\tau^{\cdot}$ from~\eqref{eq:tauexp}. The feature is static for pending
+operations and becomes exact (known origin) when the operation becomes current.
+
+\crit{The original idea was an operation feature ``describing what was
+processed''. It would carry no information: scheduled operations are
+\emph{removed} from the graph (\texttt{\_remove\_operations}), so the network
+never sees a processed operation. What was processed, and where, is kept by the
+job node through $\loc_j$. The operation feature is therefore redefined to look
+ahead, which is where the operation node is useful.}
+
+\paragraph{Machine--machine edges.} The existing fully connected relation
+$(\text{machine},\textsf{listens},\text{machine})$ gets an attribute:
+\begin{equation}
+  \mathbf{a}_{\mu\nu}=\bigl[\ \tau_{\mu\nu},\ 0,\ 0,\ 0,\ 0,\ 0\ \bigr].
+\end{equation}
+
+\paragraph{Action edges.} The sixth column of~\eqref{eq:actionedge} holds
+$\tau_{\loc_j\mu}$ ($\theta=1$).
+
+\paragraph{Normalisation of the coordinates.}
+$\tilde X=(X-X_{\min})/W$ and $\tilde Y=(Y-Y_{\min})/W$, with
+$W=\max(X_{\max}-X_{\min},\,Y_{\max}-Y_{\min})$ computed over $\Mset_0$.
+The scale is the same for the two axes and for jobs and machines. These columns
+must be \emph{excluded} from the per-column min--max normalisation of
+\texttt{normalize\_state}.
+
+\crit{\texttt{normalize\_state} rescales every column to $[-1,1]$ separately
+for each node type. The job $x$-coordinate would be scaled by the extent of the
+\emph{job locations} and the machine $x$-coordinate by the extent of the
+\emph{machines}, so the same physical point would get two different values, and
+the network could not relate a job to a machine by position. The shared scale
+$W$ avoids this, and one scale for both axes keeps the Manhattan geometry.}
+
+\crit{Two limitations of the features should be discussed in the dissertation.
+(i) Absolute coordinates are not translation invariant. Only differences matter,
+so the coordinates are mainly useful when combined, e.g.\ in the actor, which
+concatenates job and machine embeddings. This is why I3 is also given
+explicitly. (ii) The distance on \textsf{listens} is a deterministic function of
+the two endpoint coordinates and says nothing about any job. It helps a machine
+weigh its neighbours, e.g.\ where its jobs will go next, but the quantity the
+decision actually needs, $\tau_{\loc_j\mu}$, is a job--machine value. Strictly
+speaking, T-F is ``features on existing nodes \emph{and} existing edges''.}
+
+% ===========================================================================
+\section{Transport representation T-E: auxiliary edges}
+\label{sec:repTE}
+
+No node feature is added. Transport information is encoded by new relations
+whose attributes are transport times. The same information is used as in T-F.
+\begin{align}
+  \Eset_{MM}^{\mathrm{tr}} &= \{(\mu,\nu):\ \mu\neq\nu,\ \exists j,k:\ \mu\in\Mset_{O_{j,k}},\ \nu\in\Mset_{O_{j,k+1}}\},
+  \label{eq:Etr}\\
+  \Eset_{JM}^{\mathrm{at}}(t) &= \{(j,\loc_j):\ j \text{ active},\ \loc_j\neq 0\},
+  \label{eq:Eat}\\
+  \Eset_{JM}^{\mathrm{reach}}(t) &= \{(j,\mu):\ j \text{ active},\ \mu\in\Mset_{o_j^t}\},
+  \label{eq:Ereach}\\
+  \Eset_{OO}^{\mathrm{tf}}(t) &= \{(o^+,o):\ o=O_{j,k},\ o^+=O_{j,k+1},\ o \text{ not scheduled}\}.
+  \label{eq:Etf}
+\end{align}
+
+\begin{table}[h]
+\centering
+\caption{New relations of T-E and their attributes (padded with zeros to dimension 6).}
+\label{tab:TE}
+\begin{tabular}{l l l l}
+\toprule
+Edge set & Relation & Attribute & Info \\
+\midrule
+\eqref{eq:Etr}   & (machine, \textsf{transport}, machine) & $[\tau_{\mu\nu}]$ & I1 \\
+\eqref{eq:Eat}   & (job, \textsf{at}, machine) + reverse \textsf{hosts} & none & I2 \\
+\eqref{eq:Ereach}& (job, \textsf{reach}, machine) & $[\tau_{\loc_j\mu}]$ & I3 \\
+\eqref{eq:Etf}   & (operation, \textsf{transfer}, operation) & $[\tau^{\min}_{o\to o^+},\ \tau^{\mathrm{avg}}_{o\to o^+}]$ & I4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\noindent The action edge keeps $\theta=0$.
+
+\paragraph{Interpretation.}
+\begin{itemize}
+  \item \textsf{transport} (I1) is a \emph{sparse} layout graph. Only machine
+    pairs that some routing can actually use are connected, unlike the fully
+    connected \textsf{listens}. Both directions are included ($\tau$ is symmetric).
+  \item \textsf{at}/\textsf{hosts} (I2) gives the location as structure. A
+    machine learns which jobs are waiting there, which matters for batching,
+    because members of the same batch leave from the same machine
+    (assumption~\ref{T:batch}). A job at the depot has no \textsf{at} edge. Its
+    origin is still visible through the \textsf{reach} attributes.
+  \item \textsf{reach} (I3) connects the same pairs as the action edges but is a
+    separate relation with its own attention. The actor reads edge attributes
+    \emph{only} from the action edges, so in T-E the value $\tau_{\loc_j\mu}$
+    reaches the decision only through the embeddings. This is the real
+    difference from T-F for I3: T-F gives it to the scorer directly, T-E makes
+    the GNN use it.
+  \item \textsf{transfer} (I4) runs parallel to \textsf{prec} and in the same
+    direction (successor $\to$ predecessor). The current operation therefore
+    receives the transport of the downstream part of its routing, like the
+    transport-weighted conjunctive arcs of a disjunctive graph.
+\end{itemize}
+
+\paragraph{Size.}
+$|\Eset^{\mathrm{tr}}_{MM}|\le m(m-1)$, $|\Eset^{\mathrm{at}}_{JM}|\le n$,
+$|\Eset^{\mathrm{reach}}_{JM}|$ equals the number of action edges ($\le nm$), and
+$|\Eset^{\mathrm{tf}}_{OO}|\le|\Oset|-n$. The graph grows linearly in the
+instance size.
+
+\paragraph{Receptive field.} With the two GAT layers used, every piece of
+information reaches the scored nodes: I2 and I3 in one hop into the job and
+machine of the action, I4 in one hop into the current operation and a second hop
+into its job, and I1 in one hop between machines.
+
+\crit{The heterogeneous model aggregates relations with a \emph{mean}
+(\texttt{to\_hetero(..., aggr='mean')} in \texttt{src/bopo.py}). Adding
+\textsf{at}, \textsf{reach} and \textsf{hosts} changes the number of relations
+arriving at job and machine nodes, and therefore the weight of every existing
+message. Part of any difference between T-E and T-F may come from this dilution
+rather than from the transport information. The same confound exists between
+batching Representations A and B. It should be named as a threat to validity,
+or controlled by one ablation that adds the T-E relations with all attributes
+set to zero.}
+
+\crit{\textsf{at} and \textsf{reach} partly overlap: given the edge \textsf{at}
+and the \textsf{transport} attributes, $\tau_{\loc_j\mu}$ is determined. They
+are kept separate because a 2-layer GNN cannot reliably reconstruct a pairwise
+distance from averaged embeddings. If edges have to be saved, \textsf{at} is the
+first candidate to remove.}
+
+% ===========================================================================
+\section{Experimental grid}
+\label{sec:grid}
+
+Batching and transport are represented independently, which gives nine
+configurations:
+\begin{center}
+\begin{tabular}{l ccc}
+\toprule
+ & T-0 & T-F & T-E \\
+\midrule
+batching baseline (\texttt{ojmb\_base}) & \texttt{base+t0} & \texttt{base+tf} & \texttt{base+te} \\
+Representation A (\texttt{ojmb\_node})  & \texttt{node+t0} & \texttt{node+tf} & \texttt{node+te} \\
+Representation B (\texttt{ojmb\_edge})  & \texttt{edge+t0} & \texttt{edge+tf} & \texttt{edge+te} \\
+\bottomrule
+\end{tabular}
+\end{center}
+All nine configurations solve \emph{the same problem} (batching + transport) on
+the \emph{same instances}, with the same action space, batch rule, mask, teacher
+and reward. They differ only in the graph. \texttt{base+t0} is the full
+baseline.
+
+\begin{itemize}
+  \item \textbf{Main effects.} The transport effect is read along the rows and
+    the batching effect along the columns. Because all configurations are
+    evaluated on the same instances, the comparisons are \emph{paired}.
+    Friedman's test over the nine configurations, followed by pairwise Wilcoxon
+    signed-rank tests with a multiple-comparison correction, is recommended.
+  \item \textbf{Interaction.} If the best transport representation depends on
+    the batching representation, this is itself a result (e.g.\ \textsf{hosts}
+    edges may help most together with the family node).
+  \item \textbf{Seeds.} At least three training seeds per configuration. With
+    nine configurations this is 27 training runs, so the per-run budget has to
+    be fixed before the grid is started.
+\end{itemize}
+
+\paragraph{Instance generation and calibration.}
+Coordinates are drawn uniformly from $\{0,\dots,L\}^2$, with the depot drawn the
+same way. For points uniform on $[0,L]^2$, $\mathbb{E}|X_\mu-X_\nu|=L/3$, so the
+expected transport time is $\mathbb{E}[\tau]=2L/3$. To make transport a fraction
+$\rho$ of the mean processing time $\bar p$,
+\begin{equation}
+  L=\left\lceil \tfrac{3}{2}\,\rho\,\bar p\right\rceil,
+  \qquad\text{e.g. } \bar p\approx 50,\ \rho=0.3\ \Rightarrow\ L=23.
+\end{equation}
+
+\crit{If $\rho$ is too small, transport is irrelevant and every configuration
+will perform the same, which cannot be told apart from ``the representation does
+not help''. If $\rho$ is too large, transport dominates and the batching signal
+is lost. Before training, the CP-SAT solutions for a few values of $\rho$ (e.g.\
+$0.1,0.3,0.5$) should be used to report (i) the relative increase of the
+makespan over the transport-free instance and (ii) the fraction of job time
+spent in transport. The value of $\rho$ is then chosen so that transport is
+clearly present but not dominant. The same statistics also go in the
+dissertation, to show that the problem actually changed.}
+
+% ===========================================================================
+\section{Metrics that must change}
+\label{sec:metrics}
+
+\paragraph{Feasibility check.} Add the transport constraint to
+\texttt{check\_schedule} (batching solver and \texttt{src/metrics}):
+$S_{c}\ge C_{a}+\tau_{\mu(a)\mu(c)}$ for consecutive $a,c$, and
+$S_{O_{j,1}}\ge\tau_{0\mu(O_{j,1})}$.
+
+\paragraph{Lower bound.} The machine-set bound (b) of \texttt{lower\_bound} is
+still valid, because transport does not occupy machines. The job bound (a) must
+include transport, otherwise it is loose and the relative error to the lower
+bound is inflated. The tightest cheap bound is a shortest path through the
+layered graph of eligible machines:
+\begin{equation}
+  \mathrm{LB}_j=\min_{\nu_1,\dots,\nu_{n_j}}\Bigl(\tau_{0\nu_1}+\sum_{k=1}^{n_j}p_{O_{j,k},\nu_k}
+  +\sum_{k=1}^{n_j-1}\tau_{\nu_k\nu_{k+1}}\Bigr),\qquad \nu_k\in\Mset_{O_{j,k}},
+\end{equation}
+computed by dynamic programming in $\mathcal{O}(n_j m^2)$. It is valid with
+batching, because a batch lasts at least as long as each of its members. Note
+that $\sum_k\min_\nu p_{O_{j,k},\nu}+\sum_k\tau^{\min}_{O_{j,k}\to O_{j,k+1}}$ is
+also valid but weaker, since it may use different machines for the same
+operation in two terms.
+
+\paragraph{References.} All CP-SAT reference makespans must be recomputed with
+transport. The references of the batching experiments do not apply.
+
+% ===========================================================================
+\section{Critical assessment and open decisions}
+\label{sec:critique}
+
+\subsection{Weaknesses of the proposal}
+\begin{enumerate}
+  \item \textbf{Transport without resources.} Under~\ref{T:unlimited} the problem
+    is an FJSP with batching and \emph{machine-dependent time lags}, not an FJSP
+    with transport resources (AGVs, robots), which is the more common meaning of
+    ``transport'' in the literature. This is a legitimate and cleaner variant,
+    but it must be named and justified as such. The justification is that it
+    isolates the spatial effect of the layout, which is what the
+    representations encode, without adding a new resource type. Adding vehicles
+    would require new decisions (which vehicle, empty trips) and would change
+    the action space. That is outside the scope of a representation study.
+  \item \textbf{Operation feature ``what was processed''.} Processed operations
+    are deleted from the graph, so this feature is never observed. It is
+    replaced by the incoming transport (Section~\ref{sec:repTF}).
+  \item \textbf{Machine identity as a job feature.} A machine index is a label
+    that only has meaning inside one instance, the same argument used to reject
+    the family index. The location is given as coordinates (T-F) or as an edge
+    (T-E).
+  \item \textbf{Coordinate normalisation.} Without the shared scale $W$, job and
+    machine coordinates live in different frames (Section~\ref{sec:repTF}). This
+    is the error most likely to silently void T-F.
+  \item \textbf{Machine--machine distance.} It is static, and so far removed
+    from the decision that on its own it is unlikely to matter. It is kept in
+    both representations (I1) for completeness, but the explicit job--machine
+    transport (I3) is the main component. An ablation without I1 would show
+    whether it contributes anything.
+  \item \textbf{The baseline sees transport.} See Section~\ref{sec:repT0}.
+    Expect smaller effects than for batching and phrase the hypothesis
+    accordingly.
+  \item \textbf{Batching becomes machine-dependent.} The completion rule, $\pi_j$
+    and the family-node features change definition, and the batching features
+    become approximations evaluated at one machine. The batch rule also stays
+    myopic. It may add a partner to a batch on a machine that is far from that
+    partner's next machine, increasing its future transport. The policy has no
+    control over this. It is a property of the environment and must be stated.
+  \item \textbf{Edge dimension.} The transport environments use width 6 instead
+    of 5, so models trained for batching only cannot be reused on them. This is
+    acceptable because the problem is different anyway, but the batching-only
+    results and the transport results are not directly comparable.
+  \item \textbf{Aggregation confound} in T-E (Section~\ref{sec:repTE}).
+  \item \textbf{Calibration.} Without the $\rho$ study, a null result cannot be
+    interpreted (Section~\ref{sec:grid}).
+  \item \textbf{Cost.} Nine configurations with several seeds. If the budget is
+    short, the most informative subset is the batching representation that won
+    the batching experiments, combined with T-0, T-F and T-E.
+\end{enumerate}
+
+\subsection{Decisions to confirm}
+\begin{description}[style=nextline]
+  \item[D1 -- Depot.] Recommended: include a depot and the first transport. It
+    gives every job a defined location at $t=0$, which the job feature needs.
+    Alternative: no depot and $\tau=0$ for the first operation. This is simpler,
+    but then the location of an unstarted job is undefined and needs a flag.
+  \item[D2 -- Return to the depot.] Recommended: not counted. Counting it adds
+    $\tau_{\mu(O_{j,n_j}),0}$ to the completion of each job and makes the choice
+    of the last machine matter.
+  \item[D3 -- Transport magnitude $\rho$.] Calibrated in
+    Section~\ref{sec:calibration}: $\rho=0.3$.
+  \item[D4 -- I3 in T-F.] Recommended: on the action edge (direct access by the
+    scorer). Alternative: omit it, and let the actor derive it from the job and
+    machine coordinates. This is a stricter ``node features only'' variant, but
+    weaker.
+  \item[D5 -- Batch features per machine.] Recommended for now: evaluate at
+    $\mu^\ast_j$ / $\mu_f$ and keep the batching representation unchanged. A
+    per-machine version on the \textsf{batch\_exec} edges is a later refinement.
+\end{description}
+
+% ===========================================================================
+\section{Calibration of the transport magnitude}
+\label{sec:calibration}
+
+Eight batching instances of the training size (8--10 jobs, 5--10 machines, 5--6
+operations per job) were solved by CP-SAT without transport and with the layouts
+of four values of $\rho$. The layout is drawn after the rest of the instance, so
+the jobs, families and processing times are the same for every $\rho$. All 40
+solutions were proven optimal within 20~s. The \emph{increase} is
+$C_{\max}(\rho)/C_{\max}(0)-1$. The \emph{share} is the fraction of the jobs'
+time spent travelling in the optimal schedule,
+$\sum_j(\text{transport of } j)/\sum_j C_j$.
+
+\begin{table}[h]
+\centering
+\caption{Effect of $\rho$ on the optimal makespan (8 instances, mean $C_{\max}(0)=343.8$).}
+\label{tab:calibration}
+\begin{tabular}{c c c c}
+\toprule
+$\rho$ & increase (mean) & increase (min--max) & share \\
+\midrule
+0.1 & 0.055 & 0.029--0.102 & 0.061 \\
+0.3 & 0.140 & 0.081--0.226 & 0.145 \\
+0.5 & 0.198 & 0.118--0.325 & 0.170 \\
+1.0 & 0.425 & 0.293--0.606 & 0.300 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent $\rho=0.1$ changes the makespan by about 5\%, which is within the
+typical gap of a learned policy, so the representations could not be told apart.
+$\rho=1$ makes transport the dominant cost (30\% of the jobs' time) and would
+drown the batching signal. $\rho=0.3$ adds 14\% to the makespan, with transport
+15\% of the jobs' time. It is chosen as the transport scale. The share grows
+more slowly than $\rho$ (0.17 at $\rho=0.5$) because the optimal schedules
+increasingly keep consecutive operations on the same or nearby machines. This is
+exactly the behaviour the representations should help the policy learn. The
+calibration uses only eight instances and should be repeated on the final
+dataset (\texttt{python -m src.calibrate\_transport}).
+
+% ===========================================================================
+\section{Implementation}
+\label{sec:impl}
+
+\begin{description}[style=nextline]
+  \item[Layout (\texttt{src/transport.py}).] Instance keys \texttt{"coords"}
+    ($m\times2$ integers), \texttt{"depot"} and \texttt{"transport\_rho"}. It also
+    provides the matrix $\tau$ (depot at index $m$), $\tau^{\min}$ and
+    $\tau^{\mathrm{avg}}$ of~\eqref{eq:tauexp}, and the job lower bound. Instances
+    without a layout have $\tau\equiv0$.
+  \item[Instances (\texttt{src/batch\_generator.py}).] Option
+    \texttt{transport\_rho}. Positions are uniform on $\{0,\dots,L\}^2$ with
+    $L=\lceil1.5\,\rho\,\bar p\rceil$, drawn last. The dataset is built with
+    \texttt{python -m src.generate\_batching\_dataset --transport-rho 0.3 --out data/transport}.
+    Training instances use the $\rho$ stored in the validation dataset.
+  \item[Solver and checkers.] \texttt{src/batch\_solver.py} implements
+    \eqref{eq:Ta}--\eqref{eq:Td} in CP-SAT, and its \texttt{check\_schedule}
+    reports transport and depot violations. \texttt{src/metrics/batching.py} adds
+    the \texttt{transport} constraint to the batching checks. The job bound of
+    \texttt{lower\_bound} is the shortest path of Section~\ref{sec:metrics},
+    which reduces to the old bound without transport.
+  \item[Environments (\texttt{src/env\_batching.py}).] The transport dynamics
+    (location $\loc_j$, arrivals, transport-aware start times, batch rule with
+    arrivals) are applied by every batching environment, so the three
+    batching-only environments also solve transport instances correctly. A
+    second class attribute \texttt{TRANSPORT\_REP} selects the representation,
+    and the nine combinations are registered as
+    \texttt{ojmb\_<node|edge|base>\_<t0|tf|te>}. In T-F the coordinates are the
+    last two columns of the machine and job features, and \texttt{normalize\_state}
+    keeps them on the shared scale, mapped to $[-1,1]$. All attributed relations
+    are padded to width 6 after normalisation.
+  \item[Model (\texttt{src/bopo.py}, \texttt{src/gat.py}, \texttt{src/gine.py},
+    \texttt{src/transformer.py}).] The edge width of the GNN layers is taken from
+    the environment (5 or 6).
+  \item[Command line.] \texttt{--representation transport} trains the nine
+    configurations. The test script only pairs a model with instances of its own
+    kind (plain FJSP, batching, batching with transport).
+\end{description}
+
+\paragraph{Tests (\texttt{tests/test\_transport.py}).}
+\begin{enumerate}[label=(\roman*)]
+  \item Regression: without a layout, and with every location at the same point,
+    each of the nine environments takes exactly the same schedules as the
+    batching-only environment for the same actions. T-0 also has identical
+    features.
+  \item Random and teacher rollouts of every environment pass both checkers, and
+    the makespan never falls below the lower bound.
+  \item On small instances the CP-SAT solution passes the checker and is never
+    worse than the teacher, and the lower bound never exceeds the solver's bound.
+  \item The hand-built instance of Section~\ref{sec:example} gives the expected
+    batches, arrival-based start times, T-F features and T-E edges.
+  \item Violations of the transport and depot constraints are detected.
+  \item A model is built for all nine representations, evaluated with the metrics
+    pipeline, and trained for one BOPO update.
+\end{enumerate}
+The tests were checked against a mutation: when the environment ignores
+transport, (ii) and (iv) fail. The existing tests (\texttt{tests/test\_metrics.py})
+still pass. A two-step training run of \texttt{ojmb\_node\_tf},
+\texttt{ojmb\_edge\_te} and \texttt{ojmb\_base\_t0} completed end to end.
+
+% ===========================================================================
+\section{Illustrative example}
+\label{sec:example}
+
+Three machines and a depot, with
+$M_1=(0,0)$, $M_2=(4,3)$, $M_3=(10,0)$ and depot $(0,5)$:
+\[
+  \tau=\begin{array}{c|cccc}
+     & 0 & M_1 & M_2 & M_3\\\hline
+   0   & 0 & 5 & 6 & 15\\
+   M_1 & 5 & 0 & 7 & 10\\
+   M_2 & 6 & 7 & 0 & 9\\
+   M_3 & 15& 10& 9 & 0
+  \end{array}
+\]
+Jobs~1 and~2 have just finished: job~1 on $M_1$ at $C_1=10$ and job~2 on $M_3$
+at $C_2=12$. Their current operations belong to the same family $f$, with
+$B_f=2$, satisfy the order difference, and are both eligible only on $M_2$,
+which is free from $F_{M_2}=15$. Arrivals: $a_{1,M_2}=10+7=17$ and
+$a_{2,M_2}=12+9=21$.
+\begin{itemize}
+  \item Action $(M_2,1)$: $S_b=\max(15,17)=17$. Job~2 arrives at $21>17$, so it
+    does not join. Job~1 runs alone, and job~2 later needs its own batch.
+  \item Action $(M_2,2)$: $S_b=\max(15,21)=21$. Job~1 has arrived ($17\le21$)
+    and joins. One batch, but $M_2$ is idle from 15 to 21 because of transport.
+  \item Without transport, both jobs would be ready at 15 and either action would
+    form the batch. Transport makes the choice of \emph{which} job opens the
+    batch decisive. The batch-aware processing time $p_b$ on the action edge
+    already shows the difference (a single job vs.\ the longest of the pair),
+    and so do the start times ($17$ vs.\ $21$), even in T-0.
+  \item After the batch, both jobs are at $M_2$. If their next operations are on
+    $M_3$, both pay $\tau_{M_2M_3}=9$. T-F shows this through the incoming
+    transport of those operations, and T-E through the \textsf{transfer} edges.
+    T-0 shows it only once the jobs are dispatched.
+\end{itemize}
+
+\paragraph{Waiting to batch is not always worth it.} The test instance is a
+variant of this example: job~0 ends on $M_1$ at 10 and arrives at $M_2$ at 17,
+job~1 ends on $M_3$ at 16 and arrives at 25, and the family operations take 4
+and 3. Batching them means starting at 25 and ending at 29. Running job~0 alone
+(17--21) and job~1 alone (25--28) ends at 28, which equals the lower bound of
+job~1 and is the CP-SAT optimum. Transport can therefore make the batch that the
+completion rule would form (when job~1 opens it) the \emph{worse} choice. The
+policy has to learn when to accept that.
+
+\end{document}
