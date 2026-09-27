@@ -1,0 +1,47 @@
+C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-09-27 22:57:33
+[MAIN] mode=optuna
+[MAIN] run_name=train_run
+[MAIN] representation(s)=['ojm']
+[MAIN] gnn_type=gat
+[MAIN] overrides={'num_layers': 2, 'logp_norm': 'sum', 'exclude_greedy_from_loss': False}
+============================================================
+======================================================================
+[PARAM] Hyperparameter tuning runner (Optuna)
+[PARAM] Representations : ['OJM']
+[PARAM] Trials          : 4
+[PARAM] Max episodes    : 30
+[PARAM] Objective       : min(last_val_gap_Q80)
+[PARAM] Storage         : optuna_journal.log
+======================================================================
+[I 2026-09-27 22:57:33,302] Using an existing study with `study_name='fjsp_tuning_ojm_exgreedyFalse_logpsum_L2'` instead of creating a new one.
+[PARAM] Starting Optuna study for OJM | gnn_type=gat | study_name=fjsp_tuning_ojm_exgreedyFalse_logpsum_L2 | trials=4 | overrides={'num_layers': 2, 'logp_norm': 'sum', 'exclude_greedy_from_loss': False} | max_episodes=30 | objective=min(last_val_gap_Q80)
+[PARAM] Critical params (OJM): ['lr', 'hidden_channels', 'batch_size', 'num_layers', 'heads', 'n_cases', 'new_freq', 'K', 'use_greedy', 'mask_option', 'sel_k']
+[PARAM][OJM] Trial 8 | gnn_type=gat | episodes=30 | lr=2.26e-04 | hidden=128 | layers=2 | heads=3 | K=32 | use_greedy=True | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-27 22:57:33
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=128 | K=32 | use_greedy=True | lr=0.0002255527445243218 (decaying to 4.51e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=2 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gat | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gat_exgreedyFalse_logpsum_L2_1790546253\trial_8
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=39 | bc_loss=2.0062 | decisions=50
+[TRAIN][WARMSTART] step 10/100 | instance=59 | bc_loss=2.0020 | decisions=50
+[TRAIN][WARMSTART] step 15/100 | instance=40 | bc_loss=1.9265 | decisions=47
+[TRAIN][WARMSTART] step 20/100 | instance=74 | bc_loss=1.8734 | decisions=43
+[TRAIN][WARMSTART] step 25/100 | instance=70 | bc_loss=1.8115 | decisions=48
+[TRAIN][WARMSTART] step 30/100 | instance=23 | bc_loss=1.8015 | decisions=43
+[TRAIN][WARMSTART] step 35/100 | instance=46 | bc_loss=1.7858 | decisions=51
+[TRAIN][WARMSTART] step 40/100 | instance=18 | bc_loss=1.7552 | decisions=42
+[TRAIN][WARMSTART] step 45/100 | instance=28 | bc_loss=1.8238 | decisions=52
+[TRAIN][WARMSTART] step 50/100 | instance=64 | bc_loss=1.9298 | decisions=47
+[TRAIN][WARMSTART] step 55/100 | instance=31 | bc_loss=2.0095 | decisions=53

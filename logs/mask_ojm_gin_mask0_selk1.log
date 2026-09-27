@@ -1,0 +1,76 @@
+C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-09-27 09:43:48
+[MAIN] mode=train
+[MAIN] run_name=mask_ojm_gin_mask0_selk1
+[MAIN] representation(s)=['ojm']
+[MAIN] gnn_type=gin
+[MAIN] overrides={'mask_option': 0, 'sel_k': 1}
+============================================================
+[MAIN] Training representation=ojm | run_name=mask_ojm_gin_mask0_selk1 | gnn_type=gin | overrides={'mask_option': 0, 'sel_k': 1}
+============================================================
+[TRAIN] Training started at: 2026-09-27 09:43:48
+[TRAIN] Hyperparams | max_steps=100 | new_freq=500
+[TRAIN]             | n_cases=100 | B=64 | K=16 | use_greedy=True | lr=0.0005 (decaying to 1.00e-04)
+[TRAIN]             | warm_start_steps=200 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=mean | exclude_greedy_from_loss=True
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\mask_ojm_gin_mask0_selk1_20260927_094348
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=20 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 200 step(s)...
+[TRAIN][WARMSTART] step 10/200 | instance=27 | bc_loss=1.7746 | decisions=52
+[TRAIN][WARMSTART] step 20/200 | instance=65 | bc_loss=1.4619 | decisions=44
+[TRAIN][WARMSTART] step 30/200 | instance=89 | bc_loss=1.6032 | decisions=47
+[TRAIN][WARMSTART] step 40/200 | instance=52 | bc_loss=1.9623 | decisions=54
+[TRAIN][WARMSTART] step 50/200 | instance=17 | bc_loss=1.4971 | decisions=45
+[TRAIN][WARMSTART] step 60/200 | instance=35 | bc_loss=1.5024 | decisions=50
+[TRAIN][WARMSTART] step 70/200 | instance=5 | bc_loss=1.6030 | decisions=55
+[TRAIN][WARMSTART] step 80/200 | instance=46 | bc_loss=1.3597 | decisions=43
+[TRAIN][WARMSTART] step 90/200 | instance=37 | bc_loss=1.3760 | decisions=49
+[TRAIN][WARMSTART] step 100/200 | instance=62 | bc_loss=1.0666 | decisions=42
+[TRAIN][WARMSTART] step 110/200 | instance=58 | bc_loss=1.4832 | decisions=51
+[TRAIN][WARMSTART] step 120/200 | instance=46 | bc_loss=1.2307 | decisions=43
+[TRAIN][WARMSTART] step 130/200 | instance=45 | bc_loss=0.9951 | decisions=48
+[TRAIN][WARMSTART] step 140/200 | instance=24 | bc_loss=1.4896 | decisions=54
+[TRAIN][WARMSTART] step 150/200 | instance=43 | bc_loss=1.1797 | decisions=41
+[TRAIN][WARMSTART] step 160/200 | instance=53 | bc_loss=1.1667 | decisions=51
+[TRAIN][WARMSTART] step 170/200 | instance=1 | bc_loss=1.0607 | decisions=45
+[TRAIN][WARMSTART] step 180/200 | instance=1 | bc_loss=1.1775 | decisions=45
+[TRAIN][WARMSTART] step 190/200 | instance=58 | bc_loss=1.7126 | decisions=51
+[TRAIN][WARMSTART] step 200/200 | instance=83 | bc_loss=1.3940 | decisions=52
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 100 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/100 | 09:52:36
+[TRAIN] Step 1 | Loss=0.623565 | Best makespan in group=466.00
+[TRAIN] Step 2/100 | 09:53:19
+[TRAIN] Step 2 | Loss=0.636831 | Best makespan in group=335.00
+[TRAIN] Step 3/100 | 09:54:11
+[TRAIN] Step 3 | Loss=0.733315 | Best makespan in group=401.00
+[TRAIN] Step 4/100 | 09:55:20
+[TRAIN] Step 4 | Loss=0.714955 | Best makespan in group=384.00
+[TRAIN] Step 5/100 | 09:56:27
+[TRAIN] Step 5 | Loss=0.655286 | Best makespan in group=371.00
+[TRAIN] Step 6/100 | 09:57:43
+[TRAIN] Step 6 | Loss=0.634142 | Best makespan in group=438.00
+[TRAIN] Step 7/100 | 09:58:39
+[TRAIN] Step 7 | Loss=0.714311 | Best makespan in group=424.00
+[TRAIN] Step 8/100 | 09:59:28
+[TRAIN] Step 8 | Loss=0.707839 | Best makespan in group=380.00
+[TRAIN] Step 9/100 | 10:00:28
+[TRAIN] Step 9 | Loss=0.659908 | Best makespan in group=405.00
+[TRAIN] Step 10/100 | 10:01:14
+[TRAIN] Step 10 | Loss=0.642402 | Best makespan in group=442.00
+[TRAIN] Step 11/100 | 10:02:19
+[TRAIN] Step 11 | Loss=0.717744 | Best makespan in group=404.00
+[TRAIN] Step 12/100 | 10:03:18
+[TRAIN] Step 12 | Loss=0.641718 | Best makespan in group=470.00
+[TRAIN] Step 13/100 | 10:04:11
+[TRAIN] Step 13 | Loss=0.666015 | Best makespan in group=484.00
+[TRAIN] Step 14/100 | 10:05:13

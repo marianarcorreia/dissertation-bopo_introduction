@@ -85,11 +85,34 @@ def parse_args():
              "Default: train() default in train mode, sampled by param.py in optuna mode.",
     )
     parser.add_argument(
+        "--sel-k-choices",
+        type=int,
+        nargs="+",
+        default=None,
+        help="[optuna] sel_k values the om/ojm search samples from (default: param.py's "
+             "DEFAULT_SEL_K_CHOICES). Ignored when --sel-k fixes sel_k.",
+    )
+    parser.add_argument(
         "--num-layers",
         type=int,
         default=None,
         help="[train/optuna] Number of GNN layers. Default: train() default in train mode, "
              "param.py's value in optuna mode.",
+    )
+    parser.add_argument(
+        "--logp-norm",
+        default=None,
+        choices=["mean", "sum"],
+        help="[train/optuna] How a rollout's log-probs are combined in the BOPO loss: 'mean' "
+             "(per-decision average, train() default) or 'sum' (the loss used before f1b12fe).",
+    )
+    parser.add_argument(
+        "--exclude-greedy",
+        default=None,
+        action=argparse.BooleanOptionalAction,
+        help="[train/optuna] Leave the greedy rollout out of the BOPO loss pairs (train() "
+             "default). --no-exclude-greedy keeps it in, as before f1b12fe. The old loss is "
+             "--logp-norm sum --no-exclude-greedy.",
     )
     test_group = parser.add_argument_group("test mode")
     test_group.add_argument("--models-file", default="models/model_params.json",
@@ -141,7 +164,8 @@ def parse_args():
 
 def _override_kwargs(args):
     """Only the flags the user actually passed, so train()/param.py defaults apply otherwise."""
-    overrides = {"mask_option": args.mask_option, "sel_k": args.sel_k, "num_layers": args.num_layers}
+    overrides = {"mask_option": args.mask_option, "sel_k": args.sel_k, "num_layers": args.num_layers,
+                 "logp_norm": args.logp_norm, "exclude_greedy_from_loss": args.exclude_greedy}
     return {k: v for k, v in overrides.items() if v is not None}
 
 
@@ -185,6 +209,7 @@ def run_optuna(args):
         representations=reps,
         gnn_type=args.gnn_type,
         overrides=_override_kwargs(args),
+        sel_k_choices=args.sel_k_choices,
     )
     param_cli.run_tuning(optuna_args)
 
