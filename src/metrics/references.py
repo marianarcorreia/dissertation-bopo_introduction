@@ -36,25 +36,45 @@ def load_reference(path):
 
 def load_folder(folder):
     """Every instance file of a folder (sorted by name), parsed, with its reference makespan
-    as "score" (None when there is no reference file)."""
+    as "score" (None when there is no reference file). Plain FJSP instances are .fjs text;
+    batching instances are .json dicts with family / capacities / delta
+    (src/batch_generator.py)."""
     ref_dir = reference_dir(folder)
     instances = []
     for file_name in sorted(os.listdir(folder)):
         path = os.path.join(folder, file_name)
-        if not os.path.isfile(path) or not file_name.lower().endswith(".fjs"):
+        name, ext = os.path.splitext(file_name)
+        if not os.path.isfile(path) or ext.lower() not in (".fjs", ".json"):
             continue
         with open(path, "r") as f:
-            jobs, operations, info, maximum = get_data(parse(f.read()))
-        name = os.path.splitext(file_name)[0]
-        instances.append({
-            "name": name,
-            "jobs": jobs,
-            "operations": operations,
-            "maximum": maximum,
-            "num_machines": info["machinesNb"],
-            "score": load_reference(os.path.join(ref_dir, name + ".json")),
-        })
+            if ext.lower() == ".json":
+                instance = json.load(f)
+            else:
+                jobs, operations, info, maximum = get_data(parse(f.read()))
+                instance = {"jobs": jobs, "operations": operations, "maximum": maximum,
+                            "num_machines": info["machinesNb"]}
+        instance["name"] = name
+        instance["score"] = load_reference(os.path.join(ref_dir, name + ".json"))
+        instances.append(instance)
     return instances
+
+
+def load_dataset(path):
+    """A fixed split saved as JSON (e.g. val/test_dataset_blocking.json): a list of already
+    parsed instances with their reference makespan in "score"."""
+    with open(path, "r") as f:
+        instances = json.load(f)
+    for k, inst in enumerate(instances):
+        inst.setdefault("name", f"{os.path.splitext(os.path.basename(path))[0]}_{k:03d}")
+        inst["score"] = None if inst.get("score") is None else float(inst["score"])
+    return instances
+
+
+def load_instances(path):
+    """A folder of .fjs files (references from the matching solutions folder) or a JSON split."""
+    if os.path.isfile(path) and path.lower().endswith(".json"):
+        return load_dataset(path)
+    return load_folder(path)
 
 
 def _solve_one(args):

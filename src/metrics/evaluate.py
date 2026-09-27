@@ -14,7 +14,27 @@ ACTION_STORE = {
     "oo": "operation",
     "om": ("machine", "exec", "operation"),
     "ojm": ("machine", "exec", "job"),
+    # parallel batching (src/env_batching.py) keeps the ojm action space
+    "ojmb_node": ("machine", "exec", "job"),
+    "ojmb_edge": ("machine", "exec", "job"),
+    "ojmb_base": ("machine", "exec", "job"),
 }
+
+
+def _is_batching(env):
+    from src.env_batching import _FJSPBatchEnv
+    return isinstance(env, _FJSPBatchEnv)
+
+
+def problem_spec(env):
+    """(schedule in the shared metrics format, constraint checks, step_key, extra stats) for
+    the problem `env` solves - parallel batching schedules a whole batch per decision."""
+    if _is_batching(env):
+        from src.metrics.batching import BATCHING_CONSTRAINTS, batch_stats, metric_schedule
+        schedule = metric_schedule(env.schedule)
+        return schedule, BATCHING_CONSTRAINTS, "batch", batch_stats(schedule)
+    return env.schedule, FJSP_CONSTRAINTS, None, {}
+
 
 SUMMARY_METRICS = (
     "makespan", "relative_error", "relative_error_lb", "scheduling_score",
@@ -22,6 +42,8 @@ SUMMARY_METRICS = (
     "rss_mb", "rss_delta_mb", "gpu_peak_mb", "gpu_peak_delta_mb",
     "action_distinct_ratio", "embedding_distinct_ratio", "input_distinct_ratio",
     "structure_gain", "effective_rank_ratio", "embedding_heterophily", "feature_heterophily",
+    # batching only (n = 0 elsewhere)
+    "num_batches", "avg_batch_size", "batched_fraction",
 )
 
 
@@ -45,10 +67,11 @@ def _rollout(agent, env, index):
 
 
 def evaluate_agent(agent, env, instances, representation, representation_metrics=True,
-                   constraints=FJSP_CONSTRAINTS, references=None):
+                   constraints=None, references=None):
     """env must have been built on `instances` (in the same order). references[i] is the
     CP-SAT makespan of instance i, or None; defaults to each instance's own "score"
-    (how the validation / test splits store it).
+    (how the validation / test splits store it). constraints defaults to the checks of the
+    problem env solves (problem_spec).
 
     Returns (rows, representation_summary): one dict of metrics per instance, and the probe
     summary pooled over all instances (None when representation_metrics is False)."""
@@ -61,12 +84,15 @@ def evaluate_agent(agent, env, instances, representation, representation_metrics
         with MemoryTracker() as mem:
             decisions = _rollout(agent, env, i)
         ref = references[i]
+        schedule, problem_constraints, step_key, stats = problem_spec(env)
         row = {
             "index": i,
             "name": instance.get("name", str(i)),
             **instance_size(instance),
-            **schedule_metrics(instance, env.schedule, None if ref is None else float(ref), constraints),
+            **schedule_metrics(instance, schedule, None if ref is None else float(ref),
+                               constraints or problem_constraints, step_key),
             "env_makespan": float(env.mk),
+            **stats,
             "decisions": decisions,
             **mem.result,
             "time_per_decision_ms": 1000.0 * mem.result["time_sec"] / max(decisions, 1),

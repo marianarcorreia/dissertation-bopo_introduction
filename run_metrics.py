@@ -31,10 +31,10 @@ if __package__ is None or __package__ == "":
 import torch
 
 from src.metrics.evaluate import evaluate_agent, summarize
-from src.metrics.references import load_folder, solve_missing_references
+from src.metrics.references import load_instances, solve_missing_references
 from src.metrics.report import HEADLINE_HEADER, fmt, headline_row, markdown_table
 from src.metrics.statistics import compare, required_sample_size
-from src.train import _resolve_representation_modules
+from src.train import MODEL_VERSION, _resolve_representation_modules
 
 
 def parse_args(argv=None):
@@ -46,8 +46,9 @@ def parse_args(argv=None):
     p.add_argument("--models", nargs="*", default=None,
                    help="Model file names to evaluate (default: every model in --models-file).")
     p.add_argument("--folders", nargs="+", default=["val/instances"],
-                   help="Instance folders (.fjs). References are read from the matching solutions folder "
-                        "(see src/metrics/references.py).")
+                   help="Instance folders (.fjs, or .json batching instances such as data/batching/instances; "
+                        "references from the matching solutions folder, see src/metrics/references.py) or JSON "
+                        "splits with references, e.g. data/batching/batching_dataset.json.")
     p.add_argument("--in-distribution-folder", default=None,
                    help="Folder whose sizes match training, the baseline for generalization (default: first folder).")
     p.add_argument("--train-jobs", nargs=2, type=int, default=[8, 10], help="Training range of jobs (min max).")
@@ -80,7 +81,9 @@ def load_agent(param, models_dir, instances):
     env = EnvClass(instances, param["mask_option"], param["sel_k"], **jm_kwargs)
     metadata = env.reset().metadata()
     agent = BOPOClass(0.001, env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],
-                      gnn_type=param.get("gnn_type", "gat"), **jm_kwargs)
+                      gnn_type=param.get("gnn_type", "gat"),
+                      # checkpoints from before MODEL_VERSION 2 use the original GAT architecture
+                      gat_legacy=param.get("model_version", 1) < MODEL_VERSION, **jm_kwargs)
     agent.load(os.path.join(models_dir, param["name"]))
     agent.policy.eval()
     return rep, env, agent
@@ -112,9 +115,9 @@ def run(args):
 
     folders = {}
     for folder in args.folders:
-        if args.solve_missing_references:
+        if args.solve_missing_references and os.path.isdir(folder):
             solve_missing_references(folder, args.solve_workers)
-        instances = load_folder(folder)[: args.limit]
+        instances = load_instances(folder)[: args.limit]
         print(f"[METRICS] {folder}: {len(instances)} instance(s), "
               f"{sum(i['score'] is not None for i in instances)} with a CP-SAT reference")
         folders[folder] = instances

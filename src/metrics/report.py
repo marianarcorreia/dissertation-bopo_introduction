@@ -17,6 +17,9 @@ HEADLINE = (
     ("effective_rank_ratio", "Eff. rank", "higher"),
     ("embedding_heterophily", "Heterophily (emb)", None),
     ("feature_heterophily", "Heterophily (feat)", None),
+    # batching
+    ("avg_batch_size", "Batch size", None),
+    ("batched_fraction", "Batched ops", None),
 )
 BETTER = {k: b for k, _, b in HEADLINE}
 BETTER["feasible"] = "higher"

@@ -181,6 +181,83 @@ def test_probe_detects_ties():
     assert math.isclose(probe.summary()["expressiveness"]["action_distinct_ratio"], 1 / n_valid)
 
 
+def batching_instances(n=3):
+    from src.metrics.references import load_dataset
+    return load_dataset("data/batching/batching_dataset.json")[:n]
+
+
+def test_batching_env_schedules_are_feasible():
+    """Random rollouts of every batching env pass both our checks and the branch's own
+    independent checker (src/batch_solver.py:check_schedule), with decisions = batches."""
+    from src.batch_solver import check_schedule as batch_check
+    from src.metrics.batching import BATCHING_CONSTRAINTS, batch_stats, metric_schedule
+    instances = batching_instances()
+    for rep in ("ojmb_node", "ojmb_edge", "ojmb_base"):
+        seed(0)
+        _, EnvClass, _ = _resolve_representation_modules(rep)
+        env = EnvClass(instances, 0, 100)
+        for i in range(len(instances)):
+            env.reset(sel_index=i)
+            done = False
+            while not done:
+                _, _, done, _ = env.step(env.sample())
+            assert batch_check(instances[i], env.schedule) == [], rep
+            sched = metric_schedule(env.schedule)
+            c = check_schedule(instances[i], sched, BATCHING_CONSTRAINTS, step_key="batch")
+            assert c["feasible"], (rep, i, c["violations"])
+            assert c["n_steps"] == env.num_batches == batch_stats(sched)["num_batches"]
+            assert math.isclose(round(max(r["end"] for r in sched), 2), env.mk)
+
+
+def test_batching_violations_are_detected():
+    from src.metrics.batching import BATCHING_CONSTRAINTS
+    # 3 one-operation jobs; ops 0 and 1 in family 0 (capacity 2), op 2 alone; 1 machine
+    inst = {"jobs": [[0], [1], [2]], "operations": [[3], [5], [2]], "family": [0, 0, -1],
+            "capacities": [2], "delta": 0}
+
+    def rec(op, batch, start, end, **kw):
+        return dict({"job": op, "operation": op, "position": 0, "machine": 0, "batch": batch,
+                     "start": start, "end": end}, **kw)
+
+    ok = [rec(0, 0, 0, 5), rec(1, 0, 0, 5), rec(2, 1, 5, 7)]
+    assert check_schedule(inst, ok, BATCHING_CONSTRAINTS, step_key="batch")["feasible"]
+    cases = {
+        "processing_time": [rec(0, 0, 0, 3), rec(1, 0, 0, 3), rec(2, 1, 3, 5)],   # batch must last 5
+        "machine_capacity": [rec(0, 0, 0, 5), rec(1, 0, 0, 5), rec(2, 1, 4, 6)],  # overlaps the batch
+        "batch_composition": [rec(0, 0, 0, 5), rec(2, 0, 0, 5), rec(1, 1, 5, 10)],  # op 2 has no family
+    }
+    for name, sched in cases.items():
+        c = check_schedule(inst, sched, BATCHING_CONSTRAINTS, step_key="batch")
+        assert c["violations"][name] > 0, (name, c["violations"])
+    over = dict(inst, capacities=[1])  # capacity 1: ops 0 and 1 cannot share a batch
+    assert check_schedule(over, ok, BATCHING_CONSTRAINTS, step_key="batch")["violations"]["batch_composition"] > 0
+    split = [rec(0, 0, 0, 5), rec(1, 0, 1, 6), rec(2, 1, 6, 8)]  # members not simultaneous
+    c = check_schedule(inst, split, BATCHING_CONSTRAINTS, step_key="batch")
+    assert c["violations"]["batch_composition"] > 0 and c["n_steps"] == 2
+
+
+def test_batching_lower_bound_is_valid():
+    instances = batching_instances(40)
+    assert all(lower_bound(i) <= i["score"] + 1e-9 for i in instances)
+
+
+def test_evaluate_batching_representations():
+    instances = batching_instances(2)
+    for rep in ("ojmb_node", "ojmb_edge", "ojmb_base"):
+        seed(0)
+        rep, EnvClass, BOPOClass = _resolve_representation_modules(rep)
+        env = EnvClass(instances, 0, 100)
+        agent = BOPOClass(0.001, env, env.reset().metadata(), 16, 1, 1, gnn_type="gat")
+        rows, repr_summary = evaluate_agent(agent, env, instances, rep)
+        for r in rows:
+            assert r["feasible"], (rep, r["violations"])
+            assert "batch_composition" in r["violations"]
+            assert r["n_steps"] == r["num_batches"] <= r["num_operations"]
+            assert r["relative_error"] is not None and r["relative_error"] >= -1e-9
+            assert r["relative_error_lb"] >= -1e-9
+        assert repr_summary["n_states"] > 0
+
+
 if __name__ == "__main__":
     tests = [v for k, v in list(globals().items()) if k.startswith("test_") and callable(v)]
     for t in tests:
