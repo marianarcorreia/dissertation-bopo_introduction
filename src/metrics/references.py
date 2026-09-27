@@ -57,6 +57,24 @@ def load_folder(folder):
     return instances
 
 
+def load_dataset(path):
+    """A fixed split saved as JSON (e.g. val/test_dataset_blocking.json): a list of already
+    parsed instances with their reference makespan in "score"."""
+    with open(path, "r") as f:
+        instances = json.load(f)
+    for k, inst in enumerate(instances):
+        inst.setdefault("name", f"{os.path.splitext(os.path.basename(path))[0]}_{k:03d}")
+        inst["score"] = None if inst.get("score") is None else float(inst["score"])
+    return instances
+
+
+def load_instances(path):
+    """A folder of .fjs files (references from the matching solutions folder) or a JSON split."""
+    if os.path.isfile(path) and path.lower().endswith(".json"):
+        return load_dataset(path)
+    return load_folder(path)
+
+
 def _solve_one(args):
     from src.solver import solve_fjsp  # ortools only needed when solving
     path, out_path = args

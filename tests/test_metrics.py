@@ -170,6 +170,78 @@ def test_probe_detects_ties():
     assert math.isclose(probe.summary()["expressiveness"]["action_distinct_ratio"], 1 / n_valid)
 
 
+def test_blocking_env_schedules_are_feasible():
+    """Random rollouts of the blocking env satisfy every blocking check (buffers, held parts,
+    flow), for the default buffers and tighter ones where swaps happen."""
+    from src.env_blocking import FJSPEnvBlocking
+    from src.metrics.blocking import blocking_constraints, blocking_stats
+    from src.metrics.references import load_dataset
+    instances = load_dataset("val/test_dataset_blocking.json")[:3]
+    for in_cap, out_cap in ((2, 1), (1, 1), (1, 0), (0, 0)):
+        seed(0)
+        env = FJSPEnvBlocking(instances, 0, 100, in_cap=in_cap, out_cap=out_cap)
+        for i in range(len(instances)):
+            env.reset(sel_index=i)
+            done = False
+            while not done:
+                _, _, done, _ = env.step(env.sample())
+            c = check_schedule(instances[i], env.schedule, blocking_constraints(in_cap, out_cap))
+            assert c["feasible"], (in_cap, out_cap, i, c["violations"])
+            assert c["n_steps"] == len(instances[i]["operations"])
+            assert math.isclose(round(max(r["end"] for r in env.schedule), 2), env.mk)
+            assert blocking_stats(env.schedule)["blocked_time"] >= 0
+
+
+def test_blocking_violations_are_detected():
+    from src.metrics.blocking import blocking_constraints
+    # 3 one-operation jobs + a 2-operation job, 2 machines
+    inst = {"jobs": [[0], [1], [2], [3, 4]], "operations": [[2, 0], [2, 0], [2, 0], [1, 0], [0, 1]]}
+
+    def rec(job, op, m, routed, start, depart=None, leave_out=None, p=None):
+        p = p if p is not None else inst["operations"][op][m]
+        depart = start + p if depart is None else depart
+        return {"job": job, "operation": op, "machine": m, "routed": routed, "start": start,
+                "end": start + p, "depart": depart, "leave_out": depart if leave_out is None else leave_out}
+
+    ok = [rec(3, 3, 0, 0, 0, depart=1, leave_out=1), rec(3, 4, 1, 1, 1),
+          rec(0, 0, 0, 0, 1), rec(1, 1, 0, 0, 3), rec(2, 2, 0, 1, 5)]
+    assert check_schedule(inst, ok, blocking_constraints(2, 1))["feasible"]
+    # op 1 and op 2 wait in machine 0's input buffer at the same time: fine with 2 slots, not with 1
+    c = check_schedule(inst, ok, blocking_constraints(1, 1))
+    assert c["violations"]["input_buffer_capacity"] > 0, c
+    # op 3 held on machine 0 until 2 (blocked) while op 0 starts at 1 -> machine overlap
+    held = [rec(3, 3, 0, 0, 0, depart=2, leave_out=2), rec(3, 4, 1, 2, 2),
+            rec(0, 0, 0, 0, 1), rec(1, 1, 0, 0, 3), rec(2, 2, 0, 1, 5)]
+    c = check_schedule(inst, held, blocking_constraints(2, 1))
+    assert c["violations"]["machine_capacity"] > 0, c
+    # op 3 waits in the output buffer [1, 3) with 0 output slots
+    out = [rec(3, 3, 0, 0, 0, depart=1, leave_out=3), rec(3, 4, 1, 3, 3),
+           rec(0, 0, 0, 0, 1), rec(1, 1, 0, 0, 3), rec(2, 2, 0, 1, 5)]
+    assert check_schedule(inst, out, blocking_constraints(2, 1))["feasible"]
+    assert check_schedule(inst, out, blocking_constraints(2, 0))["violations"]["output_buffer_capacity"] > 0
+    # the job's next operation routed before the part left its machine
+    flow = [rec(3, 3, 0, 0, 0, depart=2, leave_out=1), rec(3, 4, 1, 1, 2),
+            rec(0, 0, 0, 0, 2), rec(1, 1, 0, 0, 4), rec(2, 2, 0, 1, 6)]
+    assert check_schedule(inst, flow, blocking_constraints(2, 1))["violations"]["blocking_flow"] > 0
+
+
+def test_evaluate_blocking_representations():
+    from src.metrics.references import load_dataset
+    instances = load_dataset("val/test_dataset_blocking.json")[:2]
+    for rep in ("ojmb", "ojmd", "ojm_blk"):
+        seed(0)
+        rep, EnvClass, BOPOClass = _resolve_representation_modules(rep)
+        env = EnvClass(instances, 0, 100)
+        agent = BOPOClass(0.001, env, env.reset().metadata(), 16, 1, 1, gnn_type="gat", jm_design=env.jm_design)
+        rows, repr_summary = evaluate_agent(agent, env, instances, rep)
+        for r in rows:
+            assert r["feasible"], (rep, r["violations"])
+            assert "input_buffer_capacity" in r["violations"]
+            assert r["relative_error"] is not None and r["relative_error"] >= -1e-9  # vs blocking CP-SAT
+            assert r["num_swaps"] >= 0 and r["blocked_time"] >= 0
+        assert repr_summary["n_states"] > 0
+
+
 if __name__ == "__main__":
     tests = [v for k, v in list(globals().items()) if k.startswith("test_") and callable(v)]
     for t in tests:
