@@ -28,6 +28,34 @@ def normalize_columns(t):
     return (2 * (t - mins) / (maxs - mins + 1e-7) - 1).float()
 
 
+def remove_operation_nodes(state, nodes):
+    """Drop the given operation nodes (whose edges the caller already removed) and renumber
+    the remaining ones in every edge type - what T.RemoveIsolatedNodes() did in step(), but
+    without scanning every node and edge type for isolated nodes (~16% of the env's time).
+    Only scheduled operations ever become isolated: job and machine nodes keep their
+    all-to-all 'listens' edges for the whole episode."""
+    store = state["operation"]
+    n = store.num_nodes
+    keep = torch.ones(n, dtype=torch.bool)
+    keep[nodes] = False
+    new_index = torch.full((n,), -1, dtype=torch.long)
+    new_index[keep] = torch.arange(int(keep.sum()))
+    for key, value in list(store.items()):
+        if torch.is_tensor(value) and value.dim() > 0 and value.shape[0] == n:
+            store[key] = value[keep]
+    for edge_type in state.edge_types:
+        src, _, dst = edge_type
+        if "operation" not in (src, dst):
+            continue
+        edge_index = state[edge_type].edge_index.clone()
+        if src == "operation":
+            edge_index[0] = new_index[edge_index[0]]
+        if dst == "operation":
+            edge_index[1] = new_index[edge_index[1]]
+        state[edge_type].edge_index = edge_index
+    return state
+
+
 def select_with_tiebreak(primary, secondary, mask):
     """Index of the unmasked entry with the smallest primary value; ties are broken by the
     smallest secondary value, then by the lowest index."""
@@ -243,14 +271,18 @@ class FJSSPEnv(gym.Env):
         SENTINEL = 10000.0
         k = max(1, int(self.sel_k))
         valid = mask_matrix < SENTINEL
-        ranked = torch.where(valid, mask_matrix, torch.full_like(mask_matrix, float("inf")))
-        keep = torch.zeros_like(valid)
-        for j in range(ranked.shape[0]):
-            n_valid = int(valid[j].sum().item())
-            if n_valid == 0:
-                continue
-            _, top_idx = torch.topk(ranked[j], k=min(k, n_valid), largest=False)
-            keep[j, top_idx] = True
+        if k >= mask_matrix.shape[1]:
+            # sel_k covers every machine (e.g. the default sel_k=100): every valid pair is kept
+            keep = valid.clone()
+        else:
+            ranked = torch.where(valid, mask_matrix, torch.full_like(mask_matrix, float("inf")))
+            keep = torch.zeros_like(valid)
+            for j in range(ranked.shape[0]):
+                n_valid = int(valid[j].sum().item())
+                if n_valid == 0:
+                    continue
+                _, top_idx = torch.topk(ranked[j], k=min(k, n_valid), largest=False)
+                keep[j, top_idx] = True
 
         edge_index = self.state['machine', 'exec', 'job'].edge_index
         machine_idx, job_idx = edge_index[0], edge_index[1]
@@ -308,31 +340,43 @@ class FJSSPEnv(gym.Env):
         return select_with_tiebreak(primary, secondary, self.state['machine', 'exec', 'job'].mask)
 
     def calculate_next_state(self):
+        # Vectorized over jobs/machines (same values as the former per-job and per-machine
+        # python loops, which scanned the edge lists once per job and per machine and were
+        # ~30% of the env's time per decision).
+        mx = self.state["machine"].x
         #atualiza a ft 2 das maq. - tempo livre relativo ao mínimo
-        self.state["machine"].x[:,2] = self.state["machine"].x[:,0] - torch.min(self.state["machine"].x[:,0])
-        for j_id in range(len(self.jobs)):
-            if int(self.state["job"].x[j_id,0])==0: #se o job ainda não tiver terminado
-                o_id = self.current_operations[j_id] #operação atual do job j_id
-                pj = self.state['operation', 'belongs', 'job'].edge_index[:,self.state['operation', 'belongs', 'job'].edge_index[1,:] == j_id]
-                oper_id = pj[0,0]
-                self.state["operation"].x[oper_id, 0] = 1
-                #self.state["operation"].x[oper_id, 1] = self.all_pendings[o_id]
-                self.state["job"].x[j_id, 1] = self.operations_ends[j_id]
-                self.state["job"].x[j_id, 2] = pj.shape[1]
-                self.state["job"].x[j_id, 3] = self.all_pendings[o_id]
-        
-        #atualiza as features das máquinas (ft4)
-        for m in range(len(self.state["machine"].x)):
-            mask = self.state["operation", "exec", "machine"].edge_index[1,:] == m
-            if mask.any().item():
-                self.state["operation", "exec", "machine"].edge_attr[mask,4] = self.state["operation", "exec", "machine"].edge_attr[mask,0]/self.state["operation", "exec", "machine"].edge_attr[mask,0].max()
-                mask = self.state["machine", "exec", "operation"].edge_index[0,:] == m
-                self.state["machine", "exec", "operation"].edge_attr[mask,4] = self.state["machine", "exec", "operation"].edge_attr[mask,0]/self.state["machine", "exec", "operation"].edge_attr[mask,0].max()
+        mx[:, 2] = mx[:, 0] - torch.min(mx[:, 0])
 
-            mask = self.state["machine", "exec", "operation"].edge_index[0,:] == m
-            if mask.any().item():
-                self.state["machine", "exec", "operation"].edge_attr[mask,4] = self.state["machine", "exec", "operation"].edge_attr[mask,0]/self.state["machine", "exec", "operation"].edge_attr[mask,0].max()
-                #self.state["machine"].x[m, 7] = self.state["machine", "exec", "operation"].edge_attr[mask,0].shape[0]                   
+        jx = self.state["job"].x
+        ox = self.state["operation"].x
+        belongs = self.state['operation', 'belongs', 'job'].edge_index
+        n_jobs = jx.shape[0]
+        # pending operations of each job, and its current one = its first belongs edge
+        # (edges keep job order and scheduled operations are removed, see step())
+        counts = torch.bincount(belongs[1], minlength=n_jobs)
+        positions = torch.arange(belongs.shape[1])
+        first = torch.full((n_jobs,), belongs.shape[1], dtype=torch.long)
+        first = first.scatter_reduce(0, belongs[1], positions, reduce="amin")
+        active = (jx[:, 0] == 0) & (counts > 0)
+        if active.any():
+            jobs_idx = torch.nonzero(active).flatten()
+            ox[belongs[0, first[jobs_idx]], 0] = 1
+            ends = torch.tensor([float(self.operations_ends[j]) for j in jobs_idx.tolist()], dtype=jx.dtype)
+            pend = torch.tensor([float(self.all_pendings[self.current_operations[j]]) for j in jobs_idx.tolist()], dtype=jx.dtype)
+            jx[jobs_idx, 1] = ends
+            jx[jobs_idx, 2] = counts[jobs_idx].to(jx.dtype)
+            jx[jobs_idx, 3] = pend
+
+        #atualiza as features das máquinas (ft4): tempo / maior tempo na mesma máquina
+        n_mach = mx.shape[0]
+        for edge_type, col in ((("operation", "exec", "machine"), 1), (("machine", "exec", "operation"), 0)):
+            store = self.state[edge_type]
+            if store.edge_index.shape[1] == 0:
+                continue
+            mach = store.edge_index[col]
+            t = store.edge_attr[:, 0]
+            per_mach_max = torch.zeros(n_mach, dtype=t.dtype).scatter_reduce(0, mach, t, reduce="amax", include_self=False)
+            store.edge_attr[:, 4] = t / per_mach_max[mach]
     
     def step(self, action):
         #converte o indice da ação no par (m, j)
@@ -427,7 +471,7 @@ class FJSSPEnv(gym.Env):
         mask = self.state['machine', 'exec', 'operation'].edge_index[1,:] != oper_id
         self.state['machine', 'exec', 'operation'].edge_index = self.state['machine', 'exec', 'operation'].edge_index[:,mask]
         self.state['machine', 'exec', 'operation'].edge_attr = self.state['machine', 'exec', 'operation'].edge_attr[mask]
-        self.state = T.RemoveIsolatedNodes()(self.state)
+        self.state = remove_operation_nodes(self.state, torch.tensor([int(oper_id)]))
         #atualiza features e recalcula a mascara
         self.calculate_next_state()
         self.calculate_mask()

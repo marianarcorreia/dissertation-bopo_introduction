@@ -30,9 +30,7 @@ src.batch_solver.check_schedule.
 """
 import numpy as np
 import torch
-import torch_geometric.transforms as T
-
-from src.env import FJSSPEnv, _dbg, normalize_columns, select_with_tiebreak
+from src.env import FJSSPEnv, _dbg, normalize_columns, select_with_tiebreak, remove_operation_nodes
 
 SENTINEL = 10000
 EDGE_DIM = 5  # every attributed edge type must match GATv2Conv(edge_dim=5) in src/gat.py
@@ -68,6 +66,7 @@ class _FJSPBatchEnv(FJSSPEnv):
                 self.op_job[o], self.op_kappa[o] = j, k
 
         ops = self.operations
+        self.op_elig = [frozenset(m for m in range(self.num_machines) if ops[o][m] > 0) for o in range(n_ops)]
         self.fam_members = [[o for o in range(n_ops) if self.family[o] == f] for f in range(self.num_families)]
         self.fam_machines = [
             [m for m in range(self.num_machines) if all(ops[o][m] > 0 for o in members)]
@@ -83,7 +82,7 @@ class _FJSPBatchEnv(FJSSPEnv):
             for f in range(self.num_families)
         ]
 
-        self.data["operation"].oid = torch.arange(n_ops)  # survives RemoveIsolatedNodes
+        self.data["operation"].oid = torch.arange(n_ops)  # original op id, kept through node removal
         if self.BATCH_REP == "base":  # plain ojm graph: the batching stays invisible to the network
             return
 
@@ -159,40 +158,58 @@ class _FJSPBatchEnv(FJSSPEnv):
         self.schedule = []
         self.num_batches = 0
         self.job_done = None  # set once the instance is known (see calculate_next_state)
+        self.fam_remaining = None  # unscheduled members per family, set in calculate_next_state
         return super().reset(sel_index)
 
     def _done(self, j):
         return self.job_done is not None and self.job_done[j]
 
-    def _batch_members(self, sel_job, mach, start):
+    def _family_candidates(self):
+        """Per family: the active jobs whose current operation belongs to it, as
+        (ready time, job, operation, kappa) sorted by (ready time, job) - the order in which
+        _batch_members adds partners. Built once per decision and shared by every action
+        edge instead of rescanning all jobs for each edge."""
+        cands = {}
+        for j in range(self.num_jobs):
+            if self._done(j):
+                continue
+            o = self.current_operations[j]
+            f = self.family[o]
+            if f >= 0:
+                cands.setdefault(f, []).append((float(self.operations_ends[j]), j, o, self.op_kappa[o]))
+        for lst in cands.values():
+            lst.sort(key=lambda c: (c[0], c[1]))
+        return cands
+
+    def _batch_members(self, sel_job, mach, start, cands=None):
+        """Jobs dispatched together when sel_job is dispatched on mach at start: sel_job plus
+        ready (ready time <= start) same-family jobs eligible on mach, added by earliest ready
+        time while the capacity B_f and the order difference delta allow."""
         o = self.current_operations[sel_job]
         f = self.family[o]
         members = [sel_job]
         if f < 0:
             return members
-        candidates = []
-        for j in range(self.num_jobs):
-            if j == sel_job or self._done(j):
-                continue
-            o2 = self.current_operations[j]
-            if self.family[o2] == f and self.operations[o2][mach] > 0 and self.operations_ends[j] <= start:
-                candidates.append(j)
-        candidates.sort(key=lambda j: (self.operations_ends[j], j))
-        kappas = [self.op_kappa[o]]
-        for j in candidates:
-            if len(members) >= self.capacities[f]:
+        if cands is None:
+            cands = self._family_candidates()
+        cap = self.capacities[f]
+        k_min = k_max = self.op_kappa[o]
+        for ready, j, o2, k in cands.get(f, ()):
+            if len(members) >= cap:
                 break
-            k = self.op_kappa[self.current_operations[j]]
-            if max(kappas + [k]) - min(kappas + [k]) <= self.delta:
+            if j == sel_job or ready > start or self.operations[o2][mach] <= 0:
+                continue
+            lo, hi = min(k_min, k), max(k_max, k)
+            if hi - lo <= self.delta:
                 members.append(j)
-                kappas.append(k)
+                k_min, k_max = lo, hi
         return members
 
     def _earliest_start(self, j):
         """Earliest time job j's current operation can start on any eligible machine."""
         return float(self.job_start_machines[j].min())
 
-    def _ready_partners(self, j):
+    def _ready_partners(self, j, cands=None, start=None):
         """Jobs that the batch rule (_batch_members) would add if job j were dispatched at
         its earliest start: same family, within delta positions, a shared eligible
         machine, and ready by then. Capped at B_f - 1."""
@@ -200,15 +217,14 @@ class _FJSPBatchEnv(FJSSPEnv):
         f = self.family[o]
         if f < 0:
             return 0
-        start = self._earliest_start(j)
+        if cands is None:
+            cands = self._family_candidates()
+        if start is None:
+            start = self._earliest_start(j)
         count = 0
-        for j2 in range(self.num_jobs):
-            if j2 == j or self._done(j2):
-                continue
-            o2 = self.current_operations[j2]
-            if (self.family[o2] == f and abs(self.op_kappa[o2] - self.op_kappa[o]) <= self.delta
-                    and self.operations_ends[j2] <= start
-                    and any(self.operations[o][m] > 0 and self.operations[o2][m] > 0 for m in range(self.num_machines))):
+        for ready, j2, o2, k in cands.get(f, ()):
+            if (j2 != j and ready <= start and abs(k - self.op_kappa[o]) <= self.delta
+                    and self.op_elig[o] & self.op_elig[o2]):
                 count += 1
         return min(count, self.capacities[f] - 1)
 
@@ -235,11 +251,16 @@ class _FJSPBatchEnv(FJSSPEnv):
         machine_idx, job_idx = edge_index[0], edge_index[1]
         start = self.job_start_machines[job_idx, machine_idx].clone().float()
         proc = self.current_job_proc[job_idx, machine_idx].clone().float()
-        for e in range(edge_index.shape[1]):
-            m, j = int(machine_idx[e]), int(job_idx[e])
-            if start[e] >= SENTINEL:
+        cands = self._family_candidates()
+        if not cands:
+            return start, proc
+        starts, machines, jobs = start.tolist(), machine_idx.tolist(), job_idx.tolist()
+        for e, (m, j, s) in enumerate(zip(machines, jobs, starts)):
+            # only edges whose job has a family with another candidate can form a batch
+            f = self.family[self.current_operations[j]]
+            if s >= SENTINEL or f < 0 or len(cands.get(f, ())) < 2:
                 continue
-            members = self._batch_members(j, m, float(start[e]))
+            members = self._batch_members(j, m, s, cands)
             if len(members) > 1:
                 proc[e] = max(self.operations[self.current_operations[j2]][m] for j2 in members)
         return start, proc
@@ -260,33 +281,36 @@ class _FJSPBatchEnv(FJSSPEnv):
     def calculate_next_state(self):
         if self.job_done is None:
             self.job_done = [False] * self.num_jobs
+            self.fam_remaining = [len(m) for m in self.fam_members]
         super().calculate_next_state()
         if self.BATCH_REP == "base":
             return
 
-        jx = self.state["job"].x
+        cands = self._family_candidates()
+        earliest = self.job_start_machines.min(dim=1).values.tolist()
+        rows = []
         for j in range(self.num_jobs):
             if self.job_done[j]:
-                jx[j, 4:7] = 0
+                rows.append((0.0, 0.0, 0.0))
                 continue
             f = self.family[self.current_operations[j]]
-            jx[j, 4] = 1.0 if f >= 0 else 0.0
-            jx[j, 5] = float(self.capacities[f]) if f >= 0 else 1.0
-            jx[j, 6] = float(self._ready_partners(j))
+            if f < 0:
+                rows.append((0.0, 1.0, 0.0))
+            else:
+                rows.append((1.0, float(self.capacities[f]), float(self._ready_partners(j, cands, earliest[j]))))
+        self.state["job"].x[:, 4:7] = torch.tensor(rows, dtype=self.state["job"].x.dtype)
 
         if self.BATCH_REP == "node":
             fx = self.state["family"].x
-            scheduled = {e["op_id"] for e in self.schedule}
             for f in range(self.num_families):
                 cap = self.capacities[f]
                 # members that could share the family's earliest possible batch: current
                 # operations whose job is ready by then (the rule of _batch_members)
-                current = [j for j in range(self.num_jobs)
-                           if not self.job_done[j] and self.family[self.current_operations[j]] == f]
-                t_f = min((self._earliest_start(j) for j in current), default=0.0)
-                ready = [self.current_operations[j] for j in current if self.operations_ends[j] <= t_f]
-                remaining = sum(1 for o in self.fam_members[f] if o not in scheduled)
-                spread = (max(self.op_kappa[o] for o in ready) - min(self.op_kappa[o] for o in ready)) if ready else 0
+                current = cands.get(f, [])
+                t_f = min((earliest[j] for _, j, _, _ in current), default=0.0)
+                ready = [k for r, _, _, k in current if r <= t_f]
+                remaining = self.fam_remaining[f]
+                spread = (max(ready) - min(ready)) if ready else 0
                 fx[f] = torch.tensor([
                     float(cap),
                     self.fam_pbar[f],
@@ -320,6 +344,8 @@ class _FJSPBatchEnv(FJSSPEnv):
         for j in members:
             o = self.current_operations[j]
             scheduled_ops.append(o)
+            if self.family[o] >= 0:
+                self.fam_remaining[self.family[o]] -= 1
             self.schedule.append({
                 "job": j, "operation": self.op_kappa[o], "op_id": o, "family": self.family[o],
                 "batch": batch_id, "machine": sel_mach, "start": start, "end": end,
@@ -399,16 +425,15 @@ class _FJSPBatchEnv(FJSSPEnv):
         if self.BATCH_REP == "node":
             drop(('operation', 'in_family', 'family'), dst=False)
             drop(('family', 'has', 'operation'), src=False)
-            scheduled = {e["op_id"] for e in self.schedule}
-            finished = torch.tensor([f for f in range(self.num_families)
-                                     if all(o in scheduled for o in self.fam_members[f])], dtype=torch.long)
+            finished = torch.tensor([f for f in range(self.num_families) if self.fam_remaining[f] == 0],
+                                    dtype=torch.long)
             if finished.numel():
                 for et, col in ((('family', 'batch_exec', 'machine'), 0), (('machine', 'batch_exec', 'family'), 1)):
                     store = self.state[et]
                     _keep_edges(store, ~torch.isin(store.edge_index[col], finished))
         elif self.BATCH_REP == "edge":
             drop(('operation', 'batch', 'operation'))
-        self.state = T.RemoveIsolatedNodes()(self.state)
+        self.state = remove_operation_nodes(self.state, nodes)
 
     def normalize_state(self, state):
         state = super().normalize_state(state)
