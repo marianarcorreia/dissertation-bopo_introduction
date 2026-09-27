@@ -73,6 +73,11 @@ def test_each_violation_is_detected():
 def test_bounds_and_scores():
     # longest job: 3 + 2 = 5; work: (3 + 2 + 1) / 2 = 3
     assert lower_bound(TOY) == 5.0
+    # machine 0 is a bottleneck: 3 operations only it can run -> 9, above the longest job (3)
+    # and the average load (10 / 2)
+    bottleneck = {"jobs": [[0], [1], [2], [3]], "operations": [[3, 0], [3, 0], [3, 0], [0, 1]]}
+    assert lower_bound(bottleneck) == 9.0
+    assert lower_bound(bottleneck, exhaustive_up_to=0) == 9.0  # eligibility sets only
     assert math.isclose(relative_error(6, 5), 0.2) and relative_error(6, None) is None
     assert scheduling_score(10, 5, True) == 0.5 and scheduling_score(10, 5, False) == 0.0
     m = schedule_metrics(TOY, TOY_OK)
