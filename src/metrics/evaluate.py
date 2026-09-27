@@ -1,8 +1,8 @@
 """Runs a trained policy greedily over a list of instances and computes every metric
 (schedule, constraint, efficiency, representation) per instance, plus their summaries.
 
-Kept independent of src/train.py (the caller builds the env and agent), so both the
-evaluate CLI and train()'s final held-out test report can use it.
+Kept independent of src/train.py (the caller builds the env and agent, see run_metrics.py),
+so it can also be reused from training code.
 """
 from src.metrics.efficiency import MemoryTracker, model_size
 from src.metrics.representation import RepresentationProbe, flatten_summary

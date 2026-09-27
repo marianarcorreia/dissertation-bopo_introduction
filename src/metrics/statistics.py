@@ -6,6 +6,7 @@ describe()  - n, mean, std, median, q80, min, max and the 95% CI of the mean (St
 compare()   - paired comparison of two models on the SAME instances: Wilcoxon signed-rank
               test (no normality assumption), paired Cohen's d, and the matched-pairs
               rank-biserial correlation (the Wilcoxon test's own effect size).
+compare_unpaired() - two samples on DIFFERENT instances: Mann-Whitney U and Cliff's delta.
 required_sample_size() - instances needed to detect a given paired effect size.
 """
 import math
@@ -74,6 +75,28 @@ def compare(a, b, alpha=0.05):
         "a_better_count": int((d < 0).sum()),
         "b_better_count": int((d > 0).sum()),
         "ties": int((d == 0).sum()),
+    }
+
+
+def compare_unpaired(a, b, alpha=0.05):
+    """Comparison of a vs b when they were NOT measured on the same instances (e.g. two
+    constraint branches with different instance sets): Mann-Whitney U test and Cliff's
+    delta, P(a > b) - P(a < b) over all cross pairs, in [-1, 1] (negative = a lower)."""
+    x, y = _clean(a), _clean(b)
+    if len(x) < 2 or len(y) < 2:
+        return {"n_a": len(x), "n_b": len(y)}
+    if np.all(x == x[0]) and np.all(y == y[0]) and x[0] == y[0]:
+        p_value = 1.0
+    else:
+        p_value = float(stats.mannwhitneyu(x, y, alternative="two-sided").pvalue)
+    diff = x[:, None] - y[None, :]
+    return {
+        "n_a": len(x),
+        "n_b": len(y),
+        "mean_diff": float(x.mean() - y.mean()),
+        "mannwhitney_p": p_value,
+        "significant": bool(p_value < alpha),
+        "cliffs_delta": float((diff > 0).mean() - (diff < 0).mean()),
     }
 
 
