@@ -9,6 +9,7 @@ checks: subclass `Constraint` and pass the list to `check_schedule(...)` (or ext
 `FJSP_CONSTRAINTS`), e.g. a blocking or machine-unavailability check.
 """
 from collections import defaultdict
+from itertools import combinations
 
 TOL = 1e-6
 
@@ -18,17 +19,29 @@ def makespan(schedule):
     return max((float(r["end"]) for r in schedule), default=0.0)
 
 
-def lower_bound(instance):
+def lower_bound(instance, exhaustive_up_to=10):
     """Cheap, solver-free makespan lower bound for an FJSP instance: the larger of
     (a) the longest job, taking every operation on its fastest eligible machine, and
-    (b) the total fastest-machine work spread evenly over all machines.
+    (b) for a set S of machines, the fastest-machine work of the operations that can ONLY run
+        on machines of S, spread evenly over S. With S = all machines this is the average
+        load; smaller sets catch bottlenecks (operations with few eligible machines).
+    (b) is taken over every S when there are at most `exhaustive_up_to` machines, otherwise over
+    the operations' own eligibility sets and the full set (as tight on every set checked).
     Used as the reference for relative error when no CP-SAT solution exists (e.g. the
     unseen-size test sets), so relative error is always defined."""
     ops = instance["operations"]
     num_machines = len(ops[0])
     min_proc = [min(p for p in row if p > 0) for row in ops]
-    longest_job = max(sum(min_proc[o] for o in job) for job in instance["jobs"])
-    return float(max(longest_job, sum(min_proc) / num_machines))
+    eligible = [frozenset(m for m, p in enumerate(row) if p > 0) for row in ops]
+    best = max(sum(min_proc[o] for o in job) for job in instance["jobs"])
+    if num_machines <= exhaustive_up_to:
+        sets = [frozenset(s) for k in range(1, num_machines + 1) for s in combinations(range(num_machines), k)]
+    else:
+        sets = set(eligible) | {frozenset(range(num_machines))}
+    for s in sets:
+        work = sum(p for p, e in zip(min_proc, eligible) if e <= s)
+        best = max(best, work / len(s))
+    return float(best)
 
 
 def relative_error(value, reference):
