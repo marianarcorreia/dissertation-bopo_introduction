@@ -166,6 +166,7 @@ class FJSPEnvOO(gym.Env):
 
         self.num_steps = 0
         self.mk = 0.0
+        self.schedule = []  # one entry per scheduled operation, in decision order (used by src/metrics)
         self.state: Any = self.data.clone()
 
         self.current_operations = [self.jobs[job_id][0] for job_id in range(self.num_jobs)]
@@ -232,6 +233,8 @@ class FJSPEnvOO(gym.Env):
         prev_makespan = max(self.machine_available) if self.machine_available else 0.0
 
         sel_machine, proc_time, final_time = self._select_machine_for_operation(sel_operation)
+        self.schedule.append({"job": sel_job, "operation": sel_operation, "machine": sel_machine,
+                              "start": float(final_time - proc_time), "end": float(final_time)})
         self.machine_available[sel_machine] = final_time
         self.selected_machine[sel_operation] = sel_machine
 
