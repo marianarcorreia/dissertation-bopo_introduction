@@ -32,7 +32,7 @@ import torch
 
 from src.metrics.evaluate import evaluate_agent, summarize
 from src.metrics.references import load_instances, solve_missing_references
-from src.metrics.report import HEADLINE_HEADER, fmt, headline_row, markdown_table
+from src.metrics.report import HEADLINE_HEADER, fmt, headline_row, markdown_table, plot_metric_bars
 from src.metrics.statistics import compare, required_sample_size
 from src.train import MODEL_VERSION, _resolve_representation_modules
 
@@ -246,6 +246,11 @@ def main(argv=None):
         f.write(to_markdown(report))
     print(f"[METRICS] Report: {json_path}")
     print(f"[METRICS] Summary: {md_path}")
+    folders = list(dict.fromkeys(r["folder"] for r in report["results"]))
+    for folder in folders:  # one bar chart of every metric per folder (src/metrics/report.py)
+        suffix = "" if len(folders) == 1 else "_" + os.path.splitext(os.path.basename(os.path.normpath(folder)))[0]
+        png = plot_metric_bars(report, os.path.splitext(json_path)[0] + suffix + ".png", folder)
+        print(f"[METRICS] Chart: {png}")
     return json_path
 
 
