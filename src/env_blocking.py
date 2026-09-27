@@ -167,6 +167,8 @@ class FJSPEnvBlocking(FJSSPEnv):
         self.job_next = [0] * self.num_jobs
         self.job_done = [False] * self.num_jobs
         self.max_occupancy = {"in": 0, "out": 0}
+        self.routing_order: list[int] = []  # operations in the order they were routed (incl. swaps)
+        self.schedule = []  # filled when the episode ends (see _record_schedule), used by src/metrics
         self.mk = None
         self._advance()
         self._build_state()
@@ -345,6 +347,22 @@ class FJSPEnvBlocking(FJSSPEnv):
         self.routed_at[o] = self.t
         self.in_queue[m].append(o)
         self.job_next[j] += 1
+        self.routing_order.append(o)
+
+    def _record_schedule(self):
+        """One entry per operation, in routing order, with the solver_blocking.py times:
+        routed (enters the input buffer), start, end, depart (leaves the machine; > end if the
+        machine was blocked) and leave_out (leaves the output buffer = next operation routed)."""
+        self.schedule = []
+        for o in self.routing_order:
+            j, k = self.op_job[o], self.op_pos[o]
+            last = k == len(self.jobs[j]) - 1
+            self.schedule.append({
+                "job": j, "operation": o, "machine": self.assigned[o],
+                "routed": self.routed_at[o], "start": self.start[o], "end": self.end[o],
+                "depart": self.depart[o],
+                "leave_out": self.depart[o] if last else self.routed_at[self.jobs[j][k + 1]],
+            })
 
     def _track_occupancy(self):
         self.max_occupancy["in"] = max(self.max_occupancy["in"], max(len(q) for q in self.in_queue))
@@ -386,6 +404,7 @@ class FJSPEnvBlocking(FJSSPEnv):
             self._advance()
             if all(self.job_done):
                 self.mk = round(max(e for e in self.end if e is not None), 2)
+                self._record_schedule()
                 total_reward += prev_ms - self.mk
                 _dbg(1, f"  episode DONE after {self.num_steps} steps | makespan={self.mk} | swaps={self.num_swaps}")
                 return self.state, total_reward, True, {"current_machine": sel_mach}
@@ -506,7 +525,7 @@ class FJSPEnvBlocking(FJSSPEnv):
 
     _DYNAMIC_FIELDS = ("t", "status", "assigned", "start", "end", "entry", "routed_at", "depart",
                        "in_queue", "out_queue", "running", "held", "busy_time", "job_next",
-                       "job_done", "num_blocked", "num_swaps", "max_occupancy")
+                       "job_done", "num_blocked", "num_swaps", "max_occupancy", "routing_order")
 
     def _snapshot(self):
         return {f: copy.deepcopy(getattr(self, f)) for f in self._DYNAMIC_FIELDS}

@@ -31,10 +31,11 @@ if __package__ is None or __package__ == "":
 import torch
 
 from src.metrics.evaluate import evaluate_agent, summarize
-from src.metrics.references import load_folder, solve_missing_references
+from src.blocking_config import BLOCKING_CONFIG
+from src.metrics.references import load_instances, solve_missing_references
 from src.metrics.report import HEADLINE_HEADER, fmt, headline_row, markdown_table
 from src.metrics.statistics import compare, required_sample_size
-from src.train import _resolve_representation_modules
+from src.train import BLOCKING_REPRESENTATIONS, _resolve_representation_modules
 
 
 def parse_args(argv=None):
@@ -46,12 +47,16 @@ def parse_args(argv=None):
     p.add_argument("--models", nargs="*", default=None,
                    help="Model file names to evaluate (default: every model in --models-file).")
     p.add_argument("--folders", nargs="+", default=["val/instances"],
-                   help="Instance folders (.fjs). References are read from the matching solutions folder "
-                        "(see src/metrics/references.py).")
+                   help="Instance folders (.fjs; references from the matching solutions folder, see "
+                        "src/metrics/references.py) or JSON splits with references, e.g. "
+                        "val/test_dataset_blocking.json for the blocking models.")
     p.add_argument("--in-distribution-folder", default=None,
                    help="Folder whose sizes match training, the baseline for generalization (default: first folder).")
-    p.add_argument("--train-jobs", nargs=2, type=int, default=[8, 10], help="Training range of jobs (min max).")
-    p.add_argument("--train-machines", nargs=2, type=int, default=[5, 10], help="Training range of machines (min max).")
+    p.add_argument("--train-jobs", nargs=2, type=int, default=None,
+                   help="Training range of jobs (min max). Default: 8 10, or src/blocking_config.py's "
+                        "range for the blocking representations.")
+    p.add_argument("--train-machines", nargs=2, type=int, default=None,
+                   help="Training range of machines (min max). Default: 5 10, or the blocking config's.")
     p.add_argument("--limit", type=int, default=None, help="Evaluate at most this many instances per folder.")
     p.add_argument("--no-representation", action="store_true",
                    help="Skip expressiveness / heterophily (halves the evaluation time).")
@@ -77,7 +82,9 @@ def load_agent(param, models_dir, instances):
     rep, EnvClass, BOPOClass = _resolve_representation_modules(param.get("representation", "oo"))
     jm_design = param.get("jm_design", "baseline")
     jm_kwargs = {} if jm_design == "baseline" else {"jm_design": jm_design}
-    env = EnvClass(instances, param["mask_option"], param["sel_k"], **jm_kwargs)
+    # blocking models are evaluated with the buffer capacities they were trained with
+    cap_kwargs = {k: param[k] for k in ("in_cap", "out_cap") if k in param}
+    env = EnvClass(instances, param["mask_option"], param["sel_k"], **jm_kwargs, **cap_kwargs)
     metadata = env.reset().metadata()
     agent = BOPOClass(0.001, env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],
                       gnn_type=param.get("gnn_type", "gat"), **jm_kwargs)
@@ -86,9 +93,19 @@ def load_agent(param, models_dir, instances):
     return rep, env, agent
 
 
-def in_training_range(row, args):
-    return (args.train_jobs[0] <= row["num_jobs"] <= args.train_jobs[1]
-            and args.train_machines[0] <= row["num_machines"] <= args.train_machines[1])
+def training_range(rep, args):
+    """(jobs, machines) ranges the model was trained on."""
+    if rep in BLOCKING_REPRESENTATIONS:
+        gen = BLOCKING_CONFIG["generator"]
+        default = (list(gen["range_jobs"]), list(gen["range_machines"]))
+    else:
+        default = ([8, 10], [5, 10])
+    return args.train_jobs or default[0], args.train_machines or default[1]
+
+
+def in_training_range(row, ranges):
+    jobs, machines = ranges
+    return jobs[0] <= row["num_jobs"] <= jobs[1] and machines[0] <= row["num_machines"] <= machines[1]
 
 
 def _unique_path(path):
@@ -112,9 +129,9 @@ def run(args):
 
     folders = {}
     for folder in args.folders:
-        if args.solve_missing_references:
+        if args.solve_missing_references and os.path.isdir(folder):
             solve_missing_references(folder, args.solve_workers)
-        instances = load_folder(folder)[: args.limit]
+        instances = load_instances(folder)[: args.limit]
         print(f"[METRICS] {folder}: {len(instances)} instance(s), "
               f"{sum(i['score'] is not None for i in instances)} with a CP-SAT reference")
         folders[folder] = instances
@@ -129,8 +146,9 @@ def run(args):
                 print(f"[METRICS] {param['name']} ({rep}) on {folder} ...")
                 rows, repr_summary = evaluate_agent(agent, env, instances, rep,
                                                     representation_metrics=not args.no_representation)
+                ranges = training_range(rep, args)
                 for r in rows:
-                    r["in_training_range"] = in_training_range(r, args)
+                    r["in_training_range"] = in_training_range(r, ranges)
                 summary = summarize(rows, repr_summary, agent.policy.actor)
                 summary["in_training_range_fraction"] = sum(r["in_training_range"] for r in rows) / len(rows)
                 m = summary["metrics"]

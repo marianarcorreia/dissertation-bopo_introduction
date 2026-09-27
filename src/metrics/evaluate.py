@@ -14,7 +14,32 @@ ACTION_STORE = {
     "oo": "operation",
     "om": ("machine", "exec", "operation"),
     "ojm": ("machine", "exec", "job"),
+    # blocking representations (src/env_blocking.py) route jobs to machines like ojm
+    "ojmb": ("machine", "exec", "job"),
+    "ojmd": ("machine", "exec", "job"),
+    "ojm_blk": ("machine", "exec", "job"),
 }
+
+# problem-specific counters some envs keep per episode (the blocking env's deadlock swaps,
+# blocked completions and deadlocking routings it masked); copied into each row when present
+ENV_STATS = ("num_swaps", "num_blocked", "num_masked_deadlock_actions")
+
+
+def constraints_for(env):
+    """The constraint checks that apply to the problem `env` solves."""
+    from src.env_blocking import FJSPEnvBlocking
+    if isinstance(env, FJSPEnvBlocking):
+        from src.metrics.blocking import blocking_constraints
+        return blocking_constraints(env.in_cap, env.out_cap)
+    return FJSP_CONSTRAINTS
+
+
+def problem_stats(env):
+    stats = {k: int(getattr(env, k)) for k in ENV_STATS if hasattr(env, k)}
+    if env.schedule and "depart" in env.schedule[0]:
+        from src.metrics.blocking import blocking_stats
+        stats.update(blocking_stats(env.schedule))
+    return stats
 
 SUMMARY_METRICS = (
     "makespan", "relative_error", "relative_error_lb", "scheduling_score",
@@ -22,6 +47,8 @@ SUMMARY_METRICS = (
     "rss_mb", "rss_delta_mb", "gpu_peak_mb", "gpu_peak_delta_mb",
     "action_distinct_ratio", "embedding_distinct_ratio", "input_distinct_ratio",
     "structure_gain", "effective_rank_ratio", "embedding_heterophily", "feature_heterophily",
+    # blocking only (n = 0 elsewhere)
+    "num_swaps", "num_blocked", "blocked_ops", "blocked_time",
 )
 
 
@@ -45,15 +72,18 @@ def _rollout(agent, env, index):
 
 
 def evaluate_agent(agent, env, instances, representation, representation_metrics=True,
-                   constraints=FJSP_CONSTRAINTS, references=None):
+                   constraints=None, references=None):
     """env must have been built on `instances` (in the same order). references[i] is the
     CP-SAT makespan of instance i, or None; defaults to each instance's own "score"
-    (how the validation / test splits store it).
+    (how the validation / test splits store it). constraints defaults to the checks of the
+    problem env solves (constraints_for).
 
     Returns (rows, representation_summary): one dict of metrics per instance, and the probe
     summary pooled over all instances (None when representation_metrics is False)."""
     if references is None:
         references = [inst.get("score") for inst in instances]
+    if constraints is None:
+        constraints = constraints_for(env)
     rows = []
     probe = None
     for i, instance in enumerate(instances):
@@ -67,6 +97,7 @@ def evaluate_agent(agent, env, instances, representation, representation_metrics
             **instance_size(instance),
             **schedule_metrics(instance, env.schedule, None if ref is None else float(ref), constraints),
             "env_makespan": float(env.mk),
+            **problem_stats(env),
             "decisions": decisions,
             **mem.result,
             "time_per_decision_ms": 1000.0 * mem.result["time_sec"] / max(decisions, 1),
