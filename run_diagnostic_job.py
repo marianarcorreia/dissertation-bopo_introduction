@@ -13,9 +13,16 @@ The BOPO loss defaults to the fixed variant (per-decision mean log-likelihood, g
 rollout kept out of the preference pairs - see src/bopo_utils.py:bopo_group_loss). Pass
 --logp-norm sum --greedy-in-loss to reproduce the loss the v2 sweep actually used.
 
+The batching representations (ojmb_node / ojmb_edge / ojmb_base, src/env_batching.py) use
+the same setup. Their dataset has 40 instances, so pass --validation-size 20 (20 validation +
+20 test) and --jm-design edges (their action-edge features are rebuilt every decision).
+--lr and --max-episodes override the v2 values (5e-4, 400) when given.
+
 Usage:
     python run_diagnostic_job.py --run-name ablation_ojm_gat_layers3 \
         --representation ojm --gnn-type gat --num-layers 3 --seed 42
+    python run_diagnostic_job.py --run-name batching_ojmb_node_gat_s42 --representation ojmb_node \
+        --gnn-type gat --jm-design edges --validation-size 20 --lr 4.7e-3 --max-episodes 350
 """
 import argparse
 
@@ -23,7 +30,8 @@ from src.train import train
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--run-name", required=True)
-parser.add_argument("--representation", required=True, choices=["oo", "om", "ojm"])
+parser.add_argument("--representation", required=True,
+                    choices=["oo", "om", "ojm", "ojmb_node", "ojmb_edge", "ojmb_base"])
 parser.add_argument("--gnn-type", required=True, choices=["gat", "gin", "transformer"])
 parser.add_argument("--num-layers", type=int, default=2)
 parser.add_argument("--seed", type=int, default=42)
@@ -33,7 +41,10 @@ parser.add_argument("--logp-norm", default="mean", choices=["mean", "sum"])
 parser.add_argument("--greedy-in-loss", action="store_true",
                     help="Keep the greedy rollout in the preference pairs (pre-fix behavior).")
 parser.add_argument("--jm-design", default="baseline", choices=["baseline", "edges", "attn"],
-                    help="ojm only: job-machine action edge design (see src/env.py:FJSSPEnv.JM_DESIGNS).")
+                    help="ojm-based only: job-machine action edge design (see src/env.py:FJSSPEnv.JM_DESIGNS).")
+parser.add_argument("--lr", type=float, default=0.0005)
+parser.add_argument("--max-episodes", type=int, default=400)
+parser.add_argument("--validation-size", type=int, default=40)
 args = parser.parse_args()
 
 train(
@@ -47,18 +58,19 @@ train(
     logp_norm=args.logp_norm,
     exclude_greedy_from_loss=not args.greedy_in_loss,
     jm_design=args.jm_design,
-    # everything below matches sweep_logs/v2_*.log exactly (the loss options and, for om/ojm, sel_k above do not by default)
-    max_episodes=400,
+    # everything below matches sweep_logs/v2_*.log exactly (the loss options and, for om/ojm, sel_k above do not
+    # by default; lr, max_episodes and validation_size only when left at their defaults)
+    max_episodes=args.max_episodes,
     new_freq=200,
     n_cases=30,
     B=32,
     K=10,
     use_greedy=True,
-    lr=0.0005,
+    lr=args.lr,
     hidden_channels=128,
     heads=3,
     validation_freq=25,
-    validation_size=40,
+    validation_size=args.validation_size,
     warm_start_steps=200,
     lr_min_ratio=0.2,
     checkpoint_smooth_window=3,
