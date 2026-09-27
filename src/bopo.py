@@ -1,5 +1,5 @@
 import contextlib
-from typing import List, Optional, cast
+from typing import List, Optional, Tuple, cast
 import torch
 import torch.nn as nn
 from torch_geometric.nn import Linear, to_hetero #camadas do GNN
@@ -266,7 +266,10 @@ class BOPO:
     def update(self, instance_index):
         if self.memory_efficient:
             return self._update_memory_efficient(instance_index)
-        logp_total, makespans, rounds, entropy_stats = self.sample_group(instance_index)
+        logp_total, makespans, rounds, entropy_stats = cast(
+            Tuple[torch.Tensor, torch.Tensor, int, dict],
+            self.sample_group(instance_index, record=False),
+        )
 
         # rollout 0 is the greedy one whenever use_greedy (see sample_group)
         greedy_idx = 0 if self.use_greedy else None
