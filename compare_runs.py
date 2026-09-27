@@ -59,6 +59,8 @@ OUT_NAME = None             # output folder suffix; auto-generated if None
 # Fill in settings the script cannot detect for a run (older runs did not
 # save their config). Values here win over everything else.
 OVERRIDES = {
+    "ablation_ojm_gat_layers3": {"sel_k": 1},
+    "ablation_ojm_gin_layers3": {"sel_k": 1},
     "ablation_ojm_transformer_layers3": {"sel_k": 1},
     "ablation_ojm_transformer_layers3_selk2": {"sel_k": 2},
     "train_run_*": {"sel_k": 100}

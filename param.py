@@ -162,7 +162,18 @@ def critical_param_names(rep: str, smoke: bool) -> List[str]:
     return names
 
 
-def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
+def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool,
+                            overrides: Optional[Dict] = None) -> Dict:
+    """Sample one trial's hyperparameters. `overrides` (main.py --mask-option/--sel-k/
+    --num-layers) fixes those values instead of sampling them, so a fixed setting is
+    never a search dimension."""
+    overrides = overrides or {}
+    params = _suggest_hyperparameters(rep, trial, smoke, overrides)
+    params.update(overrides)
+    return params
+
+
+def _suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool, overrides: Dict) -> Dict:
     if smoke:
         return {
             "train_freq": 1, "new_freq": 1, "n_cases": 3,
@@ -176,32 +187,34 @@ def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
     params = {
         "train_freq":      10, 
         "warm_start_steps": 100,
-        "new_freq":        trial.suggest_categorical("new_freq",         [50,100, 200]),
-        "n_cases":         trial.suggest_categorical("n_cases",          [40, 80, 120]),
+        "new_freq":         100,
+        "n_cases":         trial.suggest_categorical("n_cases",          [40, 80]),
         "batch_size":      trial.suggest_categorical("batch_size",       [64, 128]),
         "lr":              trial.suggest_float("lr",                     5e-5, 5e-3, log=True),
-        "hidden_channels": trial.suggest_categorical("hidden_channels",  [64, 128, 256, 512]),
-        "num_layers":      trial.suggest_int("num_layers",              2, 3),
-        "heads":           trial.suggest_categorical("heads",            [2, 3, 4]),
-        "K":               trial.suggest_categorical("K",                [16,32, 64]),
+        "hidden_channels": trial.suggest_categorical("hidden_channels",  [128, 256]),
+        "num_layers":       3,
+        "heads":           3,
+        "K":               trial.suggest_categorical("K",                [32, 64]),
         # use_greedy: whether one of the B rollouts is a greedy decode instead of sampled.
         "use_greedy":      trial.suggest_categorical("use_greedy",       [True, False]),
         "j_min": 8, "j_max": 10, "m_min": 5, "m_max": 10,
-        "op_max": 6, "max_processing": 100,
+        "op_max": 6, "max_processing": 350,
     }
 
     if rep == "oo":
         # FJSPEnvOO.calculate_mask() doesn't read mask_option/sel_k at all (operation
         # choice is unrestricted; machine choice is a fixed earliest-completion-time
         # heuristic) - fix them instead of spending trials tuning a no-op.
-        params["mask_option"] = trial.suggest_categorical("mask_option", [0, 1])
-        params["sel_k"] = trial.suggest_categorical("sel_k", [1, 5, 50, 100])
+        params["mask_option"] = 1
+        if "sel_k" not in overrides:
+            params["sel_k"] = trial.suggest_categorical("sel_k", [1, 10])
     else:
         # om/ojm now keep the sel_k best candidates PER JOB (env.py/envheterogeneosmo.py
         # calculate_mask), so sel_k is a real, meaningful action-space-size knob again -
         # previously a global top-k could collapse to ~1 legal action overall.
-        params["mask_option"] = trial.suggest_categorical("mask_option", [0, 1])
-        params["sel_k"] = trial.suggest_categorical("sel_k", [1, 5, 50, 100])
+        params["mask_option"] = 1
+        if "sel_k" not in overrides:
+            params["sel_k"] = trial.suggest_categorical("sel_k", [1, 10])
 
     return params
 
@@ -247,8 +260,13 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
     # "gat" keeps the bare (legacy) study name so existing gat studies/trials
     # stay resumable with no migration; gin/transformer get their own studies.
     gnn_suffix = "" if gnn_type == "gat" else f"_{gnn_type}"
-    study_name = f"fjsp_tuning_{rep}{gnn_suffix}"
-    study_folder = f"optuna_{rep}_{gnn_type}_{int(time.time())}"  # one folder per study, shared by all trials
+    # Fixed settings (main.py --num-layers/--mask-option/--sel-k) change the search
+    # space, so they get their own study instead of resuming/mixing with the default one.
+    overrides = getattr(args, "overrides", None) or {}
+    short = {"num_layers": "L", "mask_option": "mask", "sel_k": "selk"}
+    override_suffix = "".join(f"_{short[k]}{v}" for k, v in sorted(overrides.items()))
+    study_name = f"fjsp_tuning_{rep}{gnn_suffix}{override_suffix}"
+    study_folder = f"optuna_{rep}_{gnn_type}{override_suffix}_{int(time.time())}"  # one folder per study, shared by all trials
     sampler = optuna.samplers.TPESampler(seed=args.sampler_seed)
 
     if args.storage is None:
@@ -267,7 +285,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
     effective_val_size     = 3 if args.smoke else args.validation_size
 
     def objective(trial: optuna.Trial) -> float:
-        sampled  = suggest_hyperparameters(rep, trial, args.smoke)
+        sampled  = suggest_hyperparameters(rep, trial, args.smoke, overrides)
         # "study_folder/trial_N" → train() will create results/study_folder/trial_N/
         run_name = f"{study_folder}/trial_{trial.number}"
 
@@ -328,7 +346,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
 
     print(
         f"[PARAM] Starting Optuna study for {rep_upper} | gnn_type={gnn_type} | "
-        f"study_name={study_name} | trials={effective_trials} | "
+        f"study_name={study_name} | trials={effective_trials} | overrides={overrides} | "
         f"max_episodes={effective_max_episodes} | "
         f"objective=min(last_val_gap_Q80)"
     )

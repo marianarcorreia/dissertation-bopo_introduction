@@ -68,6 +68,29 @@ def parse_args():
              "'gin' (GINEConv, sum-aggregation with edge features) or 'transformer' "
              "(TransformerConv, multi-head query/key/value attention with edge features).",
     )
+    parser.add_argument(
+        "--mask-option",
+        type=int,
+        default=None,
+        choices=[0, 1],
+        help="[train/optuna] Machine ranking for the om/ojm action mask: 0 = earliest start, "
+             "1 = earliest completion. Default: train() default in train mode, param.py's "
+             "value in optuna mode.",
+    )
+    parser.add_argument(
+        "--sel-k",
+        type=int,
+        default=None,
+        help="[train/optuna] Candidate machines kept per job by the om/ojm action mask. "
+             "Default: train() default in train mode, sampled by param.py in optuna mode.",
+    )
+    parser.add_argument(
+        "--num-layers",
+        type=int,
+        default=None,
+        help="[train/optuna] Number of GNN layers. Default: train() default in train mode, "
+             "param.py's value in optuna mode.",
+    )
     test_group = parser.add_argument_group("test mode")
     test_group.add_argument("--models-file", default="models/model_params.json",
                              help="[test] Path to model_params.json.")
@@ -116,13 +139,21 @@ def parse_args():
     return parser.parse_args()
 
 
+def _override_kwargs(args):
+    """Only the flags the user actually passed, so train()/param.py defaults apply otherwise."""
+    overrides = {"mask_option": args.mask_option, "sel_k": args.sel_k, "num_layers": args.num_layers}
+    return {k: v for k, v in overrides.items() if v is not None}
+
+
 def run_train(args):
     reps = _resolve_representations(args.representation)
     multi = len(reps) > 1
+    overrides = _override_kwargs(args)
     for rep in reps:
         run_name = f"{args.run_name}_{rep}" if multi else args.run_name
-        print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type}")
-        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type)
+        print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type} | overrides={overrides}")
+        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
+              **overrides)
 
 
 def run_test(args):
@@ -153,6 +184,7 @@ def run_optuna(args):
         smoke=args.smoke,
         representations=reps,
         gnn_type=args.gnn_type,
+        overrides=_override_kwargs(args),
     )
     param_cli.run_tuning(optuna_args)
 
@@ -170,6 +202,7 @@ if __name__ == "__main__":
         print(f"[MAIN] representation(s)={_resolve_representations(args.representation)}")
     if args.mode in ("train", "optuna"):
         print(f"[MAIN] gnn_type={args.gnn_type}")
+        print(f"[MAIN] overrides={_override_kwargs(args)}")
     print("=" * 60)
 
     _DISPATCH[args.mode](args)
