@@ -15,7 +15,11 @@ ALL_REPRESENTATIONS = ["oo", "om", "ojm"]
 BLOCKING_REPRESENTATIONS = ["ojmb", "ojmd", "ojm_blk"]
 # 'all' keeps its original meaning (the three non-blocking representations): the blocking
 # ones solve a different problem on different instances, so they are grouped separately
-REPRESENTATION_GROUPS = {"all": ALL_REPRESENTATIONS, "blocking": BLOCKING_REPRESENTATIONS}
+# machine unavailability on the blocking problem (src/env_unavailability.py): windows as machine
+# features (ojmb_uf), as dummy operations (ojmb_uo), and a window-blind graph (ojmb_u0)
+UNAVAIL_REPRESENTATIONS = ["ojmb_uf", "ojmb_uo", "ojmb_u0"]
+REPRESENTATION_GROUPS = {"all": ALL_REPRESENTATIONS, "blocking": BLOCKING_REPRESENTATIONS,
+                         "unavailability": UNAVAIL_REPRESENTATIONS}
 DEFAULT_REPRESENTATIONS = ["oo"]
 
 
@@ -53,11 +57,13 @@ def parse_args():
         "--representation",
         nargs="+",
         default=None,
-        choices=ALL_REPRESENTATIONS + BLOCKING_REPRESENTATIONS + list(REPRESENTATION_GROUPS),
+        choices=ALL_REPRESENTATIONS + BLOCKING_REPRESENTATIONS + UNAVAIL_REPRESENTATIONS + list(REPRESENTATION_GROUPS),
         help="Graph representation(s) to use: oo (operation-only), om (operation-machine), "
              "ojm (operation-job-machine); blocking FJSP: ojmb (buffer node type), ojmd (buffers "
              "as dummy machines), ojm_blk (plain OJM graph on the blocking problem). Pass several "
-             "values, 'all' (oo om ojm) or 'blocking' (ojmb ojmd ojm_blk). Default: oo. "
+             "values, 'all' (oo om ojm) or 'blocking' (ojmb ojmd ojm_blk). Unavailability on the "
+             "blocking FJSP: ojmb_uf (machine features), ojmb_uo (dummy operations), ojmb_u0 "
+             "(window-blind control), or 'unavailability' for the three. Default: oo. "
              "[test] Only the models of these representations in --models-file are evaluated "
              "(default: every model); blocking and non-blocking models cannot be mixed.",
     )

@@ -20,6 +20,10 @@ HEADLINE = (
     # blocking
     ("num_swaps", "Swaps", "lower"),
     ("blocked_time", "Blocked time", "lower"),
+    # unavailability
+    ("interrupted_time", "Interrupted time", "lower"),
+    ("trapped_time", "Trapped time", "lower"),
+    ("num_waits", "Waits", "lower"),
 )
 BETTER = {k: b for k, _, b in HEADLINE}
 BETTER["feasible"] = "higher"

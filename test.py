@@ -8,7 +8,7 @@ from multiprocessing import Pool
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(__file__))
 
-from src.train import BLOCKING_REPRESENTATIONS, test_model
+from src.train import BLOCKING_REPRESENTATIONS, UNAVAIL_REPRESENTATIONS, test_model
 from src.utils import OutputManager, open_dashboard
 
 
@@ -72,7 +72,8 @@ def expand_representations(representations):
     """'all' -> oo om ojm, 'blocking' -> ojmb ojmd ojm_blk; None stays None (no filter)."""
     if not representations:
         return None
-    groups = {"all": ("oo", "om", "ojm"), "blocking": BLOCKING_REPRESENTATIONS}
+    groups = {"all": ("oo", "om", "ojm"), "blocking": BLOCKING_REPRESENTATIONS,
+              "unavailability": UNAVAIL_REPRESENTATIONS}
     return {r for v in representations for r in groups.get(v.lower(), (v.lower(),))}
 
 
@@ -93,6 +94,11 @@ def select_models(model_params, representations=None):
     wanted = expand_representations(representations)
     if wanted:
         model_params = [p for p in model_params if p.get("representation", "oo") in wanted]
+    if any(p.get("representation") in UNAVAIL_REPRESENTATIONS for p in model_params):
+        # .fjs folders cannot carry the windows nor the per-mode references
+        raise ValueError("Unavailability models are evaluated on the JSON split, which stores the windows: "
+                         "python run_metrics.py --models-file models/unavailability/model_params.json "
+                         "--folders val/test_dataset_unavailability.json")
     blocking = {p.get("representation", "oo") in BLOCKING_REPRESENTATIONS for p in model_params}
     if len(blocking) > 1:
         raise ValueError("--models-file mixes blocking (ojmb/ojmd/ojm_blk) and non-blocking models; "

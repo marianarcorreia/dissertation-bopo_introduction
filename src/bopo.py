@@ -202,6 +202,13 @@ class BOPO:
         (normalised state, chosen action) needed to recompute the log-probs later."""
         env_cls = type(self.env)
         rollout_envs = [env_cls(self.env.instances, self.env.mask_option, self.env.sel_k, **self.env.env_kwargs()) for _ in range(self.B)]
+        if hasattr(self.env, "draw_scenario"):
+            # stochastic env (src/env_unavailability.py): common random numbers - every rollout
+            # of the group faces the same breakdowns, so the makespans BOPO ranks differ only
+            # because of the decisions; a new scenario is drawn for every group
+            scenario = self.env.draw_scenario()
+            for e in rollout_envs:
+                e.fix_scenario(scenario)
         states = [e.reset(sel_index=instance_index) for e in rollout_envs]
 
         active = list(range(self.B))

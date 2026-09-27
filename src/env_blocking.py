@@ -387,9 +387,15 @@ class FJSPEnvBlocking(FJSSPEnv):
             proj_free[m] = free
         return proj_end, proj_free
 
+    def _known_end(self, o):
+        """End time of a started operation as the policy may know it. Here the true end
+        (processing is deterministic); src/env_unavailability.py hides the effect of breakdowns
+        that have not happened yet."""
+        return self.end[o]
+
     def _makespan_estimate(self):
         proj_end, _ = self._projected_times()
-        ends = [e for e in self.end if e is not None] + list(proj_end.values())
+        ends = [self._known_end(o) for o, e in enumerate(self.end) if e is not None] + list(proj_end.values())
         return max([self.t] + ends)
 
     def step(self, action):
@@ -448,7 +454,7 @@ class FJSPEnvBlocking(FJSSPEnv):
             ready = 0.0
             if k > 0:
                 prev = self.jobs[j][k - 1]
-                end = self.end[prev]
+                end = self._known_end(prev) if self.end[prev] is not None else None
                 ready = end if end is not None else proj_end.get(prev, self.t)
             job_x[j, 1] = ready
             job_x[j, 2] = len(self.jobs[j]) - k

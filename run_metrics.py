@@ -35,7 +35,7 @@ from src.blocking_config import BLOCKING_CONFIG
 from src.metrics.references import load_instances, solve_missing_references
 from src.metrics.report import HEADLINE_HEADER, fmt, headline_row, markdown_table
 from src.metrics.statistics import compare, required_sample_size
-from src.train import BLOCKING_REPRESENTATIONS, _resolve_representation_modules
+from src.train import BLOCKING_FAMILY, UNAVAIL_REPRESENTATIONS, _resolve_representation_modules, _select_scores
 
 
 def parse_args(argv=None):
@@ -83,7 +83,7 @@ def load_agent(param, models_dir, instances):
     jm_design = param.get("jm_design", "baseline")
     jm_kwargs = {} if jm_design == "baseline" else {"jm_design": jm_design}
     # blocking models are evaluated with the buffer capacities they were trained with
-    cap_kwargs = {k: param[k] for k in ("in_cap", "out_cap") if k in param}
+    cap_kwargs = {k: param[k] for k in ("in_cap", "out_cap", "unavail_mode") if k in param}
     env = EnvClass(instances, param["mask_option"], param["sel_k"], **jm_kwargs, **cap_kwargs)
     metadata = env.reset().metadata()
     agent = BOPOClass(0.001, env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],
@@ -95,7 +95,7 @@ def load_agent(param, models_dir, instances):
 
 def training_range(rep, args):
     """(jobs, machines) ranges the model was trained on."""
-    if rep in BLOCKING_REPRESENTATIONS:
+    if rep in BLOCKING_FAMILY:
         gen = BLOCKING_CONFIG["generator"]
         default = (list(gen["range_jobs"]), list(gen["range_machines"]))
     else:
@@ -142,6 +142,10 @@ def run(args):
             for folder, instances in folders.items():
                 if not instances:
                     continue
+                if param.get("representation") in UNAVAIL_REPRESENTATIONS:
+                    # the reference of the unavailability mode the model was trained on
+                    instances = _select_scores([dict(i) for i in instances], param["representation"],
+                                               param.get("unavail_mode"))
                 rep, env, agent = load_agent(param, models_dir, instances)
                 print(f"[METRICS] {param['name']} ({rep}) on {folder} ...")
                 rows, repr_summary = evaluate_agent(agent, env, instances, rep,

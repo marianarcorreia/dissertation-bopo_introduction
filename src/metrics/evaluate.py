@@ -18,16 +18,27 @@ ACTION_STORE = {
     "ojmb": ("machine", "exec", "job"),
     "ojmd": ("machine", "exec", "job"),
     "ojm_blk": ("machine", "exec", "job"),
+    # machine unavailability on the blocking problem (src/env_unavailability.py)
+    "ojmb_uf": ("machine", "exec", "job"),
+    "ojmb_uo": ("machine", "exec", "job"),
+    "ojmb_u0": ("machine", "exec", "job"),
 }
 
 # problem-specific counters some envs keep per episode (the blocking env's deadlock swaps,
 # blocked completions and deadlocking routings it masked); copied into each row when present
-ENV_STATS = ("num_swaps", "num_blocked", "num_masked_deadlock_actions")
+ENV_STATS = ("num_swaps", "num_blocked", "num_masked_deadlock_actions",
+             # unavailability env: breakdowns before the makespan, clock jumps waiting for a window
+             "num_breakdowns", "num_waits")
 
 
 def constraints_for(env):
     """The constraint checks that apply to the problem `env` solves."""
     from src.env_blocking import FJSPEnvBlocking
+    from src.env_unavailability import FJSPEnvUnavailability
+    if isinstance(env, FJSPEnvUnavailability):
+        from src.metrics.unavailability import unavailability_constraints
+        # the windows of the episode the env just played (stored or sampled)
+        return unavailability_constraints(env.in_cap, env.out_cap, lambda instance: env.true_windows)
     if isinstance(env, FJSPEnvBlocking):
         from src.metrics.blocking import blocking_constraints
         return blocking_constraints(env.in_cap, env.out_cap)
@@ -39,6 +50,9 @@ def problem_stats(env):
     if env.schedule and "depart" in env.schedule[0]:
         from src.metrics.blocking import blocking_stats
         stats.update(blocking_stats(env.schedule))
+    if env.schedule and hasattr(env, "true_windows"):
+        from src.metrics.unavailability import unavailability_stats
+        stats.update(unavailability_stats(env.schedule, env.true_windows))
     return stats
 
 SUMMARY_METRICS = (
@@ -49,6 +63,8 @@ SUMMARY_METRICS = (
     "structure_gain", "effective_rank_ratio", "embedding_heterophily", "feature_heterophily",
     # blocking only (n = 0 elsewhere)
     "num_swaps", "num_blocked", "blocked_ops", "blocked_time",
+    # unavailability only
+    "num_breakdowns", "num_waits", "interrupted_ops", "interrupted_time", "trapped_parts", "trapped_time",
 )
 
 

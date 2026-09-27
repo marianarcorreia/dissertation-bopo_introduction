@@ -39,6 +39,12 @@ def _resolve_representation_modules(representation: str):
         "ojmb": ("src.env_blocking", "FJSPEnvBlocking", "src.bopo", "BOPO"),
         "ojmd": ("src.env_blocking", "FJSPEnvBlockingDummy", "src.bopo", "BOPO"),
         "ojm_blk": ("src.env_blocking", "FJSPEnvBlockingNoBuffer", "src.bopo", "BOPO"),
+        # machine unavailability on the blocking problem (src/env_unavailability.py), with the
+        # buffers as a node type (ojmb): windows as machine features ("uf"), as dummy
+        # operations ("uo"), and a window-blind graph on the SAME dynamics ("u0")
+        "ojmb_uf": ("src.env_unavailability", "FJSPEnvUnavailFeatures", "src.bopo", "BOPO"),
+        "ojmb_uo": ("src.env_unavailability", "FJSPEnvUnavailDummyOps", "src.bopo", "BOPO"),
+        "ojmb_u0": ("src.env_unavailability", "FJSPEnvUnavailBlind", "src.bopo", "BOPO"),
     }
     if rep not in rep_map:
         raise ValueError(f"Unsupported representation '{representation}'. Use one of: {', '.join(rep_map)}")
@@ -60,11 +66,20 @@ BLOCKING_REPRESENTATIONS = ("ojmb", "ojmd", "ojm_blk")
 # runs and models are kept apart: results/blocking/, candidate_models/blocking/ and
 # models/blocking/ (each with its own model_params.json). The others keep the original folders.
 BLOCKING_SUBDIR = "blocking"
+# Unavailability always runs on the blocking problem (same instances and buffers), but with
+# windows and its own references: results/unavailability/, candidate_models/unavailability/,
+# models/unavailability/.
+UNAVAIL_REPRESENTATIONS = ("ojmb_uf", "ojmb_uo", "ojmb_u0")
+UNAVAIL_SUBDIR = "unavailability"
+# every representation that runs on the blocking dynamics (buffers in_cap / out_cap)
+BLOCKING_FAMILY = BLOCKING_REPRESENTATIONS + UNAVAIL_REPRESENTATIONS
 
 
 def output_paths(representation):
     """Folders for a representation's results, candidate checkpoints and best models."""
-    sub = BLOCKING_SUBDIR if representation.lower().strip() in BLOCKING_REPRESENTATIONS else ""
+    rep = representation.lower().strip()
+    sub = (BLOCKING_SUBDIR if rep in BLOCKING_REPRESENTATIONS
+           else UNAVAIL_SUBDIR if rep in UNAVAIL_REPRESENTATIONS else "")
     paths = {
         "results": os.path.join("results", sub) if sub else "results",
         "candidate_models": os.path.join("candidate_models", sub) if sub else "candidate_models",
@@ -83,14 +98,31 @@ def _dataset_paths(rep_name):
     """The blocking representations are scored against blocking-aware CP-SAT references
     (src/generate_blocking_references.py) on the same fixed instances - the non-blocking
     references are only a lower bound for them and would inflate every gap."""
-    if rep_name not in BLOCKING_REPRESENTATIONS:
+    if rep_name in UNAVAIL_REPRESENTATIONS:
+        paths = {"val_path": "val/validation_dataset_unavailability.json",
+                 "test_path": "val/test_dataset_unavailability.json"}
+        script = "src.generate_unavailability_references"
+    elif rep_name in BLOCKING_REPRESENTATIONS:
+        paths = {"val_path": "val/validation_dataset_blocking.json",
+                 "test_path": "val/test_dataset_blocking.json"}
+        script = "src.generate_blocking_references"
+    else:
         return {}
-    paths = {"val_path": "val/validation_dataset_blocking.json",
-             "test_path": "val/test_dataset_blocking.json"}
     for path in paths.values():
         if not os.path.isfile(path):
-            raise FileNotFoundError(f"{path} not found: run `python -m src.generate_blocking_references` first.")
+            raise FileNotFoundError(f"{path} not found: run `python -m {script}` first.")
     return paths
+
+
+def _select_scores(dataset, rep_name, unavail_mode=None):
+    """Unavailability splits store one CP-SAT reference per mode (score_scheduled / _breakdown /
+    _mixed): score the policy against the mode it is trained and evaluated on."""
+    if rep_name in UNAVAIL_REPRESENTATIONS:
+        from src.unavailability_config import UNAVAIL_CONFIG
+        mode = unavail_mode or UNAVAIL_CONFIG["mode"]
+        for inst in dataset:
+            inst["score"] = inst[f"score_{mode}"]
+    return dataset
 
 
 def generate_train_instances(train_config):
@@ -130,7 +162,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     # only passed when set, so om/oo envs (which don't take it) are built exactly as before
     jm_kwargs = {}
     if jm_design != "baseline":
-        if rep_name not in ("ojm",) + BLOCKING_REPRESENTATIONS:
+        if rep_name not in ("ojm",) + BLOCKING_FAMILY:
             raise ValueError(f"jm_design={jm_design!r} only applies to the ojm representation")
         jm_kwargs = {"jm_design": jm_design}
     paths = output_paths(rep_name)
@@ -138,7 +170,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     output_manager = OutputManager(output_dir=paths["results"], run_name=run_name)
     print(f"[TRAIN] Output run folder: {output_manager.run_dir}")
     run_start_time = time.time()
-    validation_set = build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg, **_dataset_paths(rep_name))
+    validation_set = _select_scores(build_validation_dataset(sample_size=validation_size, dbg_fn=_dbg, **_dataset_paths(rep_name)), rep_name)
     print(f"[TRAIN] Validation config | every={validation_freq} steps | instances={len(validation_set)} (representative subset)")
     _dbg(1, f"Loaded validation set from val/instances + val/solutions: {len(validation_set)} instance(s)")
 
@@ -156,7 +188,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         "max_processing": max_processing
     }
 
-    if rep_name in BLOCKING_REPRESENTATIONS:
+    if rep_name in BLOCKING_FAMILY:
         # blocking experiments use their own instance setting (see src/blocking_config.py):
         # the default one never makes blocking bind
         train_config = {"n_cases": n_cases, **BLOCKING_CONFIG["generator"]}
@@ -289,7 +321,8 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
                     "gnn_type": gnn_type,
                     "jm_design": jm_design,
                     **({"in_cap": BLOCKING_CONFIG["in_cap"], "out_cap": BLOCKING_CONFIG["out_cap"]}
-                       if rep_name in BLOCKING_REPRESENTATIONS else {}),
+                       if rep_name in BLOCKING_FAMILY else {}),
+                    **({"unavail_mode": env.unavail_mode} if rep_name in UNAVAIL_REPRESENTATIONS else {}),
                     "all_val_results": val_metrics["all_gaps"],
                     "avg_gap": val_metrics["avg_gap"],
                     "smoothed_avg_gap": smoothed_avg_gap,
@@ -340,7 +373,7 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     test_all_gaps = None
     if best_model_path is not None:
         print(f"[TRAIN] Evaluating best checkpoint ({best_model_path}) on the held-out test split...")
-        test_set = get_test_dataset(sample_size=validation_size, dbg_fn=_dbg, **_dataset_paths(rep_name))
+        test_set = _select_scores(get_test_dataset(sample_size=validation_size, dbg_fn=_dbg, **_dataset_paths(rep_name)), rep_name)
         test_env = EnvClass(test_set, mask_option, sel_k, **jm_kwargs)
         bopo_agent.load(best_model_path)
         test_metrics = run_validation(bopo_agent, test_env, test_set, dbg_fn=_dbg,
@@ -429,7 +462,7 @@ def test_model(model_name, folder, filename, models_file="models/model_params.js
             jm_design = param.get("jm_design", "baseline")
             jm_kwargs = {} if jm_design == "baseline" else {"jm_design": jm_design}
             # blocking models are evaluated with the buffer capacities they were trained with
-            cap_kwargs = {k: param[k] for k in ("in_cap", "out_cap") if k in param}
+            cap_kwargs = {k: param[k] for k in ("in_cap", "out_cap", "unavail_mode") if k in param}
             test_env = ModelEnvClass(test_instances, param["mask_option"], param["sel_k"], **jm_kwargs, **cap_kwargs)
             metadata = test_env.reset().metadata()
             t_ppo_agent = ModelBOPOClass(0.001, test_env, metadata, param["hidden_channels"], param["num_layers"], param["heads"],

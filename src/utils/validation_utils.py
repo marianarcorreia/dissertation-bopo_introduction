@@ -224,7 +224,7 @@ def get_test_dataset(sample_size=20, instances_dir="val/instances", solutions_di
 
 def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_fn=None, print_fn=print):
     all_val_results = []
-    swaps, blocked = [], []
+    swaps, blocked, waits, trapped = [], [], [], []
     with torch.no_grad():
         for i in range(len(validation_set)):
             v_state = val_env.reset(sel_index=i)
@@ -238,6 +238,10 @@ def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_
                     if hasattr(val_env, "num_swaps"):
                         swaps.append(int(val_env.num_swaps))
                         blocked.append(int(val_env.num_blocked))
+                    if hasattr(val_env, "true_windows"):
+                        from src.metrics.unavailability import unavailability_stats
+                        waits.append(int(val_env.num_waits))
+                        trapped.append(unavailability_stats(val_env.schedule, val_env.true_windows)["trapped_parts"])
                     if dbg_fn is not None:
                         dbg_fn(1, f"  val instance {i+1}/{len(validation_set)} ({validation_set[i]['name']}) | makespan={val_env.mk} | ref={ref:.2f} | gap={gap:.4f}")
                     break
@@ -262,4 +266,10 @@ def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_
         metrics["total_blocked"] = int(sum(blocked))
         print_fn(f"{prefix} blocked_events={metrics['total_blocked']} | swaps={metrics['total_swaps']} "
                  f"in {metrics['instances_with_swap']} instance(s)")
+    if waits:
+        # unavailability env: parts that waited in the input buffer of a machine while it was
+        # down (the downtime-induced blocking the representations should help avoid)
+        metrics["total_trapped_parts"] = int(sum(trapped))
+        metrics["total_waits"] = int(sum(waits))
+        print_fn(f"{prefix} trapped_parts={metrics['total_trapped_parts']} | waits={metrics['total_waits']}")
     return metrics
