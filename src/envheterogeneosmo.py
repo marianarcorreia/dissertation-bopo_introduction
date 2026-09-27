@@ -118,6 +118,7 @@ class FJSPEnvMO(gym.Env):
 
         self.num_steps = 0
         self.mk = 0.0
+        self.schedule = []  # one entry per scheduled operation, in decision order (used by src/metrics)
         self.state: Any = self.data.clone()
 
         self.job_start_machines = torch.full((self.num_jobs, self.num_machines), 10000.0)
@@ -254,6 +255,8 @@ class FJSPEnvMO(gym.Env):
         start_time = max(float(self.state["machine"].x[sel_machine, 0]), float(self.operations_ends[sel_job]))
         proc_time = float(self.operations[sel_operation][sel_machine])
         final_time = start_time + proc_time
+        self.schedule.append({"job": sel_job, "operation": sel_operation, "machine": sel_machine,
+                              "start": start_time, "end": final_time})
 
         self.state["machine"].x[sel_machine, 0] = final_time
         self.job_start_machines[self.job_start_machines[:, sel_machine] < final_time, sel_machine] = final_time

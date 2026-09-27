@@ -216,6 +216,7 @@ class FJSSPEnv(gym.Env):
         #reinica para estado inicial
         self.num_steps = 0
         self.change_machine = 0
+        self.schedule = [] #uma entrada por operação escalonada, pela ordem de decisão (usado por src/metrics)
         self.state: Any = self.data.clone()
 
         self.job_start_machines = torch.empty((self.num_jobs,self.num_machines)) #o instante que apartir dai o job j começa na máquina m
@@ -401,6 +402,8 @@ class FJSSPEnv(gym.Env):
         proc_time  = self.operations[o_id][sel_mach]
         #o tempo de conclusão
         final_time =  start_time + proc_time
+        self.schedule.append({"job": sel_job, "operation": int(o_id), "machine": sel_mach,
+                              "start": float(start_time), "end": float(final_time)})
         #atualiza o tempo livre da máquina selecionada, que é o tempo em que a máquina estará disponível para a próxima operação. Isso é calculado como o tempo de conclusão da operação atual (final_time), e é armazenado na feature 0 da máquina selecionada no estado do ambiente. Essa atualização é crucial para refletir o impacto da ação tomada no estado do ambiente, permitindo que o agente tome decisões informadas nas próximas etapas com base na disponibilidade das máquinas.
         self.state["machine"].x[sel_mach, 0] = final_time
         #atualiza os tempos de início possíveis para todos os outros jobs na máquina selecionada, garantindo que eles não possam ser agendados para começar antes que a máquina esteja disponível. Isso é feito comparando o tempo de início atual para cada job na máquina selecionada (armazenado em self.job_start_machines) com o tempo de conclusão da operação atual (final_time), e atualizando o tempo de início para ser no mínimo igual a final_time. Essa lógica garante que as restrições de disponibilidade da máquina sejam respeitadas para todos os jobs que possam ser agendados na mesma máquina.
