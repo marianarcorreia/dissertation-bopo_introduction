@@ -17,7 +17,7 @@ import torch
 from src.metrics.evaluate import evaluate_agent, summarize
 from src.metrics.representation import RepresentationProbe
 from src.metrics.schedule import check_schedule, lower_bound, relative_error, schedule_metrics, scheduling_score
-from src.metrics.statistics import compare, describe, required_sample_size
+from src.metrics.statistics import compare, compare_unpaired, describe, required_sample_size
 from src.train import _resolve_representation_modules, generate_train_instances
 
 REPS = ["oo", "om", "ojm"]
@@ -90,6 +90,9 @@ def test_statistics():
     assert c["a_better_count"] == 8 and c["rank_biserial"] == -1.0 and c["mean_diff"] == -1.0
     assert compare(a, a)["wilcoxon_p"] == 1.0
     assert required_sample_size(0.5) == 33 and required_sample_size(0.2) == 198
+    u = compare_unpaired([1, 2, 3, 4, 5], [10, 11, 12, 13])
+    assert u["cliffs_delta"] == -1.0 and u["significant"] and u["mean_diff"] < 0
+    assert compare_unpaired([1, 1], [1, 1])["mannwhitney_p"] == 1.0
 
 
 def small_instances(n=2):
