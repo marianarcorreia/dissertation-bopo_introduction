@@ -27,11 +27,16 @@ def lower_bound(instance, exhaustive_up_to=10):
         load; smaller sets catch bottlenecks (operations with few eligible machines).
     (b) is taken over every S when there are at most `exhaustive_up_to` machines, otherwise over
     the operations' own eligibility sets and the full set (as tight on every set checked).
+    With parallel batching (instance "family" / "capacities"), up to B_f operations of family f
+    share one batch lasting at least as long as each of them, so each one's work in (b) counts
+    1 / B_f.
     Used as the reference for relative error when no CP-SAT solution exists (e.g. the
     unseen-size test sets), so relative error is always defined."""
     ops = instance["operations"]
     num_machines = len(ops[0])
     min_proc = [min(p for p in row if p > 0) for row in ops]
+    family, capacities = instance.get("family"), instance.get("capacities")
+    load = [p / capacities[f] if family and (f := family[o]) >= 0 else p for o, p in enumerate(min_proc)]
     eligible = [frozenset(m for m, p in enumerate(row) if p > 0) for row in ops]
     best = max(sum(min_proc[o] for o in job) for job in instance["jobs"])
     if num_machines <= exhaustive_up_to:
@@ -39,7 +44,7 @@ def lower_bound(instance, exhaustive_up_to=10):
     else:
         sets = set(eligible) | {frozenset(range(num_machines))}
     for s in sets:
-        work = sum(p for p, e in zip(min_proc, eligible) if e <= s)
+        work = sum(w for w, e in zip(load, eligible) if e <= s)
         best = max(best, work / len(s))
     return float(best)
 
@@ -148,29 +153,34 @@ class MachineCapacity(Constraint):
 FJSP_CONSTRAINTS = (Completeness(), Eligibility(), ProcessingTime(), Precedence(), MachineCapacity())
 
 
-def check_schedule(instance, schedule, constraints=FJSP_CONSTRAINTS):
+def check_schedule(instance, schedule, constraints=FJSP_CONSTRAINTS, step_key=None):
     """Independent feasibility check of a recorded schedule.
+
+    step_key: when one decision schedules several entries (e.g. a whole batch), the entry
+    field that identifies the decision; by default every entry is its own decision.
 
     Returns:
         feasible                   - no violation of any constraint, and every operation scheduled
-        n_steps                    - scheduling decisions (= schedule entries)
+        n_steps                    - scheduling decisions
         n_violating_steps          - decisions that broke at least one constraint
         violation_rate_per_step    - n_violating_steps / n_steps
         violations                 - {constraint name: number of violations}
     """
     violations = defaultdict(int)
-    violating_steps = 0
+    step_violated = {}
     for i in range(len(schedule)):
         step_errors = 0
         for c in constraints:
             n = c.check_step(instance, schedule, i)
             violations[c.name] += n
             step_errors += n
-        violating_steps += int(step_errors > 0)
+        step = i if step_key is None else schedule[i][step_key]
+        step_violated[step] = step_violated.get(step, False) or step_errors > 0
     for c in constraints:
         violations[c.name] += c.check_final(instance, schedule)
 
-    n_steps = len(schedule)
+    n_steps = len(step_violated)
+    violating_steps = sum(step_violated.values())
     return {
         "feasible": all(v == 0 for v in violations.values()),
         "n_steps": n_steps,
@@ -180,12 +190,12 @@ def check_schedule(instance, schedule, constraints=FJSP_CONSTRAINTS):
     }
 
 
-def schedule_metrics(instance, schedule, reference=None, constraints=FJSP_CONSTRAINTS):
+def schedule_metrics(instance, schedule, reference=None, constraints=FJSP_CONSTRAINTS, step_key=None):
     """All schedule-level metrics for one solved instance. `reference` is the CP-SAT
     makespan when one exists; the lower bound is always computed as well."""
     mk = makespan(schedule)
     lb = lower_bound(instance)
-    check = check_schedule(instance, schedule, constraints)
+    check = check_schedule(instance, schedule, constraints, step_key)
     ref = reference if reference is not None else lb
     return {
         "makespan": mk,
