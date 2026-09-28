@@ -27,6 +27,23 @@ encoded structurally (family node / batch edges) and by numeric descriptors.
 Instances must carry "family", "capacities" and "delta" (see src/batch_generator.py).
 Every episode records the schedule in env.schedule, in the format checked by
 src.batch_solver.check_schedule.
+
+Version 2 ("ojmb_<node|edge|base>_v2", docs/batching_formulation.tex) fixes two limitations
+found by the diagnostic of the batch rule, and changes nothing else:
+  WAIT_ACTION       the rule above never waits, so a partner that becomes ready shortly after
+                    the start is never batched (the teacher batched 11.7% of the operations,
+                    CP-SAT 18%). Every allowed action (machine, job) of a family operation gets a
+                    twin action "wait for the next compatible partner": it starts when that
+                    partner is ready and dispatches the larger batch. Its edge carries its own
+                    start, batch time and machine idle time, so the policy sees what waiting
+                    costs and decides; the batch rule itself is unchanged.
+  BATCH_AWARE_MASK  the mask ranked each job's machines by the job's INDIVIDUAL completion,
+                    so with sel_k = 1 a machine where a larger batch finishes earlier could be
+                    masked (14% of the family decisions). It now ranks them by the completion
+                    of the batch the action dispatches, the quantity the action edges and the
+                    teacher already use.
+Both belong to the action space, so the three v2 representations have both and still differ
+only in the graph.
 """
 import numpy as np
 import torch
@@ -42,13 +59,15 @@ def _empty_edges():
 
 def _keep_edges(store, keep):
     store.edge_index = store.edge_index[:, keep]
-    for key in ("edge_attr", "mask"):
+    for key in ("edge_attr", "mask", "wait", "wait_start"):
         if key in store and store[key].shape[0] == keep.shape[0]:
             store[key] = store[key][keep]
 
 
 class _FJSPBatchEnv(FJSSPEnv):
     BATCH_REP = None  # "node", "edge" or "base"
+    WAIT_ACTION = False  # v2: "wait for the next compatible partner" twin actions
+    BATCH_AWARE_MASK = False  # v2: sel_k ranks machines by the completion of the batch
 
     # ------------------------------------------------------------------ instance / graph
     def generate_instance(self, instance):
@@ -247,10 +266,13 @@ class _FJSPBatchEnv(FJSSPEnv):
     def _batch_start_proc(self):
         """Per (machine, job) action edge: earliest start and processing time of the batch
         the action would dispatch (the longest member, see _batch_members)."""
-        edge_index = self.state['machine', 'exec', 'job'].edge_index
+        store = self.state['machine', 'exec', 'job']
+        edge_index = store.edge_index
         machine_idx, job_idx = edge_index[0], edge_index[1]
         start = self.job_start_machines[job_idx, machine_idx].clone().float()
         proc = self.current_job_proc[job_idx, machine_idx].clone().float()
+        if "wait" in store:  # v2 wait actions start when the awaited partner is ready
+            start[store.wait] = store.wait_start[store.wait]
         cands = self._family_candidates()
         if not cands:
             return start, proc
@@ -271,12 +293,123 @@ class _FJSPBatchEnv(FJSSPEnv):
         exactly what their action edges show (see _refresh_jm_edges) - so the teacher can
         be imitated from the features they see. The baseline keeps the individual time,
         which is what its action edges show."""
+        store = self.state['machine', 'exec', 'job']
         if self.BATCH_REP == "base":
-            return super().expert_action()
+            if "wait" not in store:
+                return super().expert_action()
+            # individual times, but a wait action starts later (what its edge shows)
+            m_idx, j_idx = store.edge_index
+            start, _ = self._batch_start_proc()
+            completion = start + self.current_job_proc[j_idx, m_idx]
+            primary, secondary = (start, completion) if self.mask_option == 0 else (completion, start)
+            return select_with_tiebreak(primary, secondary, store.mask)
         start, proc = self._batch_start_proc()
         completion = start + proc
         primary, secondary = (start, completion) if self.mask_option == 0 else (completion, start)
         return select_with_tiebreak(primary, secondary, self.state['machine', 'exec', 'job'].mask)
+
+    # ------------------------------------------------------------------ v2: mask and wait
+    def calculate_mask(self):
+        if self.WAIT_ACTION:  # rebuilt below from the current state
+            self._drop_wait_edges()
+        super().calculate_mask()
+        if self.BATCH_AWARE_MASK:
+            self._batch_aware_mask()
+        if self.WAIT_ACTION:
+            self._add_wait_edges()
+
+    def _drop_wait_edges(self):
+        store = self.state['machine', 'exec', 'job']
+        if "wait" in store:
+            if store.wait.shape[0] == store.edge_index.shape[1]:
+                _keep_edges(store, ~store.wait)
+            del store["wait"], store["wait_start"]
+
+    def _sync_reverse_edges(self):
+        store = self.state['machine', 'exec', 'job']
+        if ('job', 'exec', 'machine') in self.state.edge_types:
+            self.state['job', 'exec', 'machine'].edge_index = store.edge_index.flip(0)
+            self.state['job', 'exec', 'machine'].edge_attr = store.edge_attr.clone()
+
+    def _batch_aware_mask(self):
+        """Per job, keep the sel_k machines with the earliest completion of the BATCH the action
+        dispatches (earliest start with mask_option 0, where the batch changes nothing)."""
+        store = self.state['machine', 'exec', 'job']
+        start, proc = self._batch_start_proc()
+        rank = (start if self.mask_option == 0 else start + proc).clone()
+        rank[start >= SENTINEL] = float("inf")
+        jobs = store.edge_index[1]
+        keep = torch.zeros(jobs.shape[0], dtype=torch.bool)
+        k = max(1, int(self.sel_k))
+        for j in jobs.unique().tolist():
+            idx = (jobs == j).nonzero().flatten()
+            valid = idx[rank[idx] < float("inf")]
+            if valid.numel():
+                # stable sort: ties keep the edge order, as the individual ranking did
+                order = valid[torch.sort(rank[valid], stable=True).indices[:k]]
+                keep[order] = True
+        store.mask = ~keep
+
+    def _wait_start(self, sel_job, mach, start, members, cands):
+        """Ready time of the next compatible partner of the batch (sel_job on mach at start
+        with `members`): same family, eligible on mach, within the order difference of the
+        batch, not ready yet. None when the batch is full or there is no such partner."""
+        o = self.current_operations[sel_job]
+        f = self.family[o]
+        if f < 0 or len(members) >= self.capacities[f]:
+            return None
+        ks = [self.op_kappa[self.current_operations[j]] for j in members]
+        k_min, k_max = min(ks), max(ks)
+        later = [ready for ready, j, o2, k in cands.get(f, ())
+                 if j not in members and ready > start and self.operations[o2][mach] > 0
+                 and max(k_max, k) - min(k_min, k) <= self.delta]
+        return min(later) if later else None
+
+    def _add_wait_edges(self):
+        """A twin 'wait' action for every allowed (unmasked) action whose batch would grow by
+        waiting for the next compatible partner. Features as the immediate action's, with the
+        later start, the (larger) batch's time for the batching representations, and the idle
+        time waiting leaves on the machine."""
+        store = self.state['machine', 'exec', 'job']
+        n = store.edge_index.shape[1]
+        cands = self._family_candidates()
+        new_idx, new_attr, new_start = [], [], []
+        if cands:
+            for e in (~store.mask).nonzero().flatten().tolist():
+                m, j = int(store.edge_index[0, e]), int(store.edge_index[1, e])
+                o = self.current_operations[j]
+                s = float(self.job_start_machines[j, m])
+                if self.family[o] < 0 or s >= SENTINEL:
+                    continue
+                now = self._batch_members(j, m, s, cands)
+                s_wait = self._wait_start(j, m, s, now, cands)
+                if s_wait is None:
+                    continue
+                later = self._batch_members(j, m, s_wait, cands)
+                if len(later) <= len(now):
+                    continue
+                p = float(self.operations[o][m])
+                p_batch = float(max(self.operations[self.current_operations[j2]][m] for j2 in later))
+                shown = p if self.BATCH_REP == "base" else p_batch
+                attr = store.edge_attr[e].clone()
+                attr[0] = shown
+                if store.edge_attr.shape[1] > 4 and self.jm_design != "baseline":
+                    # refreshed layout: [time, relative time, start, completion, machine idle]
+                    attr[2] = s_wait
+                    attr[3] = s_wait + shown
+                    attr[4] = s_wait - float(self.state["machine"].x[m, 0])
+                new_idx.append([m, j])
+                new_attr.append(attr)
+                new_start.append(s_wait)
+        store.wait = torch.zeros(n, dtype=torch.bool)
+        store.wait_start = torch.zeros(n, dtype=torch.float)
+        if new_idx:
+            store.edge_index = torch.cat([store.edge_index, torch.LongTensor(new_idx).T], dim=1)
+            store.edge_attr = torch.cat([store.edge_attr, torch.stack(new_attr)], dim=0)
+            store.mask = torch.cat([store.mask, torch.zeros(len(new_idx), dtype=torch.bool)])
+            store.wait = torch.cat([store.wait, torch.ones(len(new_idx), dtype=torch.bool)])
+            store.wait_start = torch.cat([store.wait_start, torch.tensor(new_start, dtype=torch.float)])
+        self._sync_reverse_edges()
 
     def calculate_next_state(self):
         if self.job_done is None:
@@ -327,6 +460,11 @@ class _FJSPBatchEnv(FJSSPEnv):
 
         prev_ms = float(torch.max(self.state["machine"].x[:, 0]))
         start = max(float(self.state["machine"].x[sel_mach, 0]), float(self.operations_ends[sel_job]))
+        store = self.state['machine', 'exec', 'job']
+        if "wait" in store and bool(store.wait[action]):
+            # v2 wait action: start when the awaited partner is ready (the batch rule then
+            # adds it, and anyone else ready by then)
+            start = max(start, float(store.wait_start[action]))
         members = self._batch_members(sel_job, sel_mach, start)
         proc = max(self.operations[self.current_operations[j]][sel_mach] for j in members)
         end = start + proc
@@ -357,6 +495,8 @@ class _FJSPBatchEnv(FJSSPEnv):
         # drop the action edges of every job in the batch
         mej = self.state['machine', 'exec', 'job']
         _keep_edges(mej, ~torch.isin(mej.edge_index[1], torch.tensor(members)))
+        if self.WAIT_ACTION:  # the wait actions are rebuilt for the new state in calculate_mask
+            self._drop_wait_edges()
 
         new_edges, new_feats = [], []
         for j in members:
@@ -462,3 +602,21 @@ class FJSPBatchEdgeEnv(_FJSPBatchEnv):
 class FJSPBatchBaseEnv(_FJSPBatchEnv):
     """Baseline: batching problem on the plain ojm graph (no batching information)."""
     BATCH_REP = "base"
+
+
+class FJSPBatchNodeV2Env(FJSPBatchNodeEnv):
+    """Representation A, v2: wait actions and batch-aware mask."""
+    WAIT_ACTION = True
+    BATCH_AWARE_MASK = True
+
+
+class FJSPBatchEdgeV2Env(FJSPBatchEdgeEnv):
+    """Representation B, v2: wait actions and batch-aware mask."""
+    WAIT_ACTION = True
+    BATCH_AWARE_MASK = True
+
+
+class FJSPBatchBaseV2Env(FJSPBatchBaseEnv):
+    """Baseline, v2: wait actions and batch-aware mask (the same action space as A and B v2)."""
+    WAIT_ACTION = True
+    BATCH_AWARE_MASK = True

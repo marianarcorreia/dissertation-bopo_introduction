@@ -422,4 +422,82 @@ families are eligible on both machines, and let $p_{O_{1,1},1}=5$ and $p_{O_{2,2
   \item Representation B adds the directed edges $O_{1,1}\leftrightarrow O_{2,2}$ and $O_{2,2}\leftrightarrow O_{3,4}$ in family 1 (not $O_{1,1}\leftrightarrow O_{3,4}$), plus $O_{1,3}\leftrightarrow O_{2,3}$ in family 2. That is 6 edges, excluding self-loops.
 \end{itemize}
 
+% ===========================================================================
+\section{Diagnostic of the batch process and version 2}
+\label{sec:diagnostic}
+
+\subsection{Diagnostic}
+The decision process of Section~\ref{sec:mdp} was checked on the 40 instances of the
+batching dataset, with the configuration used for training ($\texttt{sel\_k}=1$,
+mask on the earliest completion), replaying the warm-start teacher and a random policy
+(about 3\,500 decisions each).
+
+\paragraph{Correct behaviour.}
+\begin{itemize}
+  \item Every batch satisfies the rules: one family, at most $B_f$ members,
+    order difference $\le\Delta$, the machine eligible for every member, every member
+    ready by the start, one operation per job. All schedules pass the independent checker.
+  \item The start time and batch processing time shown on the chosen action edge are
+    exactly those the environment then schedules (all 3\,515 decisions, both
+    representations).
+  \item The partner count $\pi_j(t)$ on the job node equals the number of partners the
+    batch rule actually adds in 99.9\% of the decisions.
+  \item A partner can lengthen the batch (54\% of the batches, $+15\%$ of the chosen
+    job's time on average), since the batch lasts as long as its longest member. This is
+    not a defect: only adding partners that do not lengthen it raised the teacher's gap
+    to CP-SAT from 0.458 to 0.661 and removed almost all batching. The action edge already
+    shows the batch time, so the policy sees the cost.
+\end{itemize}
+
+\paragraph{Limitation 1: the batch never waits.}
+A partner joins only if it is already ready at the start. The teacher missed 214 compatible
+partners that became ready shortly afterwards (median 0.44 batch times later) and batched
+11.7\% of the operations, against 18\% in the CP-SAT solutions. Letting the batch wait for
+partners ready within half the chosen job's time improved the teacher's mean gap from
+0.458 to 0.424, but it helped 18 instances and hurt 17: waiting should be a decision, not
+a fixed rule.
+
+\paragraph{Limitation 2: the mask ignores batching.}
+The mask ranks each job's machines by the job's \emph{individual} completion. With
+$\texttt{sel\_k}=1$, in 14\% of the family decisions a larger batch was possible on
+another machine, and that machine was always masked. The action-edge features and the
+teacher, however, use the completion of the batch.
+
+\subsection{Version 2}
+Version 2 (representations \texttt{ojmb\_node\_v2}, \texttt{ojmb\_edge\_v2},
+\texttt{ojmb\_base\_v2}) changes only the action space; the graphs, features and the batch
+rule are those of Sections~\ref{sec:familyfeature}--\ref{sec:repB}.
+
+\paragraph{Wait actions.} For an allowed action $(\mu,j)$ whose current operation belongs
+to a family, let $b$ be the batch it dispatches now at $s_{j\mu}$, and $s^{w}_{j\mu}$ the
+ready time of the next compatible partner: the smallest $r_{j'}>s_{j\mu}$ over the jobs
+$j'\notin b$ whose current operation is in the same family, is eligible on $\mu$ and keeps
+the order difference of $b\cup\{o_{j'}^t\}$ within $\Delta$ (defined when $|b|<B_f$).
+If the batch dispatched at $s^{w}_{j\mu}$ is larger than $b$, a second action edge
+$(\mu,j)$ is added, ``wait for the next partner'': it starts at $s^{w}_{j\mu}$ and applies
+the same batch rule there. Its features are those of the immediate action with the later
+start, the batch time of the larger batch (the individual time for the baseline) and the
+machine idle time $s^{w}_{j\mu}-F_\mu$ that waiting leaves. The policy therefore sees both
+options and their costs, and chooses.
+
+\paragraph{Batch-aware mask.} Each job keeps the $\texttt{sel\_k}$ machines with the
+earliest completion of the batch the action dispatches, $s_{j\mu}+p_b$, instead of
+$s_{j\mu}+p_{o_j^t,\mu}$. A wait action is allowed exactly when its immediate twin is.
+
+\paragraph{Effect on the teacher and on a random policy.} A wait option exists in 43\% of
+the teacher's decisions. The teacher, which minimises the chosen job's completion, never
+takes one, and its gap changes from 0.458 to 0.466 (family node) and from 0.438 to 0.460
+(baseline, whose teacher ranks by individual times while the mask now ranks by batch
+times). A random policy batches more with the wait actions (20.8\% $\to$ 23.9\% of the
+operations). Whether waiting pays off must therefore be learned by BOPO beyond the
+teacher; the comparison with version 1 is made on trained policies.
+
+\paragraph{Verification.} The version-1 environments produce exactly the same schedules
+before and after the change (12 configurations: three representations, $\texttt{sel\_k}\in
+\{1,100\}$, teacher and random policy). \texttt{tests/test\_batching\_v2.py} checks that the
+version-2 schedules are feasible, that every wait action is the twin of an allowed action,
+starts later, shows its start, and when taken schedules the larger batch at exactly that
+start; that the mask keeps the machine with the earliest batch completion; and that the
+three representations train.
+
 \end{document}

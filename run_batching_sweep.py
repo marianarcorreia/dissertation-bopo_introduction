@@ -38,6 +38,8 @@ parser.add_argument("--lr", default="4.7e-3")
 parser.add_argument("--max-episodes", default="350")
 parser.add_argument("--step-metrics", default="0", help="Validation instances for per-step metrics (0 = off).")
 parser.add_argument("--tag", default="", help="Suffix for run and report names.")
+parser.add_argument("--variant", default="v1", choices=["v1", "v2"],
+                    help="v2: the batching envs with wait actions and the batch-aware mask (ojmb_*_v2).")
 parser.add_argument("--dry-run", action="store_true")
 args = parser.parse_args()
 suffix = f"_{args.tag}" if args.tag else ""
@@ -59,7 +61,7 @@ def run(cmd, log_name):
 for seed in args.seeds:
     for gnn, layers in configs:
         best = {}
-        for rep in REPS:
+        for rep in (REPS if args.variant == "v1" else tuple(r + "_v2" for r in REPS)):
             name = f"batching_{gnn}_L{layers}_{rep}_s{seed}{suffix}"
             summary = os.path.join(ROOT, "results", name, "run_summary.json")
             if os.path.isfile(summary):
@@ -84,8 +86,9 @@ for seed in args.seeds:
                 if s.get("best_model_path"):
                     best[rep] = os.path.basename(s["best_model_path"])
 
-        report = "report_metrics_batching" if (gnn, layers, seed, suffix) == ("gat", 2, 42, "") \
-            else f"report_metrics_batching_{gnn}_L{layers}_s{seed}{suffix}"
+        variant = "" if args.variant == "v1" else "_v2"
+        report = "report_metrics_batching" if (gnn, layers, seed, suffix, variant) == ("gat", 2, 42, "", "") \
+            else f"report_metrics_batching{variant}_{gnn}_L{layers}_s{seed}{suffix}"
         if args.dry_run or not best:
             log(f"{'would write' if args.dry_run else 'no checkpoint for'} {report}")
             continue

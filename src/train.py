@@ -23,10 +23,14 @@ from src.batch_generator import generate_batching_instance_list
 # FJSP with parallel batching (src/env_batching.py): ojm graph + family node (ojmb_node),
 # + batch edge (ojmb_edge), or unchanged as the comparison baseline (ojmb_base).
 # Trained and validated on batching instances (data/batching) instead of plain FJSP ones.
-BATCHING_REPRESENTATIONS = ("ojmb_node", "ojmb_edge", "ojmb_base")
+BATCHING_V1 = ("ojmb_node", "ojmb_edge", "ojmb_base")
+# v2: the same three representations with the wait actions and the batch-aware mask
+# (src/env_batching.py, WAIT_ACTION / BATCH_AWARE_MASK)
+BATCHING_V2 = ("ojmb_node_v2", "ojmb_edge_v2", "ojmb_base_v2")
+BATCHING_REPRESENTATIONS = BATCHING_V1 + BATCHING_V2
 FJSP_REPRESENTATIONS = ("oo", "om", "ojm")
 # Group names accepted wherever representations are listed (main.py, param.py).
-REPRESENTATION_GROUPS = {"all": FJSP_REPRESENTATIONS, "batching": BATCHING_REPRESENTATIONS}
+REPRESENTATION_GROUPS = {"all": FJSP_REPRESENTATIONS, "batching": BATCHING_V1, "batching_v2": BATCHING_V2}
 REPRESENTATION_CHOICES = FJSP_REPRESENTATIONS + BATCHING_REPRESENTATIONS + tuple(REPRESENTATION_GROUPS)
 
 
@@ -72,6 +76,9 @@ def _resolve_representation_modules(representation: str):
         "ojmb_node": ("src.env_batching", "FJSPBatchNodeEnv", "src.bopo", "BOPO"),
         "ojmb_edge": ("src.env_batching", "FJSPBatchEdgeEnv", "src.bopo", "BOPO"),
         "ojmb_base": ("src.env_batching", "FJSPBatchBaseEnv", "src.bopo", "BOPO"),
+        "ojmb_node_v2": ("src.env_batching", "FJSPBatchNodeV2Env", "src.bopo", "BOPO"),
+        "ojmb_edge_v2": ("src.env_batching", "FJSPBatchEdgeV2Env", "src.bopo", "BOPO"),
+        "ojmb_base_v2": ("src.env_batching", "FJSPBatchBaseV2Env", "src.bopo", "BOPO"),
     }
     if rep not in rep_map:
         raise ValueError(f"Unsupported representation '{representation}'. Use one of: {', '.join(rep_map)}")
