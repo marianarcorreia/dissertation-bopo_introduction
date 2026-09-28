@@ -1,0 +1,12 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+[METRICS] data/batching/batching_test_split.json: 20 instance(s), 20 with a CP-SAT reference
+[METRICS] 39108826801431.pth (ojmb_node) on data/batching/batching_test_split.json ...
+[METRICS]   makespan=400.0 | RE=0.1172 | RE_lb=0.1744 | score=0.9004 | feasible=1.0000 | ms/decision=47.7796
+[METRICS] 941200189550968.pth (ojmb_edge) on data/batching/batching_test_split.json ...
+[METRICS]   makespan=401.4 | RE=0.1190 | RE_lb=0.1782 | score=0.9002 | feasible=1.0000 | ms/decision=36.7976
+[METRICS] 982671064340682.pth (ojmb_base) on data/batching/batching_test_split.json ...
+[METRICS]   makespan=406.7 | RE=0.1325 | RE_lb=0.1935 | score=0.8901 | feasible=1.0000 | ms/decision=34.2008
+[METRICS] Report: results/metrics\report_metrics_batching_gin_L3_s42.json
+[METRICS] Summary: results/metrics\report_metrics_batching_gin_L3_s42.md
+[METRICS] Chart: results/metrics\report_metrics_batching_gin_L3_s42.png

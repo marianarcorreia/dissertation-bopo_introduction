@@ -1,0 +1,63 @@
+results/training_curves/batching_gat_L2_s42\avg_gap.png
+results/training_curves/batching_gat_L2_s42\smoothed_avg_gap.png
+results/training_curves/batching_gat_L2_s42\q80_gap.png
+results/training_curves/batching_gat_L2_s42\std_gap.png
+results/training_curves/batching_gat_L2_s42\makespan.png
+results/training_curves/batching_gat_L2_s42\actor_loss.png
+results/training_curves/batching_gat_L2_s42\action_entropy.png
+results/training_curves/batching_gat_L2_s42\action_entropy_max_entropy_normalized.png
+results/training_curves/batching_gat_L2_s42\action_entropy_effective_action_count.png
+results/training_curves/batching_gat_L2_s42\sro_margin_mean.png
+skip sro_saturated_frac (constant 0 in every run)
+results/training_curves/batching_gat_L2_s42\greedy_is_best.png
+results/training_curves/batching_gat_L2_s42\actor_grad_norm.png
+results/training_curves/batching_gat_L2_s42\steps.png
+results/training_curves/batching_gat_L2_s42\update_duration_sec.png
+results/training_curves/batching_gat_L2_s42\overview.png
+Evaluating the saved checkpoints on data/batching/batching_test_split.json ...
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+  batching_gat_L2_ojmb_node_s42 step 25: 177332979684013.pth RE=0.18166886476654728
+  batching_gat_L2_ojmb_node_s42 step 50: 242524210616936.pth RE=0.13071690313403878
+  batching_gat_L2_ojmb_node_s42 step 75: 625275804683208.pth RE=0.13234421846987093
+  batching_gat_L2_ojmb_node_s42 step 100: 401278653531083.pth RE=0.1339558020478248
+  batching_gat_L2_ojmb_node_s42 step 150: 589698109969626.pth RE=0.11927188857911072
+  batching_gat_L2_ojmb_node_s42 step 175: 733944869062459.pth RE=0.12439547569985714
+  batching_gat_L2_ojmb_node_s42 step 275: 594415268118644.pth RE=0.1298503551377927
+  batching_gat_L2_ojmb_node_s42 step 300: 477356094558498.pth RE=0.12037880558070295
+  batching_gat_L2_ojmb_edge_s42 step 25: 235017587222037.pth RE=0.2598623728306676
+  batching_gat_L2_ojmb_edge_s42 step 50: 266772663258334.pth RE=0.1645292014264556
+  batching_gat_L2_ojmb_edge_s42 step 75: 933125850345936.pth RE=0.11504609354034816
+  batching_gat_L2_ojmb_edge_s42 step 100: 43618954109837.pth RE=0.12179783492663362
+  batching_gat_L2_ojmb_edge_s42 step 125: 193009455858587.pth RE=0.1464428223819414
+  batching_gat_L2_ojmb_edge_s42 step 150: 93481464116947.pth RE=0.13395023729851535
+  batching_gat_L2_ojmb_edge_s42 step 175: 911225443534704.pth RE=0.0923787411447203
+  batching_gat_L2_ojmb_edge_s42 step 225: 818337565584815.pth RE=0.12521634816065924
+  batching_gat_L2_ojmb_edge_s42 step 300: 439292648211960.pth RE=0.12977348895511143
+  batching_gat_L2_ojmb_edge_s42 step 325: 852735153700113.pth RE=0.134529360702433
+  batching_gat_L2_ojmb_base_s42 step 25: 817067247054703.pth RE=0.20443595226300776
+  batching_gat_L2_ojmb_base_s42 step 50: 129784593209904.pth RE=0.15347323358542236
+  batching_gat_L2_ojmb_base_s42 step 75: 327333347404089.pth RE=0.147913523432049
+  batching_gat_L2_ojmb_base_s42 step 100: 737231399662994.pth RE=0.12021371791102708
+  batching_gat_L2_ojmb_base_s42 step 125: 348687455864578.pth RE=0.11482496485316647
+  batching_gat_L2_ojmb_base_s42 step 150: 541188441970801.pth RE=0.1067291691626974
+results/training_curves/batching_gat_L2_s42\checkpoints\makespan.png
+results/training_curves/batching_gat_L2_s42\checkpoints\relative_error.png
+results/training_curves/batching_gat_L2_s42\checkpoints\relative_error_lb.png
+results/training_curves/batching_gat_L2_s42\checkpoints\scheduling_score.png
+skip checkpoint metric feasibility_rate (constant 1 for every checkpoint)
+skip checkpoint metric violation_rate_per_step (constant 0 for every checkpoint)
+results/training_curves/batching_gat_L2_s42\checkpoints\action_distinct_ratio.png
+results/training_curves/batching_gat_L2_s42\checkpoints\embedding_distinct_ratio.png
+results/training_curves/batching_gat_L2_s42\checkpoints\input_distinct_ratio.png
+results/training_curves/batching_gat_L2_s42\checkpoints\structure_gain.png
+results/training_curves/batching_gat_L2_s42\checkpoints\effective_rank_ratio.png
+results/training_curves/batching_gat_L2_s42\checkpoints\embedding_heterophily.png
+results/training_curves/batching_gat_L2_s42\checkpoints\feature_heterophily.png
+results/training_curves/batching_gat_L2_s42\checkpoints\num_batches.png
+results/training_curves/batching_gat_L2_s42\checkpoints\avg_batch_size.png
+results/training_curves/batching_gat_L2_s42\checkpoints\batched_fraction.png
+results/training_curves/batching_gat_L2_s42\checkpoints\time_per_decision_ms.png
+results/training_curves/batching_gat_L2_s42\checkpoints\gpu_peak_mb.png
+results/training_curves/batching_gat_L2_s42\checkpoints\rss_mb.png
+results/training_curves/batching_gat_L2_s42\overview_checkpoints.png

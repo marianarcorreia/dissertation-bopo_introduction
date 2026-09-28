@@ -1,0 +1,13 @@
+[SWEEP 09-28 08:15:57] start batching_gin_L3_ojmb_node_s42
+[SWEEP 09-28 10:49:51] done batching_gin_L3_ojmb_node_s42 in 2.57 h
+[SWEEP 09-28 10:49:51]   batching_gin_L3_ojmb_node_s42: best=candidate_models/39108826801431.pth | val_gap=0.12567268085454 | test_gap=0.1171980048354512
+[SWEEP 09-28 10:49:51] start batching_gin_L3_ojmb_edge_s42
+[SWEEP 09-28 12:39:02] done batching_gin_L3_ojmb_edge_s42 in 1.82 h
+[SWEEP 09-28 12:39:02]   batching_gin_L3_ojmb_edge_s42: best=candidate_models/941200189550968.pth | val_gap=0.17673980749791418 | test_gap=0.1189693002098489
+[SWEEP 09-28 12:39:02] start batching_gin_L3_ojmb_base_s42
+[SWEEP 09-28 14:21:20] done batching_gin_L3_ojmb_base_s42 in 1.71 h
+[SWEEP 09-28 14:21:20]   batching_gin_L3_ojmb_base_s42: best=candidate_models/982671064340682.pth | val_gap=0.13629142214173398 | test_gap=0.13253908531287947
+[SWEEP 09-28 14:21:20] start report_metrics_batching_gin_L3_s42 on {'ojmb_node': '39108826801431.pth', 'ojmb_edge': '941200189550968.pth', 'ojmb_base': '982671064340682.pth'}
+[SWEEP 09-28 14:25:32] done report_metrics_batching_gin_L3_s42 in 4 min
+[SWEEP 09-28 14:25:32] sweep finished
+[SWEEP 09-28 14:25:32] start batching_gat_L2_ojmb_node_s43
