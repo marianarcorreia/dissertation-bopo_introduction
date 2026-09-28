@@ -14,7 +14,12 @@ listed in sweep_logs/<run>.log) is evaluated with the same pipeline as run_metri
 CI as a band. These are best-so-far models, so the points sit where validation improved. The
 evaluation is cached in results/<run>/checkpoint_metrics.json (delete it to recompute).
 
+Step metrics: runs trained with step_metrics_size > 0 (run_batching_sweep.py --step-metrics)
+also have every src/metrics metric after every training step, on the same few validation
+instances (<run>/step_metrics.json); they are drawn like the other per-step curves.
+
 Output: <out>/<metric>.png for every training metric and <out>/overview.png with all of them;
+<out>/steps/<metric>.png and <out>/overview_steps.png for the step metrics (when recorded);
 <out>/checkpoints/<metric>.png for every checkpoint metric and <out>/overview_checkpoints.png.
 
 Usage:
@@ -57,6 +62,13 @@ METRICS = (
     ("episode", "steps", "Decisions per episode", None),
     ("episode", "update_duration_sec", "Update time (s)", "lower"),
 )
+# Per-step src/metrics metrics (runs trained with step_metrics_size > 0, <run>/step_metrics.json):
+# every metric of the metrics report, measured after every step on the same few validation
+# instances. GPU peak and process memory are left out: during training they measure the whole
+# training process, not the policy.
+STEP_METRICS = tuple(("step", key, f"{group}: {label}", better)
+                     for group, metrics in CHART_GROUPS for key, label, better in metrics
+                     if key not in ("gpu_peak_mb", "rss_mb"))
 DEFAULT_RUNS = [f"results/batching_gat_L2_{rep}_s42" for rep in ("ojmb_node", "ojmb_edge", "ojmb_base")]
 LABELS = {"ojmb_node": "Family node", "ojmb_edge": "Batch edge", "ojmb_base": "Baseline (no batching info)"}
 
@@ -65,9 +77,13 @@ def load_run(path):
     with open(os.path.join(path, "run_summary.json")) as f:
         rep = json.load(f).get("representation", os.path.basename(path))
     data = {}
-    for source, file in (("episode", "episode_metrics.json"), ("validation", "validation_history.json")):
-        with open(os.path.join(path, file)) as f:
-            data[source] = json.load(f)
+    for source, file in (("episode", "episode_metrics.json"), ("validation", "validation_history.json"),
+                         ("step", "step_metrics.json")):
+        file = os.path.join(path, file)
+        data[source] = []
+        if os.path.isfile(file):  # step_metrics.json only exists with step_metrics_size > 0
+            with open(file) as f:
+                data[source] = json.load(f)
     return rep, data
 
 
@@ -107,13 +123,59 @@ def draw(ax, runs, source, key, window):
         if x is None:
             continue
         drawn = True
-        if source == "episode":
+        if source in ("episode", "step"):
             ax.plot(x, y, color=color, linewidth=0.8, alpha=0.22)
             ax.plot(x, moving_average(y, window), color=color, linewidth=2, label=label)
         else:
             ax.plot(x, y, color=color, linewidth=2, marker="o", markersize=5,
                     markeredgecolor=SURFACE, markeredgewidth=1.5, label=label)
     return drawn
+
+
+def plot_curves(runs, specs, out, overview_name, suptitle, note, window):
+    """One PNG per metric of specs in out/ (metrics without data or constant in every run are
+    skipped), plus an overview grid saved as out/overview_name."""
+    os.makedirs(out, exist_ok=True)
+    written = []
+    for source, key, title, better in specs:
+        values = [y for _, _, data in runs for y in (series(data, source, key)[1],) if y is not None]
+        if not values:
+            continue
+        if len(np.unique(np.concatenate(values))) == 1:  # e.g. always 0: nothing to compare
+            print(f"skip {key} (constant {float(values[0][0]):g} in every run)")
+            continue
+        fig, ax = plt.subplots(figsize=(7.5, 4.2), facecolor=SURFACE)
+        draw(ax, runs, source, key, window)
+        style(ax, title, better)
+        ax.legend(frameon=False, fontsize=8, labelcolor=INK)
+        if source in ("episode", "step"):
+            ax.text(1.0, -0.19, note, transform=ax.transAxes, ha="right", va="top", fontsize=7, color=INK_2)
+        path = os.path.join(out, f"{key}.png")
+        fig.savefig(path, dpi=160, bbox_inches="tight", facecolor=SURFACE)
+        plt.close(fig)
+        written.append((source, key, title, better))
+        print(path)
+    if not written:
+        return
+
+    ncols = 3
+    nrows = math.ceil(len(written) / ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5.2 * ncols, 3.4 * nrows + 0.8), facecolor=SURFACE,
+                             squeeze=False)
+    for ax, (source, key, title, better) in zip(axes.flat, written):
+        draw(ax, runs, source, key, window)
+        style(ax, title, better)
+    for ax in list(axes.flat)[len(written):]:
+        ax.set_visible(False)
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=len(labels), frameon=False, fontsize=10,
+               labelcolor=INK, bbox_to_anchor=(0.5, 1.0))
+    fig.suptitle(suptitle, fontsize=11, color=INK, y=1.02)
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    path = os.path.normpath(os.path.join(out, overview_name))
+    fig.savefig(path, dpi=140, bbox_inches="tight", facecolor=SURFACE)
+    plt.close(fig)
+    print(path)
 
 
 def saved_checkpoints(run_path, log_dir):
@@ -249,46 +311,12 @@ def main():
         runs.append((label, color, data))
     os.makedirs(args.out, exist_ok=True)
     note = f"faint: raw per step; bold: {args.window}-step moving average"
-
-    written = []
-    for source, key, title, better in METRICS:
-        values = [y for _, _, data in runs for y in (series(data, source, key)[1],) if y is not None]
-        if values and len(np.unique(np.concatenate(values))) == 1:  # e.g. always 0: nothing to compare
-            print(f"skip {key} (constant {float(values[0][0]):g} in every run)")
-            continue
-        fig, ax = plt.subplots(figsize=(7.5, 4.2), facecolor=SURFACE)
-        if not draw(ax, runs, source, key, args.window):
-            plt.close(fig)
-            continue
-        style(ax, title, better)
-        ax.legend(frameon=False, fontsize=8, labelcolor=INK)
-        if source == "episode":
-            ax.text(1.0, -0.19, note, transform=ax.transAxes, ha="right", va="top", fontsize=7, color=INK_2)
-        path = os.path.join(args.out, f"{key}.png")
-        fig.savefig(path, dpi=160, bbox_inches="tight", facecolor=SURFACE)
-        plt.close(fig)
-        written.append((source, key, title, better))
-        print(path)
-
-    ncols = 3
-    nrows = math.ceil(len(written) / ncols)
-    fig, axes = plt.subplots(nrows, ncols, figsize=(5.2 * ncols, 3.4 * nrows + 0.8), facecolor=SURFACE,
-                             squeeze=False)
-    for ax, (source, key, title, better) in zip(axes.flat, written):
-        draw(ax, runs, source, key, args.window)
-        style(ax, title, better)
-    for ax in list(axes.flat)[len(written):]:
-        ax.set_visible(False)
-    handles, labels = axes.flat[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=len(labels), frameon=False, fontsize=10,
-               labelcolor=INK, bbox_to_anchor=(0.5, 1.0))
-    fig.suptitle(f"Training curves - {os.path.basename(os.path.normpath(args.out))} ({note})",
-                 fontsize=11, color=INK, y=1.02)
-    fig.tight_layout(rect=(0, 0, 1, 0.97))
-    path = os.path.join(args.out, "overview.png")
-    fig.savefig(path, dpi=140, bbox_inches="tight", facecolor=SURFACE)
-    plt.close(fig)
-    print(path)
+    name = os.path.basename(os.path.normpath(args.out))
+    plot_curves(runs, METRICS, args.out, "overview.png", f"Training curves - {name} ({note})", note, args.window)
+    if any(data["step"] for _, _, data in runs):
+        plot_curves(runs, STEP_METRICS, os.path.join(args.out, "steps"), os.path.join("..", "overview_steps.png"),
+                    f"Metrics after every training step (fixed validation instances) - {name} ({note})",
+                    note, args.window)
 
     if not args.no_checkpoints:
         print(f"Evaluating the saved checkpoints on {args.instances} ...")
