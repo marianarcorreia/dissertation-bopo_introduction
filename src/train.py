@@ -101,8 +101,39 @@ def generate_train_instances(train_config, batching=False):
     return instances
 
 
+def evaluate_step_metrics(agent, env, instances, representation):
+    """Every src/metrics metric of the current policy on `instances` (greedy rollouts, the
+    run_metrics.py pipeline), as {metric: mean, metric + "_ci95": CI half-width}. The random
+    states are restored afterwards, so recording these metrics does not change training (the
+    env's forced actions and the probe draw random numbers)."""
+    from src.metrics.evaluate import evaluate_agent, summarize
+    rng = (random.getstate(), np.random.get_state(), torch.get_rng_state(),
+           torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None)
+    t0 = time.time()
+    try:
+        with torch.no_grad():
+            rows, repr_summary = evaluate_agent(agent, env, instances, representation)
+            summary = summarize(rows, repr_summary, agent.policy.actor)
+    finally:
+        random.setstate(rng[0])
+        np.random.set_state(rng[1])
+        torch.set_rng_state(rng[2])
+        if rng[3] is not None:
+            torch.cuda.set_rng_state_all(rng[3])
+    out = {"feasibility_rate": summary["feasibility_rate"], "eval_sec": time.time() - t0}
+    for key, desc in summary["metrics"].items():
+        if desc.get("n"):
+            out[key] = desc["mean"]
+            out[key + "_ci95"] = desc["ci95_high"] - desc["mean"] if desc["n"] > 1 else None
+    return out
+
+
 def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=100, B=64, K=16, use_greedy=True,lr=0.0005, hidden_channels=128,num_layers = 3, heads = 3,j_max = 10, j_min = 8, m_max = 10, m_min = 5, op_max = 6, max_processing = 100,
-         checkpoint_smooth_window=3, warm_start_steps=200, lr_min_ratio=0.2, seed=None, logp_norm="mean", exclude_greedy_from_loss=True, jm_design=None, representation="oo", gnn_type="gat", validation_freq=20, validation_size=20, dbg_fn=None, run_name="train_run"):
+         checkpoint_smooth_window=3, warm_start_steps=200, lr_min_ratio=0.2, seed=None, logp_norm="mean", exclude_greedy_from_loss=True, jm_design=None, representation="oo", gnn_type="gat", validation_freq=20, validation_size=20, dbg_fn=None, run_name="train_run",
+         step_metrics_size=0):
+    # step_metrics_size > 0: after every BOPO step, evaluate the policy with every src/metrics
+    # metric on the first step_metrics_size validation instances (the same ones every step) and
+    # save them in <run>/step_metrics.json (see evaluate_step_metrics). 0 = off (as before).
     jm_design = resolve_jm_design(jm_design, representation)
     if seed is not None:
         random.seed(seed)
@@ -156,6 +187,14 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
     teacher_test = run_expert(EnvClass(test_set, mask_option, sel_k, **jm_kwargs), test_set)
     print(f"[TRAIN][TEACHER] validation avg_gap={teacher_val['avg_gap']:.4f} | q80_gap={teacher_val['q80_gap']:.4f} "
           f"|| test avg_gap={teacher_test['avg_gap']:.4f} | q80_gap={teacher_test['q80_gap']:.4f}")
+
+    step_probe_set = validation_set[:step_metrics_size]
+    step_probe_env = EnvClass(step_probe_set, mask_option, sel_k, **jm_kwargs) if step_probe_set else None
+    step_metrics = []
+    step_metrics_path = os.path.join(output_manager.run_dir, "step_metrics.json")
+    if step_probe_env is not None:
+        print(f"[TRAIN] Step metrics | every step on {len(step_probe_set)} validation instance(s) "
+              f"({', '.join(v['name'] for v in step_probe_set)}) -> {step_metrics_path}")
 
     #define e gera instancias de treino
     train_config = {
@@ -231,6 +270,14 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
             **entropy_stats,
         }
         update_metrics = output_manager.append_update_metrics(update_metrics, update_entry)
+
+        if step_probe_env is not None:
+            step_entry = {"episode": step_number,
+                          **evaluate_step_metrics(bopo_agent, step_probe_env, step_probe_set, rep_name)}
+            step_metrics.append(step_entry)
+            with open(step_metrics_path, "w") as f:
+                json.dump(step_metrics, f)
+            _dbg(1, f"  step metrics | RE={step_entry.get('relative_error')} | {step_entry['eval_sec']:.1f}s")
 
         #gera nova instancia de treino se estiver na altura de renovar o pool
         if step_number % new_freq == 0:
@@ -328,6 +375,8 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
         step_number += 1
     env.close()
     val_env.close()
+    if step_probe_env is not None:
+        step_probe_env.close()
     actor_param_count = int(sum(p.numel() for p in bopo_agent.policy.actor.parameters()))
     plot_episode_outputs = output_manager.plot_episode_metrics(episode_metrics)
     plot_update_outputs = output_manager.plot_update_metrics(update_metrics)

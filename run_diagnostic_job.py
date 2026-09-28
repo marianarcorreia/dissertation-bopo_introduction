@@ -45,6 +45,8 @@ parser.add_argument("--jm-design", default="baseline", choices=["baseline", "edg
 parser.add_argument("--lr", type=float, default=0.0005)
 parser.add_argument("--max-episodes", type=int, default=400)
 parser.add_argument("--validation-size", type=int, default=40)
+parser.add_argument("--step-metrics", type=int, default=0,
+                    help="Evaluate every src/metrics metric after every step on this many validation instances (0 = off).")
 args = parser.parse_args()
 
 train(
@@ -71,6 +73,7 @@ train(
     heads=3,
     validation_freq=25,
     validation_size=args.validation_size,
+    step_metrics_size=args.step_metrics,
     warm_start_steps=200,
     lr_min_ratio=0.2,
     checkpoint_smooth_window=3,
