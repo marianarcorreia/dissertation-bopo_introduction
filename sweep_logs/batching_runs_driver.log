@@ -1,0 +1,12 @@
+[RUNS 09-27 23:27:16] start batching_gat_L2_ojmb_node_s42
+[RUNS 09-28 01:40:48] done batching_gat_L2_ojmb_node_s42 in 2.23 h
+[RUNS 09-28 01:40:48] batching_gat_L2_ojmb_node_s42: best=candidate_models/477356094558498.pth | val_gap=0.1409306948123943 | test_gap=0.12037880558070295
+[RUNS 09-28 01:40:48] start batching_gat_L2_ojmb_edge_s42
+[RUNS 09-28 03:26:51] done batching_gat_L2_ojmb_edge_s42 in 1.77 h
+[RUNS 09-28 03:26:51] batching_gat_L2_ojmb_edge_s42: best=candidate_models/852735153700113.pth | val_gap=0.15429075212299606 | test_gap=0.134529360702433
+[RUNS 09-28 03:26:51] start batching_gat_L2_ojmb_base_s42
+[RUNS 09-28 05:03:56] done batching_gat_L2_ojmb_base_s42 in 1.62 h
+[RUNS 09-28 05:03:56] batching_gat_L2_ojmb_base_s42: best=candidate_models/541188441970801.pth | val_gap=0.14334883639321896 | test_gap=0.1067291691626974
+[RUNS 09-28 05:03:56] start metrics report on {'ojmb_node': '477356094558498.pth', 'ojmb_edge': '852735153700113.pth', 'ojmb_base': '541188441970801.pth'}
+[RUNS 09-28 05:07:25] metrics report done
+[RUNS 09-28 05:07:25] ALL FINISHED
