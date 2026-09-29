@@ -32,7 +32,8 @@ REPS = ("ojmb_node", "ojmb_edge", "ojmb_base")
 TEST_SPLIT = "data/batching/batching_test_split.json"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--configs", nargs="+", default=["gat:2", "gin:3"], help="backbone:num_layers")
+parser.add_argument("--configs", nargs="+", default=["gat:2", "gin:3:5"],
+                    help="backbone:num_layers[:sel_k] (sel_k defaults to 1; names get _k<sel_k> when it is not 1)")
 parser.add_argument("--seeds", nargs="+", type=int, default=[42, 43, 44])
 parser.add_argument("--lr", default="4.7e-3")
 parser.add_argument("--max-episodes", default="350")
@@ -43,7 +44,8 @@ parser.add_argument("--variant", default="v1", choices=["v1", "v2"],
 parser.add_argument("--dry-run", action="store_true")
 args = parser.parse_args()
 suffix = f"_{args.tag}" if args.tag else ""
-configs = [(c.split(":")[0], int(c.split(":")[1])) for c in args.configs]
+configs = [(c.split(":")[0], int(c.split(":")[1]), int(c.split(":")[2]) if c.count(":") > 1 else 1)
+           for c in args.configs]
 os.makedirs(os.path.join(ROOT, "sweep_logs"), exist_ok=True)
 
 
@@ -59,11 +61,12 @@ def run(cmd, log_name):
 
 
 for seed in args.seeds:
-    for gnn, layers in configs:
+    for gnn, layers, sel_k in configs:
         best = {}
+        k_tag = "" if sel_k == 1 else f"_k{sel_k}"
         # v2 adds Representation C (features only), which exists only in v2
         for rep in (REPS if args.variant == "v1" else tuple(r + "_v2" for r in REPS + ("ojmb_feat",))):
-            name = f"batching_{gnn}_L{layers}_{rep}_s{seed}{suffix}"
+            name = f"batching_{gnn}_L{layers}{k_tag}_{rep}_s{seed}{suffix}"
             summary = os.path.join(ROOT, "results", name, "run_summary.json")
             if os.path.isfile(summary):
                 log(f"skip {name} (already complete)")
@@ -74,7 +77,7 @@ for seed in args.seeds:
                 log(f"start {name}")
                 rc, hours = run([sys.executable, "-u", "run_diagnostic_job.py", "--run-name", name,
                                  "--representation", rep, "--gnn-type", gnn, "--num-layers", str(layers),
-                                 "--sel-k", "1", "--mask-option", "1", "--lr", args.lr,
+                                 "--sel-k", str(sel_k), "--mask-option", "1", "--lr", args.lr,
                                  "--max-episodes", args.max_episodes, "--validation-size", "20",
                                  "--jm-design", "edges", "--seed", str(seed),
                                  "--step-metrics", args.step_metrics], f"{name}.log")
@@ -89,7 +92,7 @@ for seed in args.seeds:
 
         variant = "" if args.variant == "v1" else "_v2"
         report = "report_metrics_batching" if (gnn, layers, seed, suffix, variant) == ("gat", 2, 42, "", "") \
-            else f"report_metrics_batching{variant}_{gnn}_L{layers}_s{seed}{suffix}"
+            else f"report_metrics_batching{variant}_{gnn}_L{layers}{k_tag}_s{seed}{suffix}"
         if args.dry_run or not best:
             log(f"{'would write' if args.dry_run else 'no checkpoint for'} {report}")
             continue
