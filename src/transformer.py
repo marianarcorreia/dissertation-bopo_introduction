@@ -32,7 +32,7 @@ class TransformerConvSafe(TransformerConv):
 #Transformer (graph transformer - atenção multi-cabeça no estilo query/key/value, com
 #as edge features somadas diretamente aos vetores de key/value antes do score de atenção)
 class TransformerModel(torch.nn.Module):
-    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2):
+    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2, edge_dim = 5):
         super().__init__()
         self.lin1 = Linear(-1, 8) #camada linear inicial, -1 porque significa que se infere automaticamente o tamanho de entrada, e 8 apenas pq dava.
         self.tanh = nn.Tanh() #função de ativação
@@ -43,7 +43,7 @@ class TransformerModel(torch.nn.Module):
         #manter a mesma lógica do GAT: cada camada expande a dimensão para heads*hidden_channels.
         self.convs = torch.nn.ModuleList()
         for _ in range(num_layers):
-            conv = TransformerConvSafe(-1, hidden_channels, heads=heads, edge_dim=5)
+            conv = TransformerConvSafe(-1, hidden_channels, heads=heads, edge_dim=edge_dim)
             self.convs.append(conv)
 
     def forward(self, x, edge_index, edge_attr_dict):

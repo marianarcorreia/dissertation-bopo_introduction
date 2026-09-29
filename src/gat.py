@@ -17,7 +17,7 @@ class GAT(torch.nn.Module):
     load - see model_version in train.py/test_model. The default projects the input to
     hidden_channels and applies tanh between conv layers, so stacked layers no longer
     collapse into a single (near-)linear map of the 8 projected features."""
-    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2, legacy = False):
+    def __init__(self, hidden_channels, out_channels, num_layers = 2, heads = 2, legacy = False, edge_dim = 5):
         super().__init__()
         self.legacy = legacy
         self.lin1 = Linear(-1, 8 if legacy else hidden_channels) #camada linear inicial, -1 porque significa que se infere automaticamente o tamanho de entrada
@@ -27,7 +27,7 @@ class GAT(torch.nn.Module):
 
         self.convs = torch.nn.ModuleList()
         for _ in range(num_layers):
-            conv = GATv2Conv(-1, hidden_channels, add_self_loops=False, edge_dim=5, heads = heads) #edge_dim são as features das arestas, os self loops estão desativados porque estes já estão explicitos no grafo
+            conv = GATv2Conv(-1, hidden_channels, add_self_loops=False, edge_dim=edge_dim, heads = heads) #edge_dim são as features das arestas, os self loops estão desativados porque estes já estão explicitos no grafo
             self.convs.append(conv)
 
     def forward(self, x, edge_index, edge_attr_dict):

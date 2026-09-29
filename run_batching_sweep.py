@@ -61,7 +61,8 @@ def run(cmd, log_name):
 for seed in args.seeds:
     for gnn, layers in configs:
         best = {}
-        for rep in (REPS if args.variant == "v1" else tuple(r + "_v2" for r in REPS)):
+        # v2 adds Representation C (features only), which exists only in v2
+        for rep in (REPS if args.variant == "v1" else tuple(r + "_v2" for r in REPS + ("ojmb_feat",))):
             name = f"batching_{gnn}_L{layers}_{rep}_s{seed}{suffix}"
             summary = os.path.join(ROOT, "results", name, "run_summary.json")
             if os.path.isfile(summary):

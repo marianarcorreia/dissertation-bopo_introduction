@@ -32,7 +32,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--run-name", required=True)
 parser.add_argument("--representation", required=True,
                     choices=["oo", "om", "ojm", "ojmb_node", "ojmb_edge", "ojmb_base",
-                             "ojmb_node_v2", "ojmb_edge_v2", "ojmb_base_v2"])
+                             "ojmb_node_v2", "ojmb_edge_v2", "ojmb_base_v2", "ojmb_feat_v2"])
 parser.add_argument("--gnn-type", required=True, choices=["gat", "gin", "transformer"])
 parser.add_argument("--num-layers", type=int, default=2)
 parser.add_argument("--seed", type=int, default=42)

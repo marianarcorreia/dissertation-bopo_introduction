@@ -40,7 +40,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from src.metrics.report import (CHART_GROUPS, GRID, INK, INK_2, MUTED, REPRESENTATION_ORDER, SERIES_COLORS,
+from src.metrics.report import (CHART_GROUPS, GRID, INK, INK_2, MUTED, REPRESENTATION_ORDER, SERIES_COLORS, color_key,
                                 SURFACE, _value)
 
 # (source, key, label, better). source: "episode" = every BOPO step, "validation" = every
@@ -70,7 +70,8 @@ STEP_METRICS = tuple(("step", key, f"{group}: {label}", better)
                      for group, metrics in CHART_GROUPS for key, label, better in metrics
                      if key not in ("gpu_peak_mb", "rss_mb"))
 DEFAULT_RUNS = [f"results/batching_gat_L2_{rep}_s42" for rep in ("ojmb_node", "ojmb_edge", "ojmb_base")]
-LABELS = {"ojmb_node": "Family node", "ojmb_edge": "Batch edge", "ojmb_base": "Baseline (no batching info)"}
+LABELS = {"ojmb_node": "Family node", "ojmb_edge": "Batch edge", "ojmb_base": "Baseline (no batching info)",
+          "ojmb_feat": "Feature constraints (C)"}
 
 
 def load_run(path):
@@ -302,9 +303,9 @@ def main():
     runs, seen = [], {}
     for path in args.runs:
         rep, data = load_run(path)
-        idx = REPRESENTATION_ORDER.index(rep) if rep in REPRESENTATION_ORDER else len(seen)
+        idx = REPRESENTATION_ORDER.index(color_key(rep)) if color_key(rep) in REPRESENTATION_ORDER else len(seen)
         color = SERIES_COLORS[idx % len(SERIES_COLORS)]
-        label = LABELS.get(rep, rep)
+        label = LABELS.get(color_key(rep), rep) + (" v2" if rep.endswith("_v2") else "")
         seen[rep] = seen.get(rep, 0) + 1
         if seen[rep] > 1:  # the same representation twice (e.g. two seeds): keep them apart
             label = f"{label} ({os.path.basename(os.path.normpath(path))})"

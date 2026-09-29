@@ -21,6 +21,7 @@ ACTION_STORE = {
     "ojmb_node_v2": ("machine", "exec", "job"),
     "ojmb_edge_v2": ("machine", "exec", "job"),
     "ojmb_base_v2": ("machine", "exec", "job"),
+    "ojmb_feat_v2": ("machine", "exec", "job"),
 }
 
 

@@ -139,6 +139,57 @@ def test_v2_batches_more_than_v1():
     assert share["ojmb_node_v2"] > share["ojmb_node"], share
 
 
+def test_batch_size_column_shows_what_the_action_dispatches():
+    """Column 5 of the action edge = operations the action dispatches (0 for the baseline, which
+    stays blind); after normalisation every attributed relation has the v2 width."""
+    instances = DATA[:5]
+    for rep in BATCHING_V2:
+        env = env_of(rep, instances)
+        assert env.EDGE_DIM == 6
+        for i in range(len(instances)):
+            seed(i)
+            env.reset(sel_index=i)
+            done = False
+            while not done:
+                store = env.state['machine', 'exec', 'job']
+                assert store.edge_attr.shape[1] == 6
+                norm = env.normalize_state(env.state)
+                for et in norm.edge_types:
+                    if "edge_attr" in norm[et]:
+                        assert norm[et].edge_attr.shape[1] == 6, (rep, et)
+                a = env.sample()
+                shown = float(store.edge_attr[a, 5])
+                before = len(env.schedule)
+                _, _, done, _ = env.step(a)
+                first = env.schedule[before]
+                size = sum(1 for x in env.schedule[before:] if x["batch"] == first["batch"])
+                assert shown == (0.0 if rep == "ojmb_base_v2" else size), (rep, shown, size)
+
+
+def test_representation_c_uses_only_the_base_graph():
+    """C has exactly the node and edge types of the baseline; the batching lives in features."""
+    instances = DATA[:3]
+    base = env_of("ojmb_base_v2", instances).reset(sel_index=0)
+    env = env_of("ojmb_feat_v2", instances)
+    feat = env.reset(sel_index=0)
+    assert feat.metadata() == base.metadata()
+    assert feat["operation"].x.shape[1] == base["operation"].x.shape[1] + 6  # flag, kappa, B, p, c_o, remaining
+    assert feat["job"].x.shape[1] == base["job"].x.shape[1] + 3  # flag, B, pi_j
+    assert feat["machine"].x.shape[1] == base["machine"].x.shape[1] + 1  # batching opportunity
+    done = False
+    while not done:
+        opp = env.state["machine"].x[:, -1]
+        assert float(opp.min()) >= 0 and float(opp.max()) <= 1
+        # exec edge column 3: partners of the operation eligible on the machine
+        oid = env.state["operation"].oid.tolist()
+        store = env.state["operation", "exec", "machine"]
+        for (n, m), value in zip(store.edge_index.T.tolist(), store.edge_attr[:, 3].tolist()):
+            o = oid[n]
+            expected = sum(1 for o2 in env.feat_partners[o] if o2 in oid and env.operations[o2][m] > 0)
+            assert value == expected
+        _, _, done, _ = env.step(env.sample())
+
+
 def test_v2_trains():
     instances = DATA[:2]
     for rep in BATCHING_V2:

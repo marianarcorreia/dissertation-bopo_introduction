@@ -500,4 +500,67 @@ starts later, shows its start, and when taken schedules the larger batch at exac
 start; that the mask keeps the machine with the earliest batch completion; and that the
 three representations train.
 
+\subsection{Batch size on the action edge}
+In version 2 the immediate action and its wait twin differ mainly in how many operations
+they dispatch, which none of the five action-edge columns shows (a batch whose partners are
+short has the same start and batch time as the job alone). A sixth column is therefore added
+to the action edge of every version-2 representation:
+\begin{equation}
+  \mathbf{a}_{\mu j}=\bigl[\ p_b,\ \tfrac{p_{o_j^t,\mu}}{\sum_{\mu'}p_{o_j^t,\mu'}},\
+  s_{j\mu},\ s_{j\mu}+p_b,\ s_{j\mu}-F_\mu,\ n_{b}\ \bigr]\in\R^6,
+\end{equation}
+where $n_b=|b|$ is the number of operations of the batch the action dispatches (for a wait
+action, the larger batch). The baseline receives $0$ in this column, so it stays blind to
+batching. All attributed relations are zero-padded to dimension 6, and the edge dimension of
+the GNN is read from the environment (the version-1 environments keep 5, so their trained
+models are unchanged). Adding the column to every representation, not only to the new one
+below, keeps the information of the action edges equal across representations.
+
+% ===========================================================================
+\section{Representation C: batching as feature constraints}
+\label{sec:repC}
+
+Representation C (\texttt{ojmb\_feat\_v2}) adds no node type and no edge type: its graph has
+exactly the node and edge types of the baseline, and the batching constraint is expressed only
+through features of existing nodes and edges.
+
+\paragraph{Why not the family number.} The family index only has meaning inside one instance
+(Section~\ref{sec:familyfeature}). Moreover, operations of the same family belong to different
+jobs and are never adjacent in the operation--job--machine graph; they only meet through a
+machine node, whose aggregation mixes every family eligible on it. Equality of a family number
+would therefore be nearly invisible to the network. What the policy needs from ``same family''
+is who can be batched, how many partners there are and what the batch costs; these are
+computed by the environment and given as numbers.
+
+\paragraph{Features.} Let $P(o)=\{o'\in\Oset^{\varphi(o)}:\ \job(o')\neq\job(o),\
+|\kappa(o')-\kappa(o)|\le\Delta\}$ be the compatible partners of $o$, and $U(t)$ the operations
+not yet scheduled at step $t$.
+\begin{align}
+  \text{Operation:}\quad & \mathbf{x}^C_o(t)=\Bigl[\ \mathbf{x}_o \cat \mathbb{1}[\varphi(o)\neq\varnothing]
+     \cat \tfrac{\kappa(o)}{n_{\job(o)}} \cat B_{\varphi(o)} \cat \bar p_{\varphi(o)}
+     \cat c_o(t) \cat \tfrac{r_{\varphi(o)}(t)}{|\Oset^{\varphi(o)}|}\ \Bigr],\\
+  & c_o(t)=\bigl|\{o'\in P(o)\cap U(t):\ \Mset_o\cap\Mset_{o'}\neq\emptyset\}\bigr|,\\
+  \text{Job:}\quad & \mathbf{x}^C_j(t)=\mathbf{x}'_j(t)\quad\text{(as in A and B: flag, $B_f$, $\pi_j(t)$)},\\
+  \text{Machine:}\quad & \mathbf{x}^C_\mu(t)=\Bigl[\ \mathbf{x}_\mu \cat
+     \max_{j:\ \varphi(o_j^t)\neq\varnothing,\ \mu\in\Mset_{o_j^t}} \tfrac{|b(j,\mu)|}{B_{\varphi(o_j^t)}}\ \Bigr],\\
+  \text{Exec edge }(o,\mu):\quad & a_{o\mu,3}(t)=\bigl|\{o'\in P(o)\cap U(t):\ \mu\in\Mset_{o'}\}\bigr|,
+\end{align}
+where $b(j,\mu)$ is the batch the action $(\mu,j)$ would dispatch now and column 3 of the exec
+edge was always zero before. The action edge is that of version 2, including $n_b$.
+
+\paragraph{The batching action with features only.} The action is the existing
+$(\text{machine},\textsf{exec},\text{job})$ edge. Choosing it dispatches a batch, and its
+features describe that batch completely: $n_b$ operations start at $s_{j\mu}$, last $p_b$ and
+leave the machine idle for $s_{j\mu}-F_\mu$. The wait twin of version 2 is another edge of the
+same type, so waiting is represented by features too.
+
+\paragraph{What the comparison measures.} C lies between the baseline (no batching
+information) and A and B (the same kind of information plus structure). Its comparison with
+them is read on every group of metrics: schedule quality (whether features alone suffice),
+constraint handling (a check), expressiveness (structure gain is expected close to the
+baseline's, since no edges are added, while distinct inputs rise with the richer features),
+heterophily, batching behaviour (whether C uses batching as much as A and B), efficiency (C
+adds no nodes or edges, so it should be the cheapest batching representation) and the
+per-step training curves (whether features give the same early advantage as structure).
+
 \end{document}

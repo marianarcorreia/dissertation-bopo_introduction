@@ -68,6 +68,8 @@ class _FJSPBatchEnv(FJSSPEnv):
     BATCH_REP = None  # "node", "edge" or "base"
     WAIT_ACTION = False  # v2: "wait for the next compatible partner" twin actions
     BATCH_AWARE_MASK = False  # v2: sel_k ranks machines by the completion of the batch
+    BATCH_SIZE_COLUMN = False  # v2: 6th action-edge column = operations the action dispatches
+    EDGE_DIM = EDGE_DIM  # attributed edge width, read by src/bopo.py:BOPO (6 with the size column)
 
     # ------------------------------------------------------------------ instance / graph
     def generate_instance(self, instance):
@@ -112,8 +114,10 @@ class _FJSPBatchEnv(FJSSPEnv):
             in_fam = 1.0 if f >= 0 else 0.0
             kappa_norm = (self.op_kappa[o] + 1) / len(self.jobs[self.op_job[o]])
             row = [in_fam, kappa_norm]
-            if self.BATCH_REP == "edge":  # no family node: batch-level parameters live on the op
+            if self.BATCH_REP in ("edge", "feat"):  # no family node: batch-level parameters live on the op
                 row += [float(self.capacities[f]) if f >= 0 else 1.0, self.fam_pbar[f] if f >= 0 else 0.0]
+            if self.BATCH_REP == "feat":  # dynamic, filled in calculate_next_state
+                row += [0.0, 0.0]  # compatible partners c_o(t), share of the family still to schedule
             extra.append(row)
         self.data["operation"].x = torch.cat([self.data["operation"].x, torch.tensor(extra)], dim=1)
 
@@ -123,8 +127,17 @@ class _FJSPBatchEnv(FJSSPEnv):
 
         if self.BATCH_REP == "node":
             self._build_family_node()
-        else:
+        elif self.BATCH_REP == "edge":
             self._build_batch_edges()
+        else:  # "feat", Representation C: features only, no node or edge type is added
+            # machine: largest batch a current operation could form on it now / its capacity
+            self.data["machine"].x = torch.cat([self.data["machine"].x, torch.zeros((self.num_machines, 1))], dim=1)
+            # (o, mu) exec edges: column 3 (always 0 before) = compatible partners eligible on mu
+            self.feat_partners = [
+                [o2 for o2 in self.fam_members[self.family[o]]
+                 if o2 != o and self.op_job[o2] != self.op_job[o]
+                 and abs(self.op_kappa[o2] - self.op_kappa[o]) <= self.delta] if self.family[o] >= 0 else []
+                for o in range(n_ops)]
 
     def _build_family_node(self):
         n_fam_nodes = max(self.num_families, 1)  # dummy node keeps the node type present
@@ -254,28 +267,40 @@ class _FJSPBatchEnv(FJSSPEnv):
         what the action actually costs. The baseline keeps the individual operation's time,
         so its graph stays free of batching information."""
         super()._refresh_jm_edges()
-        if self.BATCH_REP == "base":
-            return
         store = self.state['machine', 'exec', 'job']
+        if self.BATCH_REP == "base":
+            if self.BATCH_SIZE_COLUMN:  # same width as the other v2 representations, but blind
+                store.edge_attr = torch.cat([store.edge_attr, store.edge_attr.new_zeros((store.edge_attr.shape[0], 1))], 1)
+                self.state['job', 'exec', 'machine'].edge_attr = store.edge_attr.clone()
+            return
         attr = store.edge_attr
-        start, proc = self._batch_start_proc()
+        start, proc, size = self._batch_start_proc_size()
         attr[:, 0] = proc
         attr[:, 3] = start + proc
+        if self.BATCH_SIZE_COLUMN:  # v2: operations the action dispatches (column 5)
+            attr = torch.cat([attr, size.unsqueeze(1).to(attr.dtype)], dim=1)
+            store.edge_attr = attr
         self.state['job', 'exec', 'machine'].edge_attr = attr.clone()
 
     def _batch_start_proc(self):
         """Per (machine, job) action edge: earliest start and processing time of the batch
         the action would dispatch (the longest member, see _batch_members)."""
+        start, proc, _ = self._batch_start_proc_size()
+        return start, proc
+
+    def _batch_start_proc_size(self):
+        """_batch_start_proc plus the number of operations the batch dispatches."""
         store = self.state['machine', 'exec', 'job']
         edge_index = store.edge_index
         machine_idx, job_idx = edge_index[0], edge_index[1]
         start = self.job_start_machines[job_idx, machine_idx].clone().float()
         proc = self.current_job_proc[job_idx, machine_idx].clone().float()
+        size = torch.ones(edge_index.shape[1])
         if "wait" in store:  # v2 wait actions start when the awaited partner is ready
             start[store.wait] = store.wait_start[store.wait]
         cands = self._family_candidates()
         if not cands:
-            return start, proc
+            return start, proc, size
         starts, machines, jobs = start.tolist(), machine_idx.tolist(), job_idx.tolist()
         for e, (m, j, s) in enumerate(zip(machines, jobs, starts)):
             # only edges whose job has a family with another candidate can form a batch
@@ -285,7 +310,8 @@ class _FJSPBatchEnv(FJSSPEnv):
             members = self._batch_members(j, m, s, cands)
             if len(members) > 1:
                 proc[e] = max(self.operations[self.current_operations[j2]][m] for j2 in members)
-        return start, proc
+                size[e] = len(members)
+        return start, proc, size
 
     def expert_action(self):
         """Warm-start teacher. For the node and edge representations the completion time
@@ -398,6 +424,8 @@ class _FJSPBatchEnv(FJSSPEnv):
                     attr[2] = s_wait
                     attr[3] = s_wait + shown
                     attr[4] = s_wait - float(self.state["machine"].x[m, 0])
+                if self.BATCH_SIZE_COLUMN and self.BATCH_REP != "base":
+                    attr[5] = len(later)  # the larger batch waiting dispatches
                 new_idx.append([m, j])
                 new_attr.append(attr)
                 new_start.append(s_wait)
@@ -410,6 +438,48 @@ class _FJSPBatchEnv(FJSSPEnv):
             store.wait = torch.cat([store.wait, torch.ones(len(new_idx), dtype=torch.bool)])
             store.wait_start = torch.cat([store.wait_start, torch.tensor(new_start, dtype=torch.float)])
         self._sync_reverse_edges()
+
+    def _update_feature_constraints(self, cands):
+        """Representation C: the batching constraint as features of the existing nodes/edges.
+          operation  c_o(t): unscheduled partners (same family, other job, order difference
+                     <= delta, a shared eligible machine); share of its family still to schedule
+          machine    largest batch a current operation could form on it now / that batch's B_f
+          exec edge  (o, mu) column 3: unscheduled partners of o eligible on mu"""
+        oid = self.state["operation"].oid.tolist()
+        pending = set(oid)
+        partners = {o: [o2 for o2 in self.feat_partners[o] if o2 in pending] for o in oid}
+        ox = self.state["operation"].x
+        rows = []
+        for o in oid:
+            f = self.family[o]
+            shared = [o2 for o2 in partners[o] if self.op_elig[o] & self.op_elig[o2]]
+            rows.append((float(len(shared)), self.fam_remaining[f] / len(self.fam_members[f]) if f >= 0 else 0.0))
+        if rows:
+            ox[:, -2:] = torch.tensor(rows, dtype=ox.dtype)
+
+        opportunity = [0.0] * self.num_machines
+        for j in range(self.num_jobs):
+            if self.job_done[j]:
+                continue
+            f = self.family[self.current_operations[j]]
+            if f < 0:
+                continue
+            for m in range(self.num_machines):
+                s = float(self.job_start_machines[j, m])
+                if s < SENTINEL:
+                    size = len(self._batch_members(j, m, s, cands)) / self.capacities[f]
+                    opportunity[m] = max(opportunity[m], size)
+        self.state["machine"].x[:, -1] = torch.tensor(opportunity, dtype=self.state["machine"].x.dtype)
+
+        for edge_type, op_row in ((("operation", "exec", "machine"), 0), (("machine", "exec", "operation"), 1)):
+            store = self.state[edge_type]
+            if store.edge_index.shape[1] == 0:
+                continue
+            ops = store.edge_index[op_row].tolist()
+            machs = store.edge_index[1 - op_row].tolist()
+            store.edge_attr[:, 3] = torch.tensor(
+                [float(sum(1 for o2 in partners[oid[n]] if self.operations[o2][m] > 0)) for n, m in zip(ops, machs)],
+                dtype=store.edge_attr.dtype)
 
     def calculate_next_state(self):
         if self.job_done is None:
@@ -432,6 +502,9 @@ class _FJSPBatchEnv(FJSSPEnv):
             else:
                 rows.append((1.0, float(self.capacities[f]), float(self._ready_partners(j, cands, earliest[j]))))
         self.state["job"].x[:, 4:7] = torch.tensor(rows, dtype=self.state["job"].x.dtype)
+
+        if self.BATCH_REP == "feat":
+            self._update_feature_constraints(cands)
 
         if self.BATCH_REP == "node":
             fx = self.state["family"].x
@@ -522,6 +595,7 @@ class _FJSPBatchEnv(FJSSPEnv):
             for row in feats:
                 row.append(row[0] / total_gap)
                 row.append(0)
+                row += [0] * (mej.edge_attr.shape[1] - len(row))  # v2: batch-size column (rebuilt in calculate_mask)
             new_feats += feats
         if new_edges:
             mej.edge_index = torch.cat([mej.edge_index, torch.LongTensor(new_edges).T], dim=1)
@@ -577,15 +651,20 @@ class _FJSPBatchEnv(FJSSPEnv):
 
     def normalize_state(self, state):
         state = super().normalize_state(state)
-        if self.BATCH_REP == "base":
-            return state
+        edge_types = ()
         if self.BATCH_REP == "node":
             state["family"].x = normalize_columns(state["family"].x)
             edge_types = (('family', 'batch_exec', 'machine'), ('machine', 'batch_exec', 'family'))
-        else:
+        elif self.BATCH_REP == "edge":
             edge_types = (('operation', 'batch', 'operation'),)
         for et in edge_types:
             state[et].edge_attr = normalize_columns(state[et].edge_attr)
+        if self.EDGE_DIM > EDGE_DIM:  # v2: every attributed relation to the width of the action edges
+            for et in state.edge_types:
+                attr = state[et].get("edge_attr")
+                if attr is not None and attr.shape[1] < self.EDGE_DIM:
+                    state[et].edge_attr = torch.cat(
+                        [attr, attr.new_zeros((attr.shape[0], self.EDGE_DIM - attr.shape[1]))], dim=1)
         return state
 
 
@@ -604,19 +683,29 @@ class FJSPBatchBaseEnv(_FJSPBatchEnv):
     BATCH_REP = "base"
 
 
-class FJSPBatchNodeV2Env(FJSPBatchNodeEnv):
-    """Representation A, v2: wait actions and batch-aware mask."""
+class _V2:
+    """v2: wait actions, batch-aware mask and the batch size (operations the action dispatches)
+    as a 6th action-edge column - 0 for the baseline, which stays blind to batching."""
     WAIT_ACTION = True
     BATCH_AWARE_MASK = True
+    BATCH_SIZE_COLUMN = True
+    EDGE_DIM = EDGE_DIM + 1
 
 
-class FJSPBatchEdgeV2Env(FJSPBatchEdgeEnv):
-    """Representation B, v2: wait actions and batch-aware mask."""
-    WAIT_ACTION = True
-    BATCH_AWARE_MASK = True
+class FJSPBatchNodeV2Env(_V2, FJSPBatchNodeEnv):
+    """Representation A, v2."""
 
 
-class FJSPBatchBaseV2Env(FJSPBatchBaseEnv):
-    """Baseline, v2: wait actions and batch-aware mask (the same action space as A and B v2)."""
-    WAIT_ACTION = True
-    BATCH_AWARE_MASK = True
+class FJSPBatchEdgeV2Env(_V2, FJSPBatchEdgeEnv):
+    """Representation B, v2."""
+
+
+class FJSPBatchBaseV2Env(_V2, FJSPBatchBaseEnv):
+    """Baseline, v2 (the same action space as the other v2 representations)."""
+
+
+class FJSPBatchFeatV2Env(_V2, _FJSPBatchEnv):
+    """Representation C, v2: the batching constraint as features of the existing node and
+    edge types only (operation, job, machine, exec edges, action edges) - no family node and
+    no batch edge (see _update_feature_constraints)."""
+    BATCH_REP = "feat"

@@ -108,7 +108,12 @@ CHART_GROUPS = (
 # Categorical slots of the reference palette (the first three validate for all pairs), fixed
 # per representation so a colour always means the same representation across charts.
 SERIES_COLORS = ("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948")
-REPRESENTATION_ORDER = ("ojmb_node", "ojmb_edge", "ojmb_base", "oo", "om", "ojm")
+REPRESENTATION_ORDER = ("ojmb_node", "ojmb_edge", "ojmb_base", "ojmb_feat", "oo", "om", "ojm")
+
+
+def color_key(rep):
+    """The representation a colour belongs to: a v2 variant keeps its v1 colour."""
+    return rep[:-3] if rep.endswith("_v2") else rep
 INK, INK_2, MUTED, GRID, SURFACE = "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#fcfcfb"
 
 
@@ -117,7 +122,7 @@ def _series(report, folder):
     results = [r for r in report["results"] if r["folder"] == folder]
     reps = [r["representation"] for r in results]
     rank = {rep: i for i, rep in enumerate(REPRESENTATION_ORDER)}
-    results.sort(key=lambda r: (rank.get(r["representation"], len(rank)), r["model"]))
+    results.sort(key=lambda r: (rank.get(color_key(r["representation"]), len(rank)), r["model"]))
     return [(r["representation"] if reps.count(r["representation"]) == 1
              else f"{r['representation']} ({r['model']})", r["representation"], r["summary"]) for r in results]
 
@@ -148,7 +153,7 @@ def plot_metric_bars(report, path, folder=None):
     series = _series(report, folder)
     colors = {}
     for _, rep, _ in series:  # colour follows the representation, never the rank
-        idx = REPRESENTATION_ORDER.index(rep) if rep in REPRESENTATION_ORDER else len(colors)
+        idx = REPRESENTATION_ORDER.index(color_key(rep)) if color_key(rep) in REPRESENTATION_ORDER else len(colors)
         colors.setdefault(rep, SERIES_COLORS[idx % len(SERIES_COLORS)])
 
     groups = []
