@@ -1,0 +1,1110 @@
+C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-09-28 03:42:45
+[MAIN] mode=optuna
+[MAIN] run_name=train_run
+[MAIN] representation(s)=['ojm']
+[MAIN] gnn_type=gin
+[MAIN] overrides={'num_layers': 3, 'logp_norm': 'sum', 'exclude_greedy_from_loss': False}
+============================================================
+======================================================================
+[PARAM] Hyperparameter tuning runner (Optuna)
+[PARAM] Representations : ['OJM']
+[PARAM] Trials          : 10
+[PARAM] Max episodes    : 30
+[PARAM] Objective       : min(last_val_gap_Q80)
+[PARAM] Storage         : optuna_journal.log
+======================================================================
+[I 2026-09-28 03:42:45,508] A new study created in Journal with name: fjsp_tuning_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5
+[PARAM] Starting Optuna study for OJM | gnn_type=gin | study_name=fjsp_tuning_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5 | trials=10 | overrides={'num_layers': 3, 'logp_norm': 'sum', 'exclude_greedy_from_loss': False} | max_episodes=30 | objective=min(last_val_gap_Q80)
+[PARAM] Critical params (OJM): ['lr', 'hidden_channels', 'batch_size', 'num_layers', 'heads', 'n_cases', 'new_freq', 'K', 'use_greedy', 'mask_option', 'sel_k']
+[PARAM][OJM] Trial 0 | gnn_type=gin | episodes=30 | lr=1.03e-04 | hidden=128 | layers=3 | heads=3 | K=32 | use_greedy=True | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 03:42:45
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=64 | K=32 | use_greedy=True | lr=0.00010256691315437255 (decaying to 2.05e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_0
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=56 | bc_loss=2.5036 | decisions=54
+[TRAIN][WARMSTART] step 10/100 | instance=28 | bc_loss=2.1063 | decisions=49
+[TRAIN][WARMSTART] step 15/100 | instance=17 | bc_loss=2.3033 | decisions=55
+[TRAIN][WARMSTART] step 20/100 | instance=57 | bc_loss=2.0207 | decisions=52
+[TRAIN][WARMSTART] step 25/100 | instance=21 | bc_loss=1.9780 | decisions=50
+[TRAIN][WARMSTART] step 30/100 | instance=49 | bc_loss=1.9654 | decisions=53
+[TRAIN][WARMSTART] step 35/100 | instance=6 | bc_loss=1.7972 | decisions=53
+[TRAIN][WARMSTART] step 40/100 | instance=65 | bc_loss=1.6126 | decisions=49
+[TRAIN][WARMSTART] step 45/100 | instance=54 | bc_loss=1.4553 | decisions=45
+[TRAIN][WARMSTART] step 50/100 | instance=17 | bc_loss=2.2403 | decisions=55
+[TRAIN][WARMSTART] step 55/100 | instance=78 | bc_loss=1.9192 | decisions=45
+[TRAIN][WARMSTART] step 60/100 | instance=2 | bc_loss=1.6758 | decisions=44
+[TRAIN][WARMSTART] step 65/100 | instance=4 | bc_loss=1.8253 | decisions=49
+[TRAIN][WARMSTART] step 70/100 | instance=11 | bc_loss=1.6827 | decisions=42
+[TRAIN][WARMSTART] step 75/100 | instance=51 | bc_loss=1.8603 | decisions=56
+[TRAIN][WARMSTART] step 80/100 | instance=59 | bc_loss=1.9222 | decisions=50
+[TRAIN][WARMSTART] step 85/100 | instance=28 | bc_loss=1.6953 | decisions=49
+[TRAIN][WARMSTART] step 90/100 | instance=43 | bc_loss=1.9344 | decisions=51
+[TRAIN][WARMSTART] step 95/100 | instance=45 | bc_loss=1.5740 | decisions=47
+[TRAIN][WARMSTART] step 100/100 | instance=38 | bc_loss=1.7300 | decisions=55
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 03:47:19
+[TRAIN] Step 1 | Loss=8.365466 | Best makespan in group=1802.00
+[TRAIN] Step 2/30 | 03:48:35
+[TRAIN] Step 2 | Loss=7.013894 | Best makespan in group=1255.00
+[TRAIN] Step 3/30 | 03:49:32
+[TRAIN] Step 3 | Loss=2.791826 | Best makespan in group=1573.00
+[TRAIN] Step 4/30 | 03:50:29
+[TRAIN] Step 4 | Loss=1.187424 | Best makespan in group=1648.00
+[TRAIN] Step 5/30 | 03:51:28
+[TRAIN] Step 5 | Loss=0.683609 | Best makespan in group=1238.00
+[TRAIN] Step 6/30 | 03:52:24
+[TRAIN] Step 6 | Loss=3.135494 | Best makespan in group=2041.00
+[TRAIN] Step 7/30 | 03:53:19
+[TRAIN] Step 7 | Loss=6.593568 | Best makespan in group=1563.00
+[TRAIN] Step 8/30 | 03:54:29
+[TRAIN] Step 8 | Loss=2.974888 | Best makespan in group=1638.00
+[TRAIN] Step 9/30 | 03:55:32
+[TRAIN] Step 9 | Loss=1.388375 | Best makespan in group=1889.00
+[TRAIN] Step 10/30 | 03:56:43
+[TRAIN] Step 10 | Loss=-0.000000 | Best makespan in group=1389.00
+[TRAIN][VAL][ep 10] avg_gap=0.2485 | std_gap=0.0801 | q80_gap=0.3046 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2485 (raw=0.2485) | saving candidate: 439911755889036.pth
+[TRAIN] Step 11/30 | 03:59:22
+[TRAIN] Step 11 | Loss=3.143826 | Best makespan in group=1959.00
+[TRAIN] Step 12/30 | 04:00:17
+[TRAIN] Step 12 | Loss=0.667538 | Best makespan in group=1550.00
+[TRAIN] Step 13/30 | 04:01:34
+[TRAIN] Step 13 | Loss=1.748070 | Best makespan in group=1576.00
+[TRAIN] Step 14/30 | 04:02:20
+[TRAIN] Step 14 | Loss=5.397791 | Best makespan in group=1846.00
+[TRAIN] Step 15/30 | 04:03:15
+[TRAIN] Step 15 | Loss=3.069300 | Best makespan in group=1399.00
+[TRAIN] Step 16/30 | 04:04:26
+[TRAIN] Step 16 | Loss=0.785830 | Best makespan in group=1783.00
+[TRAIN] Step 17/30 | 04:05:32
+[TRAIN] Step 17 | Loss=-0.000000 | Best makespan in group=2063.00
+[TRAIN] Step 18/30 | 04:06:25
+[TRAIN] Step 18 | Loss=5.141554 | Best makespan in group=1583.00
+[TRAIN] Step 19/30 | 04:07:26
+[TRAIN] Step 19 | Loss=0.539544 | Best makespan in group=1337.00
+[TRAIN] Step 20/30 | 04:08:33
+[TRAIN] Step 20 | Loss=0.464838 | Best makespan in group=1861.00
+[TRAIN][VAL][ep 20] avg_gap=0.2427 | std_gap=0.0832 | q80_gap=0.3250 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2456 (raw=0.2427) | saving candidate: 10747692945487.pth
+[TRAIN] Step 21/30 | 04:11:10
+[TRAIN] Step 21 | Loss=0.791025 | Best makespan in group=1534.00
+[TRAIN] Step 22/30 | 04:12:15
+[TRAIN] Step 22 | Loss=0.224779 | Best makespan in group=1551.00
+[TRAIN] Step 23/30 | 04:13:07
+[TRAIN] Step 23 | Loss=0.316537 | Best makespan in group=1572.00
+[TRAIN] Step 24/30 | 04:14:01
+[TRAIN] Step 24 | Loss=0.052821 | Best makespan in group=1852.00
+[TRAIN] Step 25/30 | 04:14:48
+[TRAIN] Step 25 | Loss=5.188856 | Best makespan in group=1519.00
+[TRAIN] Step 26/30 | 04:15:50
+[TRAIN] Step 26 | Loss=0.046771 | Best makespan in group=1933.00
+[TRAIN] Step 27/30 | 04:17:04
+[TRAIN] Step 27 | Loss=0.002108 | Best makespan in group=1673.00
+[TRAIN] Step 28/30 | 04:17:54
+[TRAIN] Step 28 | Loss=4.424202 | Best makespan in group=1864.00
+[TRAIN] Step 29/30 | 04:19:03
+[TRAIN] Step 29 | Loss=2.155959 | Best makespan in group=1409.00
+[TRAIN] Step 30/30 | 04:20:32
+[TRAIN] Step 30 | Loss=0.501701 | Best makespan in group=2154.00
+[TRAIN][VAL][ep 30] avg_gap=0.2414 | std_gap=0.0853 | q80_gap=0.3343 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2442 (raw=0.2414) | saving candidate: 988921148468206.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/988921148468206.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.2742 | std_gap=0.0884 | q80_gap=0.3444 | n=40
+[TRAIN][04:24:59] Training ended. Validation history and plots updated.
+[I 2026-09-28 04:24:59,671] Trial 0 finished with value: 0.334261100066269 and parameters: {'n_cases': 80, 'batch_size': 64, 'lr': 0.00010256691315437255, 'hidden_channels': 128, 'K': 32, 'use_greedy': True, 'sel_k': 2}. Best is trial 0 with value: 0.334261100066269.
+[PARAM][OJM] Trial 1 | gnn_type=gin | episodes=30 | lr=3.65e-04 | hidden=256 | layers=3 | heads=3 | K=64 | use_greedy=False | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 04:24:59
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=128 | K=64 | use_greedy=False | lr=0.0003654769917956456 (decaying to 7.31e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_1
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=1 | bc_loss=2.4401 | decisions=55
+[TRAIN][WARMSTART] step 10/100 | instance=50 | bc_loss=2.2151 | decisions=54
+[TRAIN][WARMSTART] step 15/100 | instance=78 | bc_loss=1.8145 | decisions=44
+[TRAIN][WARMSTART] step 20/100 | instance=77 | bc_loss=1.7024 | decisions=50
+[TRAIN][WARMSTART] step 25/100 | instance=48 | bc_loss=1.6332 | decisions=53
+[TRAIN][WARMSTART] step 30/100 | instance=62 | bc_loss=1.7804 | decisions=46
+[TRAIN][WARMSTART] step 35/100 | instance=27 | bc_loss=1.9831 | decisions=44
+[TRAIN][WARMSTART] step 40/100 | instance=42 | bc_loss=1.7550 | decisions=42
+[TRAIN][WARMSTART] step 45/100 | instance=68 | bc_loss=1.9273 | decisions=47
+[TRAIN][WARMSTART] step 50/100 | instance=20 | bc_loss=1.8018 | decisions=55
+[TRAIN][WARMSTART] step 55/100 | instance=54 | bc_loss=1.8582 | decisions=43
+[TRAIN][WARMSTART] step 60/100 | instance=34 | bc_loss=1.7132 | decisions=45
+[TRAIN][WARMSTART] step 65/100 | instance=5 | bc_loss=1.7045 | decisions=43
+[TRAIN][WARMSTART] step 70/100 | instance=70 | bc_loss=1.6346 | decisions=44
+[TRAIN][WARMSTART] step 75/100 | instance=50 | bc_loss=2.1345 | decisions=54
+[TRAIN][WARMSTART] step 80/100 | instance=20 | bc_loss=1.8792 | decisions=55
+[TRAIN][WARMSTART] step 85/100 | instance=53 | bc_loss=1.5414 | decisions=56
+[TRAIN][WARMSTART] step 90/100 | instance=71 | bc_loss=1.7040 | decisions=43
+[TRAIN][WARMSTART] step 95/100 | instance=21 | bc_loss=1.2855 | decisions=54
+[TRAIN][WARMSTART] step 100/100 | instance=71 | bc_loss=1.6417 | decisions=43
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 04:32:40
+[TRAIN] Step 1 | Loss=1.693703 | Best makespan in group=2654.00
+[TRAIN] Step 2/30 | 04:35:55
+[TRAIN] Step 2 | Loss=13.068014 | Best makespan in group=2372.00
+[TRAIN] Step 3/30 | 04:39:17
+[TRAIN] Step 3 | Loss=1.016516 | Best makespan in group=1497.00
+[TRAIN] Step 4/30 | 04:44:14
+[TRAIN] Step 4 | Loss=2.828750 | Best makespan in group=1768.00
+[TRAIN] Step 5/30 | 04:47:39
+[TRAIN] Step 5 | Loss=1.100634 | Best makespan in group=1458.00
+[TRAIN] Step 6/30 | 04:52:03
+[TRAIN] Step 6 | Loss=0.839545 | Best makespan in group=2174.00
+[TRAIN] Step 7/30 | 04:55:35
+[TRAIN] Step 7 | Loss=1.724443 | Best makespan in group=2076.00
+[TRAIN] Step 8/30 | 04:59:07
+[TRAIN] Step 8 | Loss=2.517242 | Best makespan in group=1685.00
+[TRAIN] Step 9/30 | 05:01:36
+[TRAIN] Step 9 | Loss=0.637522 | Best makespan in group=1969.00
+[TRAIN] Step 10/30 | 05:04:32
+[TRAIN] Step 10 | Loss=5.781553 | Best makespan in group=1201.00
+[TRAIN][VAL][ep 10] avg_gap=0.2916 | std_gap=0.1038 | q80_gap=0.3712 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2916 (raw=0.2916) | saving candidate: 325924625578875.pth
+[TRAIN] Step 11/30 | 05:10:30
+[TRAIN] Step 11 | Loss=2.069600 | Best makespan in group=2204.00
+[TRAIN] Step 12/30 | 05:13:38
+[TRAIN] Step 12 | Loss=0.872748 | Best makespan in group=1565.00
+[TRAIN] Step 13/30 | 05:17:36
+[TRAIN] Step 13 | Loss=0.861641 | Best makespan in group=1299.00
+[TRAIN] Step 14/30 | 05:20:14
+[TRAIN] Step 14 | Loss=0.409546 | Best makespan in group=1273.00
+[TRAIN] Step 15/30 | 05:24:30
+[TRAIN] Step 15 | Loss=1.427067 | Best makespan in group=1290.00
+[TRAIN] Step 16/30 | 05:28:05
+[TRAIN] Step 16 | Loss=0.259009 | Best makespan in group=1678.00
+[TRAIN] Step 17/30 | 05:30:51
+[TRAIN] Step 17 | Loss=0.974611 | Best makespan in group=1502.00
+[TRAIN] Step 18/30 | 05:33:34
+[TRAIN] Step 18 | Loss=2.698157 | Best makespan in group=1415.00
+[TRAIN] Step 19/30 | 05:37:51
+[TRAIN] Step 19 | Loss=0.533360 | Best makespan in group=1418.00
+[TRAIN] Step 20/30 | 05:41:03
+[TRAIN] Step 20 | Loss=0.490814 | Best makespan in group=1503.00
+[TRAIN][VAL][ep 20] avg_gap=0.2446 | std_gap=0.1003 | q80_gap=0.3383 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2681 (raw=0.2446) | saving candidate: 13494167586728.pth
+[TRAIN] Step 21/30 | 05:47:21
+[TRAIN] Step 21 | Loss=0.670329 | Best makespan in group=1490.00
+[TRAIN] Step 22/30 | 05:49:48
+[TRAIN] Step 22 | Loss=2.472921 | Best makespan in group=1987.00
+[TRAIN] Step 23/30 | 05:53:18
+[TRAIN] Step 23 | Loss=1.023434 | Best makespan in group=1428.00
+[TRAIN] Step 24/30 | 05:56:05
+[TRAIN] Step 24 | Loss=4.944438 | Best makespan in group=1617.00
+[TRAIN] Step 25/30 | 05:58:45
+[TRAIN] Step 25 | Loss=1.196206 | Best makespan in group=1564.00
+[TRAIN] Step 26/30 | 06:02:57
+[TRAIN] Step 26 | Loss=0.444820 | Best makespan in group=1151.00
+[TRAIN] Step 27/30 | 06:05:41
+[TRAIN] Step 27 | Loss=1.788133 | Best makespan in group=1438.00
+[TRAIN] Step 28/30 | 06:08:47
+[TRAIN] Step 28 | Loss=5.289850 | Best makespan in group=1577.00
+[TRAIN] Step 29/30 | 06:11:25
+[TRAIN] Step 29 | Loss=0.413057 | Best makespan in group=2015.00
+[TRAIN] Step 30/30 | 06:13:52
+[TRAIN] Step 30 | Loss=0.177290 | Best makespan in group=1580.00
+[TRAIN][VAL][ep 30] avg_gap=0.2290 | std_gap=0.0862 | q80_gap=0.2999 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2551 (raw=0.2290) | saving candidate: 760397372489836.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/760397372489836.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.2470 | std_gap=0.0884 | q80_gap=0.3480 | n=40
+[TRAIN][06:23:24] Training ended. Validation history and plots updated.
+[I 2026-09-28 06:23:25,041] Trial 1 finished with value: 0.2998738253950879 and parameters: {'n_cases': 80, 'batch_size': 128, 'lr': 0.0003654769917956456, 'hidden_channels': 256, 'K': 64, 'use_greedy': False, 'sel_k': 2}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 2 | gnn_type=gin | episodes=30 | lr=6.75e-05 | hidden=256 | layers=3 | heads=3 | K=32 | use_greedy=False | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 06:23:25
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=40 | B=64 | K=32 | use_greedy=False | lr=6.746417134006623e-05 (decaying to 1.35e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_2
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=9 | bc_loss=2.8617 | decisions=43
+[TRAIN][WARMSTART] step 10/100 | instance=24 | bc_loss=2.8612 | decisions=55
+[TRAIN][WARMSTART] step 15/100 | instance=19 | bc_loss=2.6998 | decisions=56
+[TRAIN][WARMSTART] step 20/100 | instance=27 | bc_loss=2.2892 | decisions=43
+[TRAIN][WARMSTART] step 25/100 | instance=2 | bc_loss=2.4894 | decisions=55
+[TRAIN][WARMSTART] step 30/100 | instance=23 | bc_loss=2.6810 | decisions=51
+[TRAIN][WARMSTART] step 35/100 | instance=4 | bc_loss=1.9969 | decisions=41
+[TRAIN][WARMSTART] step 40/100 | instance=29 | bc_loss=2.3287 | decisions=51
+[TRAIN][WARMSTART] step 45/100 | instance=8 | bc_loss=2.2628 | decisions=42
+[TRAIN][WARMSTART] step 50/100 | instance=7 | bc_loss=2.3063 | decisions=54
+[TRAIN][WARMSTART] step 55/100 | instance=0 | bc_loss=2.1836 | decisions=55
+[TRAIN][WARMSTART] step 60/100 | instance=39 | bc_loss=2.6112 | decisions=54
+[TRAIN][WARMSTART] step 65/100 | instance=10 | bc_loss=2.1104 | decisions=51
+[TRAIN][WARMSTART] step 70/100 | instance=25 | bc_loss=1.9629 | decisions=48
+[TRAIN][WARMSTART] step 75/100 | instance=29 | bc_loss=2.2331 | decisions=51
+[TRAIN][WARMSTART] step 80/100 | instance=25 | bc_loss=2.0693 | decisions=48
+[TRAIN][WARMSTART] step 85/100 | instance=4 | bc_loss=2.1086 | decisions=41
+[TRAIN][WARMSTART] step 90/100 | instance=16 | bc_loss=2.1189 | decisions=44
+[TRAIN][WARMSTART] step 95/100 | instance=11 | bc_loss=1.8087 | decisions=45
+[TRAIN][WARMSTART] step 100/100 | instance=2 | bc_loss=2.0724 | decisions=55
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 06:31:57
+[TRAIN] Step 1 | Loss=2.584537 | Best makespan in group=1707.00
+[TRAIN] Step 2/30 | 06:34:01
+[TRAIN] Step 2 | Loss=2.520777 | Best makespan in group=1475.00
+[TRAIN] Step 3/30 | 06:35:46
+[TRAIN] Step 3 | Loss=1.283752 | Best makespan in group=1389.00
+[TRAIN] Step 4/30 | 06:37:19
+[TRAIN] Step 4 | Loss=3.532005 | Best makespan in group=1720.00
+[TRAIN] Step 5/30 | 06:38:40
+[TRAIN] Step 5 | Loss=12.716579 | Best makespan in group=1593.00
+[TRAIN] Step 6/30 | 06:40:20
+[TRAIN] Step 6 | Loss=3.610834 | Best makespan in group=1932.00
+[TRAIN] Step 7/30 | 06:41:35
+[TRAIN] Step 7 | Loss=0.863096 | Best makespan in group=1471.00
+[TRAIN] Step 8/30 | 06:43:15
+[TRAIN] Step 8 | Loss=1.810587 | Best makespan in group=1593.00
+[TRAIN] Step 9/30 | 06:45:18
+[TRAIN] Step 9 | Loss=6.922102 | Best makespan in group=1586.00
+[TRAIN] Step 10/30 | 06:47:02
+[TRAIN] Step 10 | Loss=1.045644 | Best makespan in group=1412.00
+[TRAIN][VAL][ep 10] avg_gap=1.1831 | std_gap=1.1459 | q80_gap=1.2903 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.1831 (raw=1.1831) | saving candidate: 694643385122763.pth
+[TRAIN] Step 11/30 | 06:52:01
+[TRAIN] Step 11 | Loss=1.459499 | Best makespan in group=1371.00
+[TRAIN] Step 12/30 | 06:53:39
+[TRAIN] Step 12 | Loss=1.187950 | Best makespan in group=2063.00
+[TRAIN] Step 13/30 | 06:55:48
+[TRAIN] Step 13 | Loss=0.012483 | Best makespan in group=1421.00
+[TRAIN] Step 14/30 | 06:57:42
+[TRAIN] Step 14 | Loss=5.708048 | Best makespan in group=1532.00
+[TRAIN] Step 15/30 | 07:00:04
+[TRAIN] Step 15 | Loss=0.000079 | Best makespan in group=1558.00
+[TRAIN] Step 16/30 | 07:01:24
+[TRAIN] Step 16 | Loss=1.421292 | Best makespan in group=1573.00
+[TRAIN] Step 17/30 | 07:02:38
+[TRAIN] Step 17 | Loss=1.209000 | Best makespan in group=2598.00
+[TRAIN] Step 18/30 | 07:04:32
+[TRAIN] Step 18 | Loss=2.009762 | Best makespan in group=1898.00
+[TRAIN] Step 19/30 | 07:06:28
+[TRAIN] Step 19 | Loss=0.300859 | Best makespan in group=1510.00
+[TRAIN] Step 20/30 | 07:08:28
+[TRAIN] Step 20 | Loss=0.061142 | Best makespan in group=1506.00
+[TRAIN][VAL][ep 20] avg_gap=1.1230 | std_gap=1.1343 | q80_gap=1.2760 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.1531 (raw=1.1230) | saving candidate: 640725061454780.pth
+[TRAIN] Step 21/30 | 07:12:40
+[TRAIN] Step 21 | Loss=0.076435 | Best makespan in group=1553.00
+[TRAIN] Step 22/30 | 07:14:33
+[TRAIN] Step 22 | Loss=0.053267 | Best makespan in group=2022.00
+[TRAIN] Step 23/30 | 07:16:47
+[TRAIN] Step 23 | Loss=0.125990 | Best makespan in group=1448.00
+[TRAIN] Step 24/30 | 07:18:36
+[TRAIN] Step 24 | Loss=2.378992 | Best makespan in group=1690.00
+[TRAIN] Step 25/30 | 07:20:25
+[TRAIN] Step 25 | Loss=0.385354 | Best makespan in group=1750.00
+[TRAIN] Step 26/30 | 07:22:52
+[TRAIN] Step 26 | Loss=0.039347 | Best makespan in group=2409.00
+[TRAIN] Step 27/30 | 07:24:52
+[TRAIN] Step 27 | Loss=0.946955 | Best makespan in group=1444.00
+[TRAIN] Step 28/30 | 07:26:26
+[TRAIN] Step 28 | Loss=1.475234 | Best makespan in group=1742.00
+[TRAIN] Step 29/30 | 07:27:53
+[TRAIN] Step 29 | Loss=0.735419 | Best makespan in group=1853.00
+[TRAIN] Step 30/30 | 07:29:46
+[TRAIN] Step 30 | Loss=1.166566 | Best makespan in group=1397.00
+[TRAIN][VAL][ep 30] avg_gap=1.0951 | std_gap=1.1059 | q80_gap=1.0226 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.1338 (raw=1.0951) | saving candidate: 792445513108412.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/792445513108412.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=1.0942 | std_gap=1.1152 | q80_gap=1.0868 | n=40
+[TRAIN][07:36:44] Training ended. Validation history and plots updated.
+[I 2026-09-28 07:36:44,707] Trial 2 finished with value: 1.0226167745999253 and parameters: {'n_cases': 40, 'batch_size': 64, 'lr': 6.746417134006623e-05, 'hidden_channels': 256, 'K': 32, 'use_greedy': False, 'sel_k': 5}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 3 | gnn_type=gin | episodes=30 | lr=2.10e-04 | hidden=256 | layers=3 | heads=3 | K=64 | use_greedy=False | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 07:36:44
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=128 | K=64 | use_greedy=False | lr=0.00021008360271862668 (decaying to 4.20e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_3
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=11 | bc_loss=2.9398 | decisions=43
+[TRAIN][WARMSTART] step 10/100 | instance=39 | bc_loss=2.4230 | decisions=51
+[TRAIN][WARMSTART] step 15/100 | instance=33 | bc_loss=2.3722 | decisions=48
+[TRAIN][WARMSTART] step 20/100 | instance=68 | bc_loss=2.4229 | decisions=42
+[TRAIN][WARMSTART] step 25/100 | instance=47 | bc_loss=2.2699 | decisions=43
+[TRAIN][WARMSTART] step 30/100 | instance=36 | bc_loss=2.4501 | decisions=42
+[TRAIN][WARMSTART] step 35/100 | instance=58 | bc_loss=2.6323 | decisions=55
+[TRAIN][WARMSTART] step 40/100 | instance=61 | bc_loss=2.3625 | decisions=47
+[TRAIN][WARMSTART] step 45/100 | instance=15 | bc_loss=2.4780 | decisions=48
+[TRAIN][WARMSTART] step 50/100 | instance=72 | bc_loss=2.4241 | decisions=53
+[TRAIN][WARMSTART] step 55/100 | instance=1 | bc_loss=2.4445 | decisions=53
+[TRAIN][WARMSTART] step 60/100 | instance=75 | bc_loss=2.1499 | decisions=48
+[TRAIN][WARMSTART] step 65/100 | instance=22 | bc_loss=1.7933 | decisions=50
+[TRAIN][WARMSTART] step 70/100 | instance=13 | bc_loss=2.2296 | decisions=54
+[TRAIN][WARMSTART] step 75/100 | instance=9 | bc_loss=2.0536 | decisions=55
+[TRAIN][WARMSTART] step 80/100 | instance=68 | bc_loss=2.3090 | decisions=42
+[TRAIN][WARMSTART] step 85/100 | instance=69 | bc_loss=2.2841 | decisions=54
+[TRAIN][WARMSTART] step 90/100 | instance=64 | bc_loss=2.4611 | decisions=51
+[TRAIN][WARMSTART] step 95/100 | instance=20 | bc_loss=2.0760 | decisions=48
+[TRAIN][WARMSTART] step 100/100 | instance=1 | bc_loss=2.7223 | decisions=53
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 07:45:22
+[TRAIN] Step 1 | Loss=11.553872 | Best makespan in group=1517.00
+[TRAIN] Step 2/30 | 07:48:27
+[TRAIN] Step 2 | Loss=13.600602 | Best makespan in group=1978.00
+[TRAIN] Step 3/30 | 07:53:07
+[TRAIN] Step 3 | Loss=9.912602 | Best makespan in group=1620.00
+[TRAIN] Step 4/30 | 07:57:26
+[TRAIN] Step 4 | Loss=7.453828 | Best makespan in group=1534.00
+[TRAIN] Step 5/30 | 08:01:07
+[TRAIN] Step 5 | Loss=8.254523 | Best makespan in group=1992.00
+[TRAIN] Step 6/30 | 08:04:25
+[TRAIN] Step 6 | Loss=11.799235 | Best makespan in group=2058.00
+[TRAIN] Step 7/30 | 08:08:43
+[TRAIN] Step 7 | Loss=12.094227 | Best makespan in group=2626.00
+[TRAIN] Step 8/30 | 08:11:36
+[TRAIN] Step 8 | Loss=15.683953 | Best makespan in group=1779.00
+[TRAIN] Step 9/30 | 08:16:09
+[TRAIN] Step 9 | Loss=12.055106 | Best makespan in group=1981.00
+[TRAIN] Step 10/30 | 08:20:13
+[TRAIN] Step 10 | Loss=12.258622 | Best makespan in group=1805.00
+[TRAIN][VAL][ep 10] avg_gap=0.7997 | std_gap=0.5895 | q80_gap=1.1348 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.7997 (raw=0.7997) | saving candidate: 503232079989329.pth
+[TRAIN] Step 11/30 | 08:25:16
+[TRAIN] Step 11 | Loss=1.668387 | Best makespan in group=2394.00
+[TRAIN] Step 12/30 | 08:27:28
+[TRAIN] Step 12 | Loss=11.543771 | Best makespan in group=2354.00
+[TRAIN] Step 13/30 | 08:30:52
+[TRAIN] Step 13 | Loss=15.421803 | Best makespan in group=1690.00
+[TRAIN] Step 14/30 | 08:35:30
+[TRAIN] Step 14 | Loss=2.157573 | Best makespan in group=1569.00
+[TRAIN] Step 15/30 | 08:39:41
+[TRAIN] Step 15 | Loss=1.642029 | Best makespan in group=1883.00
+[TRAIN] Step 16/30 | 08:42:25
+[TRAIN] Step 16 | Loss=5.964990 | Best makespan in group=1948.00
+[TRAIN] Step 17/30 | 08:45:29
+[TRAIN] Step 17 | Loss=12.661365 | Best makespan in group=1614.00
+[TRAIN] Step 18/30 | 08:48:28
+[TRAIN] Step 18 | Loss=0.239200 | Best makespan in group=2477.00
+[TRAIN] Step 19/30 | 08:50:52
+[TRAIN] Step 19 | Loss=2.306796 | Best makespan in group=2790.00
+[TRAIN] Step 20/30 | 08:54:21
+[TRAIN] Step 20 | Loss=4.362014 | Best makespan in group=1880.00
+[TRAIN][VAL][ep 20] avg_gap=0.7001 | std_gap=0.7081 | q80_gap=0.7295 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.7499 (raw=0.7001) | saving candidate: 555084070521026.pth
+[TRAIN] Step 21/30 | 09:00:35
+[TRAIN] Step 21 | Loss=0.874501 | Best makespan in group=2920.00
+[TRAIN] Step 22/30 | 09:04:02
+[TRAIN] Step 22 | Loss=0.007098 | Best makespan in group=2680.00
+[TRAIN] Step 23/30 | 09:06:37
+[TRAIN] Step 23 | Loss=12.244379 | Best makespan in group=1461.00
+[TRAIN] Step 24/30 | 09:11:09
+[TRAIN] Step 24 | Loss=0.416640 | Best makespan in group=2102.00
+[TRAIN] Step 25/30 | 09:14:16
+[TRAIN] Step 25 | Loss=1.852578 | Best makespan in group=2492.00
+[TRAIN] Step 26/30 | 09:17:22
+[TRAIN] Step 26 | Loss=0.065565 | Best makespan in group=1801.00
+[TRAIN] Step 27/30 | 09:21:19
+[TRAIN] Step 27 | Loss=1.603939 | Best makespan in group=2024.00
+[TRAIN] Step 28/30 | 09:24:31
+[TRAIN] Step 28 | Loss=5.109551 | Best makespan in group=2463.00
+[TRAIN] Step 29/30 | 09:28:16
+[TRAIN] Step 29 | Loss=1.318183 | Best makespan in group=1539.00
+[TRAIN] Step 30/30 | 09:31:19
+[TRAIN] Step 30 | Loss=0.262073 | Best makespan in group=1769.00
+[TRAIN][VAL][ep 30] avg_gap=0.9081 | std_gap=0.4791 | q80_gap=1.2335 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/555084070521026.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.7770 | std_gap=0.7555 | q80_gap=0.9060 | n=40
+[TRAIN][09:39:13] Training ended. Validation history and plots updated.
+[I 2026-09-28 09:39:13,108] Trial 3 finished with value: 1.2335039476625838 and parameters: {'n_cases': 80, 'batch_size': 128, 'lr': 0.00021008360271862668, 'hidden_channels': 256, 'K': 64, 'use_greedy': False, 'sel_k': 5}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 4 | gnn_type=gin | episodes=30 | lr=2.99e-04 | hidden=256 | layers=3 | heads=3 | K=32 | use_greedy=True | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 09:39:13
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=128 | K=32 | use_greedy=True | lr=0.00029945018361271497 (decaying to 5.99e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_4
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=27 | bc_loss=2.8571 | decisions=57
+[TRAIN][WARMSTART] step 10/100 | instance=65 | bc_loss=2.2688 | decisions=58
+[TRAIN][WARMSTART] step 15/100 | instance=1 | bc_loss=2.8161 | decisions=47
+[TRAIN][WARMSTART] step 20/100 | instance=50 | bc_loss=2.4230 | decisions=51
+[TRAIN][WARMSTART] step 25/100 | instance=65 | bc_loss=2.1180 | decisions=58
+[TRAIN][WARMSTART] step 30/100 | instance=79 | bc_loss=2.1446 | decisions=49
+[TRAIN][WARMSTART] step 35/100 | instance=6 | bc_loss=2.2353 | decisions=47
+[TRAIN][WARMSTART] step 40/100 | instance=22 | bc_loss=2.1859 | decisions=43
+[TRAIN][WARMSTART] step 45/100 | instance=68 | bc_loss=2.1949 | decisions=44
+[TRAIN][WARMSTART] step 50/100 | instance=16 | bc_loss=2.2863 | decisions=50
+[TRAIN][WARMSTART] step 55/100 | instance=66 | bc_loss=2.6366 | decisions=59
+[TRAIN][WARMSTART] step 60/100 | instance=22 | bc_loss=2.1953 | decisions=43
+[TRAIN][WARMSTART] step 65/100 | instance=30 | bc_loss=1.8824 | decisions=41
+[TRAIN][WARMSTART] step 70/100 | instance=24 | bc_loss=1.8752 | decisions=49
+[TRAIN][WARMSTART] step 75/100 | instance=50 | bc_loss=2.2854 | decisions=51
+[TRAIN][WARMSTART] step 80/100 | instance=66 | bc_loss=2.4649 | decisions=59
+[TRAIN][WARMSTART] step 85/100 | instance=23 | bc_loss=2.3403 | decisions=55
+[TRAIN][WARMSTART] step 90/100 | instance=72 | bc_loss=2.0825 | decisions=55
+[TRAIN][WARMSTART] step 95/100 | instance=39 | bc_loss=2.1097 | decisions=48
+[TRAIN][WARMSTART] step 100/100 | instance=19 | bc_loss=2.0471 | decisions=44
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 09:47:38
+[TRAIN] Step 1 | Loss=7.251122 | Best makespan in group=1801.00
+[TRAIN] Step 2/30 | 09:49:49
+[TRAIN] Step 2 | Loss=2.333025 | Best makespan in group=1474.00
+[TRAIN] Step 3/30 | 09:52:21
+[TRAIN] Step 3 | Loss=0.153661 | Best makespan in group=1846.00
+[TRAIN] Step 4/30 | 09:54:26
+[TRAIN] Step 4 | Loss=4.741856 | Best makespan in group=1523.00
+[TRAIN] Step 5/30 | 09:57:06
+[TRAIN] Step 5 | Loss=7.656664 | Best makespan in group=1850.00
+[TRAIN] Step 6/30 | 09:59:53
+[TRAIN] Step 6 | Loss=4.669215 | Best makespan in group=1972.00
+[TRAIN] Step 7/30 | 10:02:09
+[TRAIN] Step 7 | Loss=0.003666 | Best makespan in group=1742.00
+[TRAIN] Step 8/30 | 10:04:57
+[TRAIN] Step 8 | Loss=0.520574 | Best makespan in group=1349.00
+[TRAIN] Step 9/30 | 10:07:58
+[TRAIN] Step 9 | Loss=5.483677 | Best makespan in group=1732.00
+[TRAIN] Step 10/30 | 10:11:44
+[TRAIN] Step 10 | Loss=2.457083 | Best makespan in group=1941.00
+[TRAIN][VAL][ep 10] avg_gap=0.9441 | std_gap=0.5104 | q80_gap=1.3586 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.9441 (raw=0.9441) | saving candidate: 955369285511826.pth
+[TRAIN] Step 11/30 | 10:16:58
+[TRAIN] Step 11 | Loss=5.923260 | Best makespan in group=2130.00
+[TRAIN] Step 12/30 | 10:20:44
+[TRAIN] Step 12 | Loss=15.458832 | Best makespan in group=1659.00
+[TRAIN] Step 13/30 | 10:24:24
+[TRAIN] Step 13 | Loss=6.858325 | Best makespan in group=1725.00
+[TRAIN] Step 14/30 | 10:27:14
+[TRAIN] Step 14 | Loss=12.500022 | Best makespan in group=1636.00
+[TRAIN] Step 15/30 | 10:30:01
+[TRAIN] Step 15 | Loss=0.087141 | Best makespan in group=1857.00
+[TRAIN] Step 16/30 | 10:31:58
+[TRAIN] Step 16 | Loss=4.504214 | Best makespan in group=2586.00
+[TRAIN] Step 17/30 | 10:34:31
+[TRAIN] Step 17 | Loss=1.096717 | Best makespan in group=1909.00
+[TRAIN] Step 18/30 | 10:36:36
+[TRAIN] Step 18 | Loss=4.009859 | Best makespan in group=1467.00
+[TRAIN] Step 19/30 | 10:39:45
+[TRAIN] Step 19 | Loss=1.601875 | Best makespan in group=1843.00
+[TRAIN] Step 20/30 | 10:43:44
+[TRAIN] Step 20 | Loss=2.336543 | Best makespan in group=2142.00
+[TRAIN][VAL][ep 20] avg_gap=0.9389 | std_gap=0.4607 | q80_gap=1.2522 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.9415 (raw=0.9389) | saving candidate: 619116186596798.pth
+[TRAIN] Step 21/30 | 10:48:40
+[TRAIN] Step 21 | Loss=6.329675 | Best makespan in group=1701.00
+[TRAIN] Step 22/30 | 10:50:49
+[TRAIN] Step 22 | Loss=2.063046 | Best makespan in group=1473.00
+[TRAIN] Step 23/30 | 10:53:47
+[TRAIN] Step 23 | Loss=10.295604 | Best makespan in group=1301.00
+[TRAIN] Step 24/30 | 10:56:13
+[TRAIN] Step 24 | Loss=2.332790 | Best makespan in group=1900.00
+[TRAIN] Step 25/30 | 10:59:10
+[TRAIN] Step 25 | Loss=1.063287 | Best makespan in group=1938.00
+[TRAIN] Step 26/30 | 11:02:05
+[TRAIN] Step 26 | Loss=0.603635 | Best makespan in group=1899.00
+[TRAIN] Step 27/30 | 11:04:21
+[TRAIN] Step 27 | Loss=1.605214 | Best makespan in group=2470.00
+[TRAIN] Step 28/30 | 11:06:47
+[TRAIN] Step 28 | Loss=2.880282 | Best makespan in group=1897.00
+[TRAIN] Step 29/30 | 11:10:07
+[TRAIN] Step 29 | Loss=3.728975 | Best makespan in group=1430.00
+[TRAIN] Step 30/30 | 11:12:56
+[TRAIN] Step 30 | Loss=2.041456 | Best makespan in group=1638.00
+[TRAIN][VAL][ep 30] avg_gap=0.9594 | std_gap=0.4689 | q80_gap=1.3630 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/619116186596798.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.9016 | std_gap=0.4150 | q80_gap=1.2218 | n=40
+[TRAIN][11:20:52] Training ended. Validation history and plots updated.
+[I 2026-09-28 11:20:52,457] Trial 4 finished with value: 1.3630499573083306 and parameters: {'n_cases': 80, 'batch_size': 128, 'lr': 0.00029945018361271497, 'hidden_channels': 256, 'K': 32, 'use_greedy': True, 'sel_k': 5}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 5 | gnn_type=gin | episodes=30 | lr=1.30e-03 | hidden=256 | layers=3 | heads=3 | K=64 | use_greedy=False | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 11:20:52
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=40 | B=128 | K=64 | use_greedy=False | lr=0.0012962378302375805 (decaying to 2.59e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_5
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=33 | bc_loss=2.1742 | decisions=47
+[TRAIN][WARMSTART] step 10/100 | instance=19 | bc_loss=2.2449 | decisions=44
+[TRAIN][WARMSTART] step 15/100 | instance=23 | bc_loss=1.9954 | decisions=43
+[TRAIN][WARMSTART] step 20/100 | instance=11 | bc_loss=1.7030 | decisions=47
+[TRAIN][WARMSTART] step 25/100 | instance=25 | bc_loss=2.1270 | decisions=47
+[TRAIN][WARMSTART] step 30/100 | instance=21 | bc_loss=2.0929 | decisions=54
+[TRAIN][WARMSTART] step 35/100 | instance=11 | bc_loss=1.6751 | decisions=47
+[TRAIN][WARMSTART] step 40/100 | instance=37 | bc_loss=1.6935 | decisions=52
+[TRAIN][WARMSTART] step 45/100 | instance=35 | bc_loss=1.6806 | decisions=53
+[TRAIN][WARMSTART] step 50/100 | instance=13 | bc_loss=1.6063 | decisions=55
+[TRAIN][WARMSTART] step 55/100 | instance=10 | bc_loss=1.8426 | decisions=58
+[TRAIN][WARMSTART] step 60/100 | instance=3 | bc_loss=1.6313 | decisions=44
+[TRAIN][WARMSTART] step 65/100 | instance=29 | bc_loss=2.0431 | decisions=54
+[TRAIN][WARMSTART] step 70/100 | instance=25 | bc_loss=1.8775 | decisions=47
+[TRAIN][WARMSTART] step 75/100 | instance=30 | bc_loss=1.7014 | decisions=53
+[TRAIN][WARMSTART] step 80/100 | instance=28 | bc_loss=1.4253 | decisions=44
+[TRAIN][WARMSTART] step 85/100 | instance=8 | bc_loss=1.8682 | decisions=45
+[TRAIN][WARMSTART] step 90/100 | instance=6 | bc_loss=1.7700 | decisions=49
+[TRAIN][WARMSTART] step 95/100 | instance=37 | bc_loss=1.6685 | decisions=52
+[TRAIN][WARMSTART] step 100/100 | instance=9 | bc_loss=2.3188 | decisions=57
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 11:29:08
+[TRAIN] Step 1 | Loss=3.962548 | Best makespan in group=2455.00
+[TRAIN] Step 2/30 | 11:32:40
+[TRAIN] Step 2 | Loss=15.618123 | Best makespan in group=1552.00
+[TRAIN] Step 3/30 | 11:36:22
+[TRAIN] Step 3 | Loss=6.845852 | Best makespan in group=1832.00
+[TRAIN] Step 4/30 | 11:40:11
+[TRAIN] Step 4 | Loss=3.558724 | Best makespan in group=1451.00
+[TRAIN] Step 5/30 | 11:43:11
+[TRAIN] Step 5 | Loss=2.509598 | Best makespan in group=2327.00
+[TRAIN] Step 6/30 | 11:46:30
+[TRAIN] Step 6 | Loss=4.387739 | Best makespan in group=1789.00
+[TRAIN] Step 7/30 | 11:49:33
+[TRAIN] Step 7 | Loss=3.189797 | Best makespan in group=1826.00
+[TRAIN] Step 8/30 | 11:52:45
+[TRAIN] Step 8 | Loss=0.912550 | Best makespan in group=1460.00
+[TRAIN] Step 9/30 | 11:56:34
+[TRAIN] Step 9 | Loss=0.278805 | Best makespan in group=1812.00
+[TRAIN] Step 10/30 | 11:59:30
+[TRAIN] Step 10 | Loss=0.430863 | Best makespan in group=1690.00
+[TRAIN][VAL][ep 10] avg_gap=0.3030 | std_gap=0.0938 | q80_gap=0.3729 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.3030 (raw=0.3030) | saving candidate: 784104864319097.pth
+[TRAIN] Step 11/30 | 12:04:47
+[TRAIN] Step 11 | Loss=0.135122 | Best makespan in group=1677.00
+[TRAIN] Step 12/30 | 12:07:32
+[TRAIN] Step 12 | Loss=3.226831 | Best makespan in group=1606.00
+[TRAIN] Step 13/30 | 12:10:54
+[TRAIN] Step 13 | Loss=2.795152 | Best makespan in group=1700.00
+[TRAIN] Step 14/30 | 12:14:40
+[TRAIN] Step 14 | Loss=2.018758 | Best makespan in group=1675.00
+[TRAIN] Step 15/30 | 12:18:18
+[TRAIN] Step 15 | Loss=0.693411 | Best makespan in group=1530.00
+[TRAIN] Step 16/30 | 12:21:08
+[TRAIN] Step 16 | Loss=3.403301 | Best makespan in group=1617.00
+[TRAIN] Step 17/30 | 12:24:39
+[TRAIN] Step 17 | Loss=1.354883 | Best makespan in group=2067.00
+[TRAIN] Step 18/30 | 12:28:08
+[TRAIN] Step 18 | Loss=3.680321 | Best makespan in group=1395.00
+[TRAIN] Step 19/30 | 12:30:55
+[TRAIN] Step 19 | Loss=0.361756 | Best makespan in group=1584.00
+[TRAIN] Step 20/30 | 12:33:41
+[TRAIN] Step 20 | Loss=1.510809 | Best makespan in group=2286.00
+[TRAIN][VAL][ep 20] avg_gap=0.3111 | std_gap=0.1127 | q80_gap=0.4132 | n=40
+[TRAIN] Step 21/30 | 12:39:35
+[TRAIN] Step 21 | Loss=3.396576 | Best makespan in group=1371.00
+[TRAIN] Step 22/30 | 12:43:01
+[TRAIN] Step 22 | Loss=2.548994 | Best makespan in group=1484.00
+[TRAIN] Step 23/30 | 12:47:15
+[TRAIN] Step 23 | Loss=0.341324 | Best makespan in group=1496.00
+[TRAIN] Step 24/30 | 12:51:50
+[TRAIN] Step 24 | Loss=2.562504 | Best makespan in group=1500.00
+[TRAIN] Step 25/30 | 12:54:40
+[TRAIN] Step 25 | Loss=0.128702 | Best makespan in group=1718.00
+[TRAIN] Step 26/30 | 12:57:21
+[TRAIN] Step 26 | Loss=1.166039 | Best makespan in group=1532.00
+[TRAIN] Step 27/30 | 12:59:41
+[TRAIN] Step 27 | Loss=1.398224 | Best makespan in group=1567.00
+[TRAIN] Step 28/30 | 13:02:46
+[TRAIN] Step 28 | Loss=4.779347 | Best makespan in group=1457.00
+[TRAIN] Step 29/30 | 13:06:33
+[TRAIN] Step 29 | Loss=0.070247 | Best makespan in group=1268.00
+[TRAIN] Step 30/30 | 13:09:26
+[TRAIN] Step 30 | Loss=1.794045 | Best makespan in group=1326.00
+[TRAIN][VAL][ep 30] avg_gap=0.3008 | std_gap=0.1077 | q80_gap=0.3885 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/784104864319097.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.3326 | std_gap=0.0974 | q80_gap=0.4172 | n=40
+[TRAIN][13:17:01] Training ended. Validation history and plots updated.
+[I 2026-09-28 13:17:01,769] Trial 5 finished with value: 0.3884950510482425 and parameters: {'n_cases': 40, 'batch_size': 128, 'lr': 0.0012962378302375805, 'hidden_channels': 256, 'K': 64, 'use_greedy': False, 'sel_k': 2}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 6 | gnn_type=gin | episodes=30 | lr=2.97e-03 | hidden=128 | layers=3 | heads=3 | K=64 | use_greedy=False | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 13:17:01
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=64 | K=64 | use_greedy=False | lr=0.0029743734066098857 (decaying to 5.95e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_6
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=6 | bc_loss=2.6964 | decisions=55
+[TRAIN][WARMSTART] step 10/100 | instance=23 | bc_loss=2.8466 | decisions=49
+[TRAIN][WARMSTART] step 15/100 | instance=14 | bc_loss=2.5983 | decisions=50
+[TRAIN][WARMSTART] step 20/100 | instance=17 | bc_loss=2.6009 | decisions=55
+[TRAIN][WARMSTART] step 25/100 | instance=62 | bc_loss=2.1478 | decisions=44
+[TRAIN][WARMSTART] step 30/100 | instance=32 | bc_loss=2.3140 | decisions=40
+[TRAIN][WARMSTART] step 35/100 | instance=9 | bc_loss=1.9704 | decisions=48
+[TRAIN][WARMSTART] step 40/100 | instance=54 | bc_loss=2.0237 | decisions=45
+[TRAIN][WARMSTART] step 45/100 | instance=71 | bc_loss=2.3013 | decisions=56
+[TRAIN][WARMSTART] step 50/100 | instance=62 | bc_loss=1.8512 | decisions=44
+[TRAIN][WARMSTART] step 55/100 | instance=15 | bc_loss=2.0607 | decisions=47
+[TRAIN][WARMSTART] step 60/100 | instance=68 | bc_loss=2.1726 | decisions=51
+[TRAIN][WARMSTART] step 65/100 | instance=3 | bc_loss=1.9764 | decisions=53
+[TRAIN][WARMSTART] step 70/100 | instance=34 | bc_loss=2.0444 | decisions=44
+[TRAIN][WARMSTART] step 75/100 | instance=70 | bc_loss=2.3413 | decisions=51
+[TRAIN][WARMSTART] step 80/100 | instance=34 | bc_loss=2.0759 | decisions=44
+[TRAIN][WARMSTART] step 85/100 | instance=15 | bc_loss=2.0765 | decisions=47
+[TRAIN][WARMSTART] step 90/100 | instance=37 | bc_loss=1.8493 | decisions=43
+[TRAIN][WARMSTART] step 95/100 | instance=10 | bc_loss=1.7029 | decisions=43
+[TRAIN][WARMSTART] step 100/100 | instance=58 | bc_loss=1.8180 | decisions=59
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 13:21:40
+[TRAIN] Step 1 | Loss=9.430854 | Best makespan in group=1558.00
+[TRAIN] Step 2/30 | 13:23:11
+[TRAIN] Step 2 | Loss=1.638901 | Best makespan in group=2121.00
+[TRAIN] Step 3/30 | 13:24:05
+[TRAIN] Step 3 | Loss=1.139640 | Best makespan in group=2116.00
+[TRAIN] Step 4/30 | 13:25:05
+[TRAIN] Step 4 | Loss=2.739539 | Best makespan in group=1826.00
+[TRAIN] Step 5/30 | 13:26:22
+[TRAIN] Step 5 | Loss=3.570353 | Best makespan in group=1794.00
+[TRAIN] Step 6/30 | 13:27:22
+[TRAIN] Step 6 | Loss=3.214621 | Best makespan in group=1995.00
+[TRAIN] Step 7/30 | 13:28:20
+[TRAIN] Step 7 | Loss=0.648572 | Best makespan in group=3083.00
+[TRAIN] Step 8/30 | 13:29:40
+[TRAIN] Step 8 | Loss=2.355290 | Best makespan in group=1711.00
+[TRAIN] Step 9/30 | 13:30:45
+[TRAIN] Step 9 | Loss=5.791083 | Best makespan in group=2295.00
+[TRAIN] Step 10/30 | 13:32:15
+[TRAIN] Step 10 | Loss=1.204832 | Best makespan in group=2263.00
+[TRAIN][VAL][ep 10] avg_gap=1.0788 | std_gap=0.7655 | q80_gap=1.7857 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.0788 (raw=1.0788) | saving candidate: 974419066909777.pth
+[TRAIN] Step 11/30 | 13:35:16
+[TRAIN] Step 11 | Loss=5.370844 | Best makespan in group=2067.00
+[TRAIN] Step 12/30 | 13:36:18
+[TRAIN] Step 12 | Loss=2.135097 | Best makespan in group=1210.00
+[TRAIN] Step 13/30 | 13:37:28
+[TRAIN] Step 13 | Loss=6.114402 | Best makespan in group=2117.00
+[TRAIN] Step 14/30 | 13:38:33
+[TRAIN] Step 14 | Loss=2.309325 | Best makespan in group=2622.00
+[TRAIN] Step 15/30 | 13:39:51
+[TRAIN] Step 15 | Loss=4.998512 | Best makespan in group=1769.00
+[TRAIN] Step 16/30 | 13:41:04
+[TRAIN] Step 16 | Loss=2.522025 | Best makespan in group=1871.00
+[TRAIN] Step 17/30 | 13:42:02
+[TRAIN] Step 17 | Loss=8.583478 | Best makespan in group=1993.00
+[TRAIN] Step 18/30 | 13:42:59
+[TRAIN] Step 18 | Loss=5.351134 | Best makespan in group=2123.00
+[TRAIN] Step 19/30 | 13:44:02
+[TRAIN] Step 19 | Loss=3.698829 | Best makespan in group=1523.00
+[TRAIN] Step 20/30 | 13:45:38
+[TRAIN] Step 20 | Loss=1.779706 | Best makespan in group=1784.00
+[TRAIN][VAL][ep 20] avg_gap=0.9029 | std_gap=0.6596 | q80_gap=1.5006 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.9908 (raw=0.9029) | saving candidate: 632443198431854.pth
+[TRAIN] Step 21/30 | 13:48:25
+[TRAIN] Step 21 | Loss=1.387628 | Best makespan in group=2926.00
+[TRAIN] Step 22/30 | 13:49:40
+[TRAIN] Step 22 | Loss=3.568536 | Best makespan in group=2131.00
+[TRAIN] Step 23/30 | 13:50:39
+[TRAIN] Step 23 | Loss=0.552214 | Best makespan in group=2088.00
+[TRAIN] Step 24/30 | 13:52:10
+[TRAIN] Step 24 | Loss=11.316445 | Best makespan in group=1650.00
+[TRAIN] Step 25/30 | 13:53:08
+[TRAIN] Step 25 | Loss=5.284804 | Best makespan in group=2359.00
+[TRAIN] Step 26/30 | 13:54:10
+[TRAIN] Step 26 | Loss=1.393080 | Best makespan in group=2817.00
+[TRAIN] Step 27/30 | 13:55:17
+[TRAIN] Step 27 | Loss=5.013432 | Best makespan in group=2287.00
+[TRAIN] Step 28/30 | 13:56:23
+[TRAIN] Step 28 | Loss=5.419941 | Best makespan in group=1991.00
+[TRAIN] Step 29/30 | 13:57:32
+[TRAIN] Step 29 | Loss=2.004401 | Best makespan in group=1377.00
+[TRAIN] Step 30/30 | 13:58:43
+[TRAIN] Step 30 | Loss=2.666442 | Best makespan in group=2282.00
+[TRAIN][VAL][ep 30] avg_gap=0.8107 | std_gap=0.5661 | q80_gap=1.3194 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.9308 (raw=0.8107) | saving candidate: 24134741503183.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/24134741503183.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.7811 | std_gap=0.5651 | q80_gap=1.5312 | n=40
+[TRAIN][14:03:28] Training ended. Validation history and plots updated.
+[I 2026-09-28 14:03:28,578] Trial 6 finished with value: 1.319409426213021 and parameters: {'n_cases': 80, 'batch_size': 64, 'lr': 0.0029743734066098857, 'hidden_channels': 128, 'K': 64, 'use_greedy': False, 'sel_k': 3}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 7 | gnn_type=gin | episodes=30 | lr=2.13e-04 | hidden=256 | layers=3 | heads=3 | K=64 | use_greedy=True | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 14:03:28
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=128 | K=64 | use_greedy=True | lr=0.0002126581181895436 (decaying to 4.25e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_7
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=45 | bc_loss=2.8114 | decisions=54
+[TRAIN][WARMSTART] step 10/100 | instance=54 | bc_loss=2.3504 | decisions=46
+[TRAIN][WARMSTART] step 15/100 | instance=71 | bc_loss=2.2150 | decisions=49
+[TRAIN][WARMSTART] step 20/100 | instance=26 | bc_loss=2.2332 | decisions=47
+[TRAIN][WARMSTART] step 25/100 | instance=76 | bc_loss=2.2688 | decisions=50
+[TRAIN][WARMSTART] step 30/100 | instance=43 | bc_loss=2.3793 | decisions=56
+[TRAIN][WARMSTART] step 35/100 | instance=10 | bc_loss=2.1872 | decisions=56
+[TRAIN][WARMSTART] step 40/100 | instance=69 | bc_loss=2.0752 | decisions=48
+[TRAIN][WARMSTART] step 45/100 | instance=61 | bc_loss=1.7236 | decisions=45
+[TRAIN][WARMSTART] step 50/100 | instance=48 | bc_loss=2.0428 | decisions=55
+[TRAIN][WARMSTART] step 55/100 | instance=48 | bc_loss=2.1572 | decisions=55
+[TRAIN][WARMSTART] step 60/100 | instance=53 | bc_loss=2.0024 | decisions=50
+[TRAIN][WARMSTART] step 65/100 | instance=75 | bc_loss=1.9901 | decisions=49
+[TRAIN][WARMSTART] step 70/100 | instance=79 | bc_loss=2.0391 | decisions=58
+[TRAIN][WARMSTART] step 75/100 | instance=23 | bc_loss=2.2677 | decisions=54
+[TRAIN][WARMSTART] step 80/100 | instance=73 | bc_loss=1.9780 | decisions=53
+[TRAIN][WARMSTART] step 85/100 | instance=17 | bc_loss=2.0363 | decisions=58
+[TRAIN][WARMSTART] step 90/100 | instance=6 | bc_loss=2.1090 | decisions=57
+[TRAIN][WARMSTART] step 95/100 | instance=71 | bc_loss=2.1049 | decisions=49
+[TRAIN][WARMSTART] step 100/100 | instance=13 | bc_loss=1.8210 | decisions=43
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 14:12:36
+[TRAIN] Step 1 | Loss=6.170826 | Best makespan in group=1602.00
+[TRAIN] Step 2/30 | 14:16:28
+[TRAIN] Step 2 | Loss=13.170135 | Best makespan in group=2028.00
+[TRAIN] Step 3/30 | 14:18:59
+[TRAIN] Step 3 | Loss=4.932708 | Best makespan in group=2567.00
+[TRAIN] Step 4/30 | 14:22:57
+[TRAIN] Step 4 | Loss=1.892710 | Best makespan in group=1497.00
+[TRAIN] Step 5/30 | 14:27:49
+[TRAIN] Step 5 | Loss=0.630076 | Best makespan in group=1950.00
+[TRAIN] Step 6/30 | 14:31:01
+[TRAIN] Step 6 | Loss=0.143303 | Best makespan in group=1603.00
+[TRAIN] Step 7/30 | 14:35:45
+[TRAIN] Step 7 | Loss=1.582362 | Best makespan in group=1531.00
+[TRAIN] Step 8/30 | 14:39:04
+[TRAIN] Step 8 | Loss=7.040923 | Best makespan in group=1947.00
+[TRAIN] Step 9/30 | 14:42:52
+[TRAIN] Step 9 | Loss=1.095895 | Best makespan in group=1623.00
+[TRAIN] Step 10/30 | 14:48:11
+[TRAIN] Step 10 | Loss=2.431956 | Best makespan in group=2129.00
+[TRAIN][VAL][ep 10] avg_gap=0.7609 | std_gap=0.4892 | q80_gap=1.2991 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.7609 (raw=0.7609) | saving candidate: 309551648692837.pth
+[TRAIN] Step 11/30 | 14:54:05
+[TRAIN] Step 11 | Loss=4.406385 | Best makespan in group=1346.00
+[TRAIN] Step 12/30 | 14:58:58
+[TRAIN] Step 12 | Loss=3.962986 | Best makespan in group=1486.00
+[TRAIN] Step 13/30 | 15:03:12
+[TRAIN] Step 13 | Loss=0.662204 | Best makespan in group=1906.00
+[TRAIN] Step 14/30 | 15:06:55
+[TRAIN] Step 14 | Loss=0.847994 | Best makespan in group=2011.00
+[TRAIN] Step 15/30 | 15:10:39
+[TRAIN] Step 15 | Loss=0.312205 | Best makespan in group=1988.00
+[TRAIN] Step 16/30 | 15:13:59
+[TRAIN] Step 16 | Loss=2.278158 | Best makespan in group=1953.00
+[TRAIN] Step 17/30 | 15:18:50
+[TRAIN] Step 17 | Loss=5.296515 | Best makespan in group=2087.00
+[TRAIN] Step 18/30 | 15:23:35
+[TRAIN] Step 18 | Loss=1.620105 | Best makespan in group=2092.00
+[TRAIN] Step 19/30 | 15:27:29
+[TRAIN] Step 19 | Loss=1.337813 | Best makespan in group=1741.00
+[TRAIN] Step 20/30 | 15:30:39
+[TRAIN] Step 20 | Loss=3.708189 | Best makespan in group=1447.00
+[TRAIN][VAL][ep 20] avg_gap=0.7971 | std_gap=0.5042 | q80_gap=1.3807 | n=40
+[TRAIN] Step 21/30 | 15:37:41
+[TRAIN] Step 21 | Loss=1.151857 | Best makespan in group=1217.00
+[TRAIN] Step 22/30 | 15:42:13
+[TRAIN] Step 22 | Loss=0.477667 | Best makespan in group=2188.00
+[TRAIN] Step 23/30 | 15:45:40
+[TRAIN] Step 23 | Loss=1.002387 | Best makespan in group=1772.00
+[TRAIN] Step 24/30 | 15:48:33
+[TRAIN] Step 24 | Loss=0.891752 | Best makespan in group=1374.00
+[TRAIN] Step 25/30 | 15:52:56
+[TRAIN] Step 25 | Loss=0.083658 | Best makespan in group=1968.00
+[TRAIN] Step 26/30 | 15:56:57
+[TRAIN] Step 26 | Loss=1.084501 | Best makespan in group=2062.00
+[TRAIN] Step 27/30 | 16:00:37
+[TRAIN] Step 27 | Loss=0.187729 | Best makespan in group=1616.00
+[TRAIN] Step 28/30 | 16:06:07
+[TRAIN] Step 28 | Loss=1.404021 | Best makespan in group=1249.00
+[TRAIN] Step 29/30 | 16:10:01
+[TRAIN] Step 29 | Loss=0.439333 | Best makespan in group=1591.00
+[TRAIN] Step 30/30 | 16:12:20
+[TRAIN] Step 30 | Loss=0.989077 | Best makespan in group=1275.00
+[TRAIN][VAL][ep 30] avg_gap=0.7895 | std_gap=0.5046 | q80_gap=1.2781 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/309551648692837.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.8012 | std_gap=0.5199 | q80_gap=1.3376 | n=40
+[TRAIN][16:20:49] Training ended. Validation history and plots updated.
+[I 2026-09-28 16:20:49,580] Trial 7 finished with value: 1.2780826446280993 and parameters: {'n_cases': 80, 'batch_size': 128, 'lr': 0.0002126581181895436, 'hidden_channels': 256, 'K': 64, 'use_greedy': True, 'sel_k': 3}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 8 | gnn_type=gin | episodes=30 | lr=2.02e-03 | hidden=256 | layers=3 | heads=3 | K=64 | use_greedy=True | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 16:20:49
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=40 | B=128 | K=64 | use_greedy=True | lr=0.0020244831112923374 (decaying to 4.05e-04)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=256 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_8
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=3 | bc_loss=3.2010 | decisions=48
+[TRAIN][WARMSTART] step 10/100 | instance=0 | bc_loss=3.1955 | decisions=54
+[TRAIN][WARMSTART] step 15/100 | instance=16 | bc_loss=3.0004 | decisions=46
+[TRAIN][WARMSTART] step 20/100 | instance=7 | bc_loss=3.0202 | decisions=54
+[TRAIN][WARMSTART] step 25/100 | instance=21 | bc_loss=2.6793 | decisions=42
+[TRAIN][WARMSTART] step 30/100 | instance=1 | bc_loss=2.9403 | decisions=52
+[TRAIN][WARMSTART] step 35/100 | instance=21 | bc_loss=2.6193 | decisions=42
+[TRAIN][WARMSTART] step 40/100 | instance=5 | bc_loss=2.4754 | decisions=49
+[TRAIN][WARMSTART] step 45/100 | instance=21 | bc_loss=2.4276 | decisions=42
+[TRAIN][WARMSTART] step 50/100 | instance=27 | bc_loss=2.2176 | decisions=49
+[TRAIN][WARMSTART] step 55/100 | instance=12 | bc_loss=2.2840 | decisions=43
+[TRAIN][WARMSTART] step 60/100 | instance=36 | bc_loss=2.6624 | decisions=51
+[TRAIN][WARMSTART] step 65/100 | instance=13 | bc_loss=2.3463 | decisions=47
+[TRAIN][WARMSTART] step 70/100 | instance=14 | bc_loss=2.4578 | decisions=54
+[TRAIN][WARMSTART] step 75/100 | instance=3 | bc_loss=2.4252 | decisions=48
+[TRAIN][WARMSTART] step 80/100 | instance=38 | bc_loss=2.1020 | decisions=47
+[TRAIN][WARMSTART] step 85/100 | instance=19 | bc_loss=2.2375 | decisions=56
+[TRAIN][WARMSTART] step 90/100 | instance=2 | bc_loss=2.2214 | decisions=53
+[TRAIN][WARMSTART] step 95/100 | instance=9 | bc_loss=2.3976 | decisions=56
+[TRAIN][WARMSTART] step 100/100 | instance=29 | bc_loss=2.3853 | decisions=56
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 16:29:05
+[TRAIN] Step 1 | Loss=3.908243 | Best makespan in group=1762.00
+[TRAIN] Step 2/30 | 16:33:17
+[TRAIN] Step 2 | Loss=2.355994 | Best makespan in group=2169.00
+[TRAIN] Step 3/30 | 16:36:04
+[TRAIN] Step 3 | Loss=0.598881 | Best makespan in group=1382.00
+[TRAIN] Step 4/30 | 16:38:50
+[TRAIN] Step 4 | Loss=2.468932 | Best makespan in group=2490.00
+[TRAIN] Step 5/30 | 16:41:45
+[TRAIN] Step 5 | Loss=0.820642 | Best makespan in group=1959.00
+[TRAIN] Step 6/30 | 16:45:28
+[TRAIN] Step 6 | Loss=0.648402 | Best makespan in group=1275.00
+[TRAIN] Step 7/30 | 16:48:37
+[TRAIN] Step 7 | Loss=2.363489 | Best makespan in group=1422.00
+[TRAIN] Step 8/30 | 16:51:43
+[TRAIN] Step 8 | Loss=11.406689 | Best makespan in group=2028.00
+[TRAIN] Step 9/30 | 16:55:52
+[TRAIN] Step 9 | Loss=8.455543 | Best makespan in group=1981.00
+[TRAIN] Step 10/30 | 16:58:54
+[TRAIN] Step 10 | Loss=2.006886 | Best makespan in group=1947.00
+[TRAIN][VAL][ep 10] avg_gap=1.1329 | std_gap=1.1980 | q80_gap=1.1898 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.1329 (raw=1.1329) | saving candidate: 459794418891158.pth
+[TRAIN] Step 11/30 | 17:04:22
+[TRAIN] Step 11 | Loss=-0.000000 | Best makespan in group=1602.00
+[TRAIN] Step 12/30 | 17:06:32
+[TRAIN] Step 12 | Loss=8.269973 | Best makespan in group=2676.00
+[TRAIN] Step 13/30 | 17:09:44
+[TRAIN] Step 13 | Loss=10.275300 | Best makespan in group=1943.00
+[TRAIN] Step 14/30 | 17:12:49
+[TRAIN] Step 14 | Loss=5.686424 | Best makespan in group=1943.00
+[TRAIN] Step 15/30 | 17:17:03
+[TRAIN] Step 15 | Loss=8.218417 | Best makespan in group=1769.00
+[TRAIN] Step 16/30 | 17:20:24
+[TRAIN] Step 16 | Loss=0.303649 | Best makespan in group=1616.00
+[TRAIN] Step 17/30 | 17:22:37
+[TRAIN] Step 17 | Loss=0.491879 | Best makespan in group=1975.00
+[TRAIN] Step 18/30 | 17:25:57
+[TRAIN] Step 18 | Loss=3.531167 | Best makespan in group=1566.00
+[TRAIN] Step 19/30 | 17:28:53
+[TRAIN] Step 19 | Loss=7.049783 | Best makespan in group=1532.00
+[TRAIN] Step 20/30 | 17:32:12
+[TRAIN] Step 20 | Loss=2.783386 | Best makespan in group=2411.00
+[TRAIN][VAL][ep 20] avg_gap=1.1006 | std_gap=0.7658 | q80_gap=1.3863 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.1167 (raw=1.1006) | saving candidate: 6673357815527.pth
+[TRAIN] Step 21/30 | 17:37:56
+[TRAIN] Step 21 | Loss=4.387505 | Best makespan in group=1246.00
+[TRAIN] Step 22/30 | 17:40:41
+[TRAIN] Step 22 | Loss=6.245347 | Best makespan in group=1364.00
+[TRAIN] Step 23/30 | 17:43:31
+[TRAIN] Step 23 | Loss=5.602653 | Best makespan in group=1904.00
+[TRAIN] Step 24/30 | 17:47:20
+[TRAIN] Step 24 | Loss=0.663670 | Best makespan in group=2239.00
+[TRAIN] Step 25/30 | 17:50:28
+[TRAIN] Step 25 | Loss=8.520993 | Best makespan in group=1889.00
+[TRAIN] Step 26/30 | 17:54:30
+[TRAIN] Step 26 | Loss=3.218495 | Best makespan in group=1698.00
+[TRAIN] Step 27/30 | 17:58:33
+[TRAIN] Step 27 | Loss=6.087597 | Best makespan in group=1407.00
+[TRAIN] Step 28/30 | 18:01:10
+[TRAIN] Step 28 | Loss=2.773259 | Best makespan in group=1272.00
+[TRAIN] Step 29/30 | 18:04:11
+[TRAIN] Step 29 | Loss=1.388733 | Best makespan in group=2200.00
+[TRAIN] Step 30/30 | 18:07:04
+[TRAIN] Step 30 | Loss=0.795812 | Best makespan in group=2175.00
+[TRAIN][VAL][ep 30] avg_gap=0.9723 | std_gap=0.5139 | q80_gap=1.3202 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.0686 (raw=0.9723) | saving candidate: 480226436564279.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/480226436564279.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.9074 | std_gap=0.3686 | q80_gap=1.2638 | n=40
+[TRAIN][18:14:48] Training ended. Validation history and plots updated.
+[I 2026-09-28 18:14:48,817] Trial 8 finished with value: 1.3202084589542598 and parameters: {'n_cases': 40, 'batch_size': 128, 'lr': 0.0020244831112923374, 'hidden_channels': 256, 'K': 64, 'use_greedy': True, 'sel_k': 5}. Best is trial 1 with value: 0.2998738253950879.
+[PARAM][OJM] Trial 9 | gnn_type=gin | episodes=30 | lr=3.42e-04 | hidden=128 | layers=3 | heads=3 | K=64 | use_greedy=False | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-28 18:14:48
+[TRAIN] Hyperparams | max_steps=30 | new_freq=100
+[TRAIN]             | n_cases=80 | B=128 | K=64 | use_greedy=False | lr=0.00034181570325113634 (decaying to 6.84e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=3 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gin | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\trial_9
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=1 | bc_loss=2.9994 | decisions=53
+[TRAIN][WARMSTART] step 10/100 | instance=24 | bc_loss=2.6811 | decisions=53
+[TRAIN][WARMSTART] step 15/100 | instance=79 | bc_loss=2.4138 | decisions=59
+[TRAIN][WARMSTART] step 20/100 | instance=71 | bc_loss=2.6035 | decisions=57
+[TRAIN][WARMSTART] step 25/100 | instance=73 | bc_loss=2.4775 | decisions=48
+[TRAIN][WARMSTART] step 30/100 | instance=17 | bc_loss=2.4803 | decisions=53
+[TRAIN][WARMSTART] step 35/100 | instance=68 | bc_loss=2.1398 | decisions=58
+[TRAIN][WARMSTART] step 40/100 | instance=7 | bc_loss=1.6372 | decisions=48
+[TRAIN][WARMSTART] step 45/100 | instance=18 | bc_loss=2.1363 | decisions=42
+[TRAIN][WARMSTART] step 50/100 | instance=52 | bc_loss=2.2585 | decisions=56
+[TRAIN][WARMSTART] step 55/100 | instance=58 | bc_loss=2.2958 | decisions=41
+[TRAIN][WARMSTART] step 60/100 | instance=60 | bc_loss=2.4720 | decisions=55
+[TRAIN][WARMSTART] step 65/100 | instance=8 | bc_loss=2.0071 | decisions=43
+[TRAIN][WARMSTART] step 70/100 | instance=62 | bc_loss=2.6482 | decisions=52
+[TRAIN][WARMSTART] step 75/100 | instance=0 | bc_loss=1.9695 | decisions=51
+[TRAIN][WARMSTART] step 80/100 | instance=32 | bc_loss=2.2186 | decisions=50
+[TRAIN][WARMSTART] step 85/100 | instance=62 | bc_loss=2.6119 | decisions=52
+[TRAIN][WARMSTART] step 90/100 | instance=48 | bc_loss=2.3245 | decisions=55
+[TRAIN][WARMSTART] step 95/100 | instance=3 | bc_loss=2.4716 | decisions=47
+[TRAIN][WARMSTART] step 100/100 | instance=9 | bc_loss=2.3012 | decisions=46
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 18:19:29
+[TRAIN] Step 1 | Loss=6.720238 | Best makespan in group=2084.00
+[TRAIN] Step 2/30 | 18:22:00
+[TRAIN] Step 2 | Loss=4.851595 | Best makespan in group=1859.00
+[TRAIN] Step 3/30 | 18:23:55
+[TRAIN] Step 3 | Loss=15.263865 | Best makespan in group=1590.00
+[TRAIN] Step 4/30 | 18:26:24
+[TRAIN] Step 4 | Loss=3.815203 | Best makespan in group=1942.00
+[TRAIN] Step 5/30 | 18:28:18
+[TRAIN] Step 5 | Loss=10.272779 | Best makespan in group=1643.00
+[TRAIN] Step 6/30 | 18:30:16
+[TRAIN] Step 6 | Loss=0.380440 | Best makespan in group=1553.00
+[TRAIN] Step 7/30 | 18:31:52
+[TRAIN] Step 7 | Loss=2.575418 | Best makespan in group=1709.00
+[TRAIN] Step 8/30 | 18:33:44
+[TRAIN] Step 8 | Loss=1.016791 | Best makespan in group=1309.00
+[TRAIN] Step 9/30 | 18:35:51
+[TRAIN] Step 9 | Loss=3.043832 | Best makespan in group=1591.00
+[TRAIN] Step 10/30 | 18:38:13
+[TRAIN] Step 10 | Loss=1.581190 | Best makespan in group=1664.00
+[TRAIN][VAL][ep 10] avg_gap=1.0716 | std_gap=1.0599 | q80_gap=1.3143 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=1.0716 (raw=1.0716) | saving candidate: 122076369436490.pth
+[TRAIN] Step 11/30 | 18:42:47
+[TRAIN] Step 11 | Loss=0.988761 | Best makespan in group=1954.00
+[TRAIN] Step 12/30 | 18:45:20
+[TRAIN] Step 12 | Loss=0.114777 | Best makespan in group=2251.00
+[TRAIN] Step 13/30 | 18:47:17
+[TRAIN] Step 13 | Loss=4.552796 | Best makespan in group=1339.00
+[TRAIN] Step 14/30 | 18:49:08
+[TRAIN] Step 14 | Loss=3.855692 | Best makespan in group=2164.00
+[TRAIN] Step 15/30 | 18:50:58
+[TRAIN] Step 15 | Loss=1.370112 | Best makespan in group=1961.00
+[TRAIN] Step 16/30 | 18:53:28
+[TRAIN] Step 16 | Loss=0.562823 | Best makespan in group=1783.00
+[TRAIN] Step 17/30 | 18:56:02
+[TRAIN] Step 17 | Loss=2.019908 | Best makespan in group=1765.00
+[TRAIN] Step 18/30 | 18:57:58
+[TRAIN] Step 18 | Loss=0.486098 | Best makespan in group=2375.00
+[TRAIN] Step 19/30 | 19:00:13
+[TRAIN] Step 19 | Loss=1.875145 | Best makespan in group=1448.00
+[TRAIN] Step 20/30 | 19:02:39
+[TRAIN] Step 20 | Loss=1.010859 | Best makespan in group=2360.00
+[TRAIN][VAL][ep 20] avg_gap=1.1503 | std_gap=1.0944 | q80_gap=1.3189 | n=40
+[TRAIN] Step 21/30 | 19:06:48
+[TRAIN] Step 21 | Loss=1.767583 | Best makespan in group=1412.00
+[TRAIN] Step 22/30 | 19:09:48
+[TRAIN] Step 22 | Loss=0.790182 | Best makespan in group=2096.00
+[TRAIN] Step 23/30 | 19:12:16
+[TRAIN] Step 23 | Loss=0.158323 | Best makespan in group=1431.00
+[TRAIN] Step 24/30 | 19:14:04
+[TRAIN] Step 24 | Loss=0.285726 | Best makespan in group=1502.00
+[TRAIN] Step 25/30 | 19:16:14
+[TRAIN] Step 25 | Loss=0.087895 | Best makespan in group=1418.00
+[TRAIN] Step 26/30 | 19:18:48
+[TRAIN] Step 26 | Loss=0.245573 | Best makespan in group=2096.00
+[TRAIN] Step 27/30 | 19:21:05
+[TRAIN] Step 27 | Loss=0.420363 | Best makespan in group=2252.00
+[TRAIN] Step 28/30 | 19:22:57
+[TRAIN] Step 28 | Loss=1.151888 | Best makespan in group=1377.00
+[TRAIN] Step 29/30 | 19:24:45
+[TRAIN] Step 29 | Loss=0.027801 | Best makespan in group=1617.00
+[TRAIN] Step 30/30 | 19:27:17
+[TRAIN] Step 30 | Loss=0.918213 | Best makespan in group=1572.00
+[TRAIN][VAL][ep 30] avg_gap=1.1003 | std_gap=1.1029 | q80_gap=1.1494 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/122076369436490.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=1.1515 | std_gap=1.1510 | q80_gap=1.0865 | n=40
+[TRAIN][19:32:39] Training ended. Validation history and plots updated.
+[I 2026-09-28 19:32:39,097] Trial 9 finished with value: 1.14936291342852 and parameters: {'n_cases': 80, 'batch_size': 128, 'lr': 0.00034181570325113634, 'hidden_channels': 128, 'K': 64, 'use_greedy': False, 'sel_k': 5}. Best is trial 1 with value: 0.2998738253950879.
+----------------------------------------------------------------------
+[PARAM] Tuning completed. Summary -> results\optuna\tuning_summary_1790620359.json
+[PARAM] Ranking by last_val_Q80 (lower is better):
+  1. OJM | last_val_Q80=0.299874
+----------------------------------------------------------------------
+[MAIN] Run finished at 2026-09-28 19:32:39
+============================================================

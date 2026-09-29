@@ -1,0 +1,40 @@
+[
+  {
+    "representation": "ojm",
+    "gnn_type": "gat",
+    "study_name": "fjsp_tuning_ojm_exgreedyFalse_logpsum_L2",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [
+      "lr",
+      "hidden_channels",
+      "batch_size",
+      "num_layers",
+      "heads",
+      "n_cases",
+      "new_freq",
+      "K",
+      "use_greedy",
+      "mask_option",
+      "sel_k"
+    ],
+    "n_trials": 12,
+    "best_value": 0.1259263181863916,
+    "best_params": {
+      "n_cases": 40,
+      "batch_size": 64,
+      "lr": 0.004706996523414971,
+      "hidden_channels": 128,
+      "K": 64,
+      "use_greedy": false,
+      "sel_k": 1
+    },
+    "best_user_attrs": {
+      "run_name": "optuna_ojm_gat_exgreedyFalse_logpsum_L2_1790519400/trial_5",
+      "gnn_type": "gat",
+      "run_dir": "results\\optuna_ojm_gat_exgreedyFalse_logpsum_L2_1790519400\\trial_5",
+      "best_difference": 0.0,
+      "total_runtime_sec": 3282.23956489563,
+      "best_val_avg_gap": 0.09475959846997425
+    }
+  }
+]

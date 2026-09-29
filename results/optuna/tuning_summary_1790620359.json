@@ -1,0 +1,40 @@
+[
+  {
+    "representation": "ojm",
+    "gnn_type": "gin",
+    "study_name": "fjsp_tuning_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [
+      "lr",
+      "hidden_channels",
+      "batch_size",
+      "num_layers",
+      "heads",
+      "n_cases",
+      "new_freq",
+      "K",
+      "use_greedy",
+      "mask_option",
+      "sel_k"
+    ],
+    "n_trials": 10,
+    "best_value": 0.2998738253950879,
+    "best_params": {
+      "n_cases": 80,
+      "batch_size": 128,
+      "lr": 0.0003654769917956456,
+      "hidden_channels": 256,
+      "K": 64,
+      "use_greedy": false,
+      "sel_k": 2
+    },
+    "best_user_attrs": {
+      "run_name": "optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365/trial_1",
+      "gnn_type": "gin",
+      "run_dir": "results\\optuna_ojm_gin_exgreedyFalse_logpsum_L3_selkin2-3-5_1790563365\\trial_1",
+      "best_difference": 0.02351764315884841,
+      "total_runtime_sec": 7105.247558355331,
+      "best_val_avg_gap": 0.2550518640117873
+    }
+  }
+]
