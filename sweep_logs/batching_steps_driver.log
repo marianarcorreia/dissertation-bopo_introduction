@@ -1,0 +1,24 @@
+[SWEEP 09-28 15:01:48] start batching_gat_L2_ojmb_node_s42_steps
+[SWEEP 09-28 19:11:39] done batching_gat_L2_ojmb_node_s42_steps in 4.16 h
+[SWEEP 09-28 19:11:39]   batching_gat_L2_ojmb_node_s42_steps: best=candidate_models/796096899412646.pth | val_gap=0.14148224305199353 | test_gap=0.12634250469907538
+[SWEEP 09-28 19:11:39] start batching_gat_L2_ojmb_edge_s42_steps
+[SWEEP 09-28 23:36:02] done batching_gat_L2_ojmb_edge_s42_steps in 4.41 h
+[SWEEP 09-28 23:36:02]   batching_gat_L2_ojmb_edge_s42_steps: best=candidate_models/683173606461368.pth | val_gap=0.135146985507327 | test_gap=0.10847524657454902
+[SWEEP 09-28 23:36:02] start batching_gat_L2_ojmb_base_s42_steps
+[SWEEP 09-29 02:13:53] done batching_gat_L2_ojmb_base_s42_steps in 2.63 h
+[SWEEP 09-29 02:13:53]   batching_gat_L2_ojmb_base_s42_steps: best=candidate_models/951042479229448.pth | val_gap=0.15705972729079423 | test_gap=0.12587901254365713
+[SWEEP 09-29 02:13:53] start report_metrics_batching_gat_L2_s42_steps on {'ojmb_node': '796096899412646.pth', 'ojmb_edge': '683173606461368.pth', 'ojmb_base': '951042479229448.pth'}
+[SWEEP 09-29 02:17:20] done report_metrics_batching_gat_L2_s42_steps in 3 min
+[SWEEP 09-29 02:17:20] start batching_gat_L2_ojmb_node_s43_steps
+[SWEEP 09-29 05:50:28] done batching_gat_L2_ojmb_node_s43_steps in 3.55 h
+[SWEEP 09-29 05:50:28]   batching_gat_L2_ojmb_node_s43_steps: best=candidate_models/690574809317532.pth | val_gap=0.15678096380438988 | test_gap=0.15296860127919087
+[SWEEP 09-29 05:50:28] start batching_gat_L2_ojmb_edge_s43_steps
+[SWEEP 09-29 08:43:55] done batching_gat_L2_ojmb_edge_s43_steps in 2.89 h
+[SWEEP 09-29 08:43:55]   batching_gat_L2_ojmb_edge_s43_steps: best=candidate_models/429848009625277.pth | val_gap=0.156359362970693 | test_gap=0.11777106442339402
+[SWEEP 09-29 08:43:55] start batching_gat_L2_ojmb_base_s43_steps
+[SWEEP 09-29 12:22:09] done batching_gat_L2_ojmb_base_s43_steps in 3.64 h
+[SWEEP 09-29 12:22:09]   batching_gat_L2_ojmb_base_s43_steps: best=candidate_models/751138358325447.pth | val_gap=0.12854173865711563 | test_gap=0.14056812383683187
+[SWEEP 09-29 12:22:09] start report_metrics_batching_gat_L2_s43_steps on {'ojmb_node': '690574809317532.pth', 'ojmb_edge': '429848009625277.pth', 'ojmb_base': '751138358325447.pth'}
+[SWEEP 09-29 12:27:39] done report_metrics_batching_gat_L2_s43_steps in 5 min
+[SWEEP 09-29 12:27:39] start batching_gat_L2_ojmb_node_s44_steps
+[SWEEP 09-29 12:27:51] stopped after seed 43 (waiting for a new representation)
