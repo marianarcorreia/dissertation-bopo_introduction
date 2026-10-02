@@ -1,0 +1,13 @@
+NOTE: runs also differ in mask_option: ['0', '1', 'unknown']
+NOTE: runs also differ in seed: ['42', 'unknown']
+NOTE: runs also differ in logp_norm: ['mean', 'sum', 'unknown']
+                              run_name    gnn_type sel_k mask_option seed logp_norm  episodes_completed  best_val_gap  test_gap  test_std  generalization_gap  late_slope_per100ep  converged
+              ablation_ojm_gat_layers3         gat     1        None None      None                 400      0.130520  0.129554  0.071545           -0.000966             0.001393       True
+                    train_sel-k100_400         gat   100           0 None      mean                 100      1.008993  1.057245  1.082495            0.048252             0.148188      False
+              ablation_ojm_gin_layers3         gin     1        None None      None                 400      0.107720  0.120170  0.050190            0.012450            -0.018648       True
+            train_sel-k100_400_gin_ojm         gin   100           0 None      mean                 100      0.993776  0.904659  1.372920           -0.089117             0.306042      False
+      ablation_ojm_transformer_layers3 transformer     1        None None      None                 400      0.093555  0.094443  0.044060            0.000888            -0.002109       True
+          train_sel-k100_400_trans_ojm transformer   100           0 None      mean                 100      0.133208  0.145530  0.066267            0.012322            -0.137968      False
+ablation_ojm_transformer_layers3_selk2 transformer     2           1   42       sum                 400      0.123207  0.128430  0.050917            0.005223            -0.003984       True
+
+Saved CSV and figures to C:\Users\maria\Desktop\dissertation-bopo_introduction\results\compare_sel_k_ojm_per_gnn_type

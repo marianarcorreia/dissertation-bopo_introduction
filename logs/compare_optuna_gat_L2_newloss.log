@@ -1,0 +1,13 @@
+C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+[EVAL] T0: 946432070071051.pth on test_dataset (40 instances) ...
+[EVAL] T1: 51228276192235.pth on test_dataset (40 instances) ...
+[EVAL] T2: 706480019544866.pth on test_dataset (40 instances) ...
+[EVAL] T3: 337849195950506.pth on test_dataset (40 instances) ...
+ trial  objective_last_val_q80  n_cases  batch_size        lr  hidden_channels  K  use_greedy  sel_k  best_val_avg_gap  test_avg_gap  test_q80_gap  runtime_min  eval_relative_error  eval_scheduling_score  eval_feasibility_rate
+     3                  0.2064       40          64  0.003293              256 64        True      1            0.2095        0.1849        0.2302        89.09               0.1849                 0.8473                      1
+     1                  0.9408       40         128 0.0005604              128 32       False     10            0.7719        0.5585        0.7653        69.32               0.5585                 0.6823                      1
+     0                   1.116       80          64 0.0001026              128 32        True      1            0.9571        0.9793         1.208         42.5               0.9793                 0.5134                      1
+     2                   1.449       80          64 0.0008205              128 64        True     10             1.011        0.9143         1.646        48.34               0.9143                 0.5794                      1
+
+4 trials, 36 figures -> C:\Users\maria\Desktop\dissertation-bopo_introduction\results\compare_optuna_gat_L2_newloss
