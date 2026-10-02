@@ -1,0 +1,37 @@
+[SWEEP 10-01 14:52:53] skip batching_gat_L2_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-01 14:52:53]   batching_gat_L2_ojmb_node_v2_s43_steps: best=candidate_models/896415652061583.pth | val_gap=0.16513149615162678 | test_gap=0.149810347893998
+[SWEEP 10-01 14:52:53] skip batching_gat_L2_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-01 14:52:53]   batching_gat_L2_ojmb_edge_v2_s43_steps: best=candidate_models/353679720639032.pth | val_gap=0.14706266167774829 | test_gap=0.12560979907148942
+[SWEEP 10-01 14:52:53] skip batching_gat_L2_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-01 14:52:53]   batching_gat_L2_ojmb_base_v2_s43_steps: best=candidate_models/17360939543554.pth | val_gap=0.13681653876021516 | test_gap=0.13448326347718903
+[SWEEP 10-01 14:52:53] skip batching_gat_L2_ojmb_feat_v2_s43_steps (already complete)
+[SWEEP 10-01 14:52:53]   batching_gat_L2_ojmb_feat_v2_s43_steps: best=candidate_models/482729522553108.pth | val_gap=0.15218438184416933 | test_gap=0.12464904135660566
+[SWEEP 10-01 14:52:53] skip report_metrics_batching_v2_gat_L2_s43_steps (already exists)
+[SWEEP 10-01 14:52:53] start batching_gin_L3_k5_ojmb_node_v2_s43_steps
+[SWEEP 10-01 17:37:58] FAILED (exit 1073807364) batching_gin_L3_k5_ojmb_node_v2_s43_steps in 2.75 h
+[SWEEP 10-01 17:37:58] start batching_gin_L3_k5_ojmb_edge_v2_s43_steps
+[SWEEP 10-01 17:37:59] FAILED (exit 3221226091) batching_gin_L3_k5_ojmb_edge_v2_s43_steps in 0.00 h
+[SWEEP 10-01 17:37:59] start batching_gin_L3_k5_ojmb_base_v2_s43_steps
+[SWEEP 10-01 17:37:59] FAILED (exit 3221226091) batching_gin_L3_k5_ojmb_base_v2_s43_steps in 0.00 h
+[SWEEP 10-01 17:37:59] start batching_gin_L3_k5_ojmb_feat_v2_s43_steps
+[SWEEP 10-01 17:37:59] FAILED (exit 3221226091) batching_gin_L3_k5_ojmb_feat_v2_s43_steps in 0.00 h
+[SWEEP 10-01 17:37:59] no checkpoint for report_metrics_batching_v2_gin_L3_k5_s43_steps
+[SWEEP 10-01 17:37:59] start batching_gat_L2_ojmb_node_v2_s44_steps
+[SWEEP 10-01 17:38:00] FAILED (exit 3221226091) batching_gat_L2_ojmb_node_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:00] start batching_gat_L2_ojmb_edge_v2_s44_steps
+[SWEEP 10-01 17:38:00] FAILED (exit 3221226091) batching_gat_L2_ojmb_edge_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:00] start batching_gat_L2_ojmb_base_v2_s44_steps
+[SWEEP 10-01 17:38:00] FAILED (exit 3221226091) batching_gat_L2_ojmb_base_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:00] start batching_gat_L2_ojmb_feat_v2_s44_steps
+[SWEEP 10-01 17:38:00] FAILED (exit 3221226091) batching_gat_L2_ojmb_feat_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:00] no checkpoint for report_metrics_batching_v2_gat_L2_s44_steps
+[SWEEP 10-01 17:38:00] start batching_gin_L3_k5_ojmb_node_v2_s44_steps
+[SWEEP 10-01 17:38:00] FAILED (exit 3221226091) batching_gin_L3_k5_ojmb_node_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:00] start batching_gin_L3_k5_ojmb_edge_v2_s44_steps
+[SWEEP 10-01 17:38:00] FAILED (exit 3221226091) batching_gin_L3_k5_ojmb_edge_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:00] start batching_gin_L3_k5_ojmb_base_v2_s44_steps
+[SWEEP 10-01 17:38:01] FAILED (exit 3221226091) batching_gin_L3_k5_ojmb_base_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:01] start batching_gin_L3_k5_ojmb_feat_v2_s44_steps
+[SWEEP 10-01 17:38:01] FAILED (exit 3221226091) batching_gin_L3_k5_ojmb_feat_v2_s44_steps in 0.00 h
+[SWEEP 10-01 17:38:01] no checkpoint for report_metrics_batching_v2_gin_L3_k5_s44_steps
+[SWEEP 10-01 17:38:01] sweep finished

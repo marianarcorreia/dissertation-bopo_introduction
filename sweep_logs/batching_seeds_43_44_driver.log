@@ -1,0 +1,53 @@
+[SWEEP 10-01 22:57:01] skip batching_gat_L2_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-01 22:57:02]   batching_gat_L2_ojmb_node_v2_s43_steps: best=candidate_models/896415652061583.pth | val_gap=0.16513149615162678 | test_gap=0.149810347893998
+[SWEEP 10-01 22:57:02] skip batching_gat_L2_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-01 22:57:02]   batching_gat_L2_ojmb_edge_v2_s43_steps: best=candidate_models/353679720639032.pth | val_gap=0.14706266167774829 | test_gap=0.12560979907148942
+[SWEEP 10-01 22:57:02] skip batching_gat_L2_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-01 22:57:02]   batching_gat_L2_ojmb_base_v2_s43_steps: best=candidate_models/17360939543554.pth | val_gap=0.13681653876021516 | test_gap=0.13448326347718903
+[SWEEP 10-01 22:57:02] skip batching_gat_L2_ojmb_feat_v2_s43_steps (already complete)
+[SWEEP 10-01 22:57:02]   batching_gat_L2_ojmb_feat_v2_s43_steps: best=candidate_models/482729522553108.pth | val_gap=0.15218438184416933 | test_gap=0.12464904135660566
+[SWEEP 10-01 22:57:02] skip report_metrics_batching_v2_gat_L2_s43_steps (already exists)
+[SWEEP 10-01 22:57:02] start batching_gin_L3_k5_ojmb_node_v2_s43_steps
+[SWEEP 10-02 03:07:57] done batching_gin_L3_k5_ojmb_node_v2_s43_steps in 4.18 h
+[SWEEP 10-02 03:07:57]   batching_gin_L3_k5_ojmb_node_v2_s43_steps: best=candidate_models/411825325582948.pth | val_gap=0.16734882444798363 | test_gap=0.1275868111409697
+[SWEEP 10-02 03:07:57] start batching_gin_L3_k5_ojmb_edge_v2_s43_steps
+[SWEEP 10-02 06:35:22] done batching_gin_L3_k5_ojmb_edge_v2_s43_steps in 3.46 h
+[SWEEP 10-02 06:35:22]   batching_gin_L3_k5_ojmb_edge_v2_s43_steps: best=candidate_models/681929219451006.pth | val_gap=0.19006457179169253 | test_gap=0.14759768508042556
+[SWEEP 10-02 06:35:22] start batching_gin_L3_k5_ojmb_base_v2_s43_steps
+[SWEEP 10-02 09:31:18] done batching_gin_L3_k5_ojmb_base_v2_s43_steps in 2.93 h
+[SWEEP 10-02 09:31:18]   batching_gin_L3_k5_ojmb_base_v2_s43_steps: best=candidate_models/948172624102402.pth | val_gap=0.18130398592890526 | test_gap=0.15862114349046072
+[SWEEP 10-02 09:31:18] start batching_gin_L3_k5_ojmb_feat_v2_s43_steps
+[LAUNCHER 10-02 11:51:22] interrupted by sleep at 11:15; restarting via Task Scheduler
+[SWEEP 10-02 11:51:24] skip batching_gat_L2_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-02 11:51:24]   batching_gat_L2_ojmb_node_v2_s43_steps: best=candidate_models/896415652061583.pth | val_gap=0.16513149615162678 | test_gap=0.149810347893998
+[SWEEP 10-02 11:51:24] skip batching_gat_L2_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-02 11:51:24]   batching_gat_L2_ojmb_edge_v2_s43_steps: best=candidate_models/353679720639032.pth | val_gap=0.14706266167774829 | test_gap=0.12560979907148942
+[SWEEP 10-02 11:51:24] skip batching_gat_L2_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-02 11:51:25]   batching_gat_L2_ojmb_base_v2_s43_steps: best=candidate_models/17360939543554.pth | val_gap=0.13681653876021516 | test_gap=0.13448326347718903
+[SWEEP 10-02 11:51:25] skip batching_gat_L2_ojmb_feat_v2_s43_steps (already complete)
+[SWEEP 10-02 11:51:25]   batching_gat_L2_ojmb_feat_v2_s43_steps: best=candidate_models/482729522553108.pth | val_gap=0.15218438184416933 | test_gap=0.12464904135660566
+[SWEEP 10-02 11:51:25] skip report_metrics_batching_v2_gat_L2_s43_steps (already exists)
+[SWEEP 10-02 11:51:25] skip batching_gin_L3_k5_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-02 11:51:25]   batching_gin_L3_k5_ojmb_node_v2_s43_steps: best=candidate_models/411825325582948.pth | val_gap=0.16734882444798363 | test_gap=0.1275868111409697
+[SWEEP 10-02 11:51:25] skip batching_gin_L3_k5_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-02 11:51:25]   batching_gin_L3_k5_ojmb_edge_v2_s43_steps: best=candidate_models/681929219451006.pth | val_gap=0.19006457179169253 | test_gap=0.14759768508042556
+[SWEEP 10-02 11:51:25] skip batching_gin_L3_k5_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-02 11:51:25]   batching_gin_L3_k5_ojmb_base_v2_s43_steps: best=candidate_models/948172624102402.pth | val_gap=0.18130398592890526 | test_gap=0.15862114349046072
+[SWEEP 10-02 11:51:25] start batching_gin_L3_k5_ojmb_feat_v2_s43_steps
+[LAUNCHER 10-02 11:59:50] stopped by its console window being closed (0xC000013A); restarting without a window
+[SWEEP 10-02 11:59:56] skip batching_gat_L2_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-02 11:59:57]   batching_gat_L2_ojmb_node_v2_s43_steps: best=candidate_models/896415652061583.pth | val_gap=0.16513149615162678 | test_gap=0.149810347893998
+[SWEEP 10-02 11:59:57] skip batching_gat_L2_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-02 11:59:57]   batching_gat_L2_ojmb_edge_v2_s43_steps: best=candidate_models/353679720639032.pth | val_gap=0.14706266167774829 | test_gap=0.12560979907148942
+[SWEEP 10-02 11:59:57] skip batching_gat_L2_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-02 11:59:57]   batching_gat_L2_ojmb_base_v2_s43_steps: best=candidate_models/17360939543554.pth | val_gap=0.13681653876021516 | test_gap=0.13448326347718903
+[SWEEP 10-02 11:59:57] skip batching_gat_L2_ojmb_feat_v2_s43_steps (already complete)
+[SWEEP 10-02 11:59:57]   batching_gat_L2_ojmb_feat_v2_s43_steps: best=candidate_models/482729522553108.pth | val_gap=0.15218438184416933 | test_gap=0.12464904135660566
+[SWEEP 10-02 11:59:57] skip report_metrics_batching_v2_gat_L2_s43_steps (already exists)
+[SWEEP 10-02 11:59:57] skip batching_gin_L3_k5_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-02 11:59:57]   batching_gin_L3_k5_ojmb_node_v2_s43_steps: best=candidate_models/411825325582948.pth | val_gap=0.16734882444798363 | test_gap=0.1275868111409697
+[SWEEP 10-02 11:59:57] skip batching_gin_L3_k5_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-02 11:59:57]   batching_gin_L3_k5_ojmb_edge_v2_s43_steps: best=candidate_models/681929219451006.pth | val_gap=0.19006457179169253 | test_gap=0.14759768508042556
+[SWEEP 10-02 11:59:57] skip batching_gin_L3_k5_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-02 11:59:57]   batching_gin_L3_k5_ojmb_base_v2_s43_steps: best=candidate_models/948172624102402.pth | val_gap=0.18130398592890526 | test_gap=0.15862114349046072
+[SWEEP 10-02 11:59:57] start batching_gin_L3_k5_ojmb_feat_v2_s43_steps
