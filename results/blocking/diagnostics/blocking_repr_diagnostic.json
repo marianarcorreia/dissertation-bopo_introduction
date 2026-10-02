@@ -1,0 +1,2877 @@
+{
+  "dataset": "val/test_dataset_blocking.json",
+  "n_instances": 20,
+  "policies": [
+    "expert",
+    "random"
+  ],
+  "summary": {
+    "ojmb": {
+      "decisions": 1755,
+      "action_mismatch": 0,
+      "trajectory_divergence": 0,
+      "invariant_violations": 0,
+      "decode_mismatch": 0,
+      "raw_not_equal_to_ojmb": 0,
+      "normalized_not_equal_to_ojmb": 0,
+      "normalization_problems": 0,
+      "swaps": 60,
+      "blocked_completions": 897,
+      "episodes": 40,
+      "infeasible": 0,
+      "below_cpsat": 0,
+      "mean_gap_vs_cpsat_expert": 0.19649584407895404,
+      "mean_gap_vs_cpsat_random": 0.408440087649217,
+      "decodable": true
+    },
+    "ojmd": {
+      "decisions": 1755,
+      "action_mismatch": 0,
+      "trajectory_divergence": 0,
+      "invariant_violations": 0,
+      "decode_mismatch": 0,
+      "raw_not_equal_to_ojmb": 0,
+      "normalized_not_equal_to_ojmb": 0,
+      "normalization_problems": 0,
+      "swaps": 60,
+      "blocked_completions": 897,
+      "episodes": 40,
+      "infeasible": 0,
+      "below_cpsat": 0,
+      "mean_gap_vs_cpsat_expert": 0.19649584407895404,
+      "mean_gap_vs_cpsat_random": 0.408440087649217,
+      "decodable": true
+    },
+    "ojmf": {
+      "decisions": 1755,
+      "action_mismatch": 0,
+      "trajectory_divergence": 0,
+      "invariant_violations": 0,
+      "decode_mismatch": 0,
+      "raw_not_equal_to_ojmb": 0,
+      "normalized_not_equal_to_ojmb": 0,
+      "normalization_problems": 0,
+      "swaps": 60,
+      "blocked_completions": 897,
+      "episodes": 40,
+      "infeasible": 0,
+      "below_cpsat": 0,
+      "mean_gap_vs_cpsat_expert": 0.19649584407895404,
+      "mean_gap_vs_cpsat_random": 0.408440087649217,
+      "decodable": true
+    },
+    "ojm_blk": {
+      "decisions": 1755,
+      "action_mismatch": 0,
+      "trajectory_divergence": 0,
+      "invariant_violations": 0,
+      "decode_mismatch": 0,
+      "raw_not_equal_to_ojmb": 0,
+      "normalized_not_equal_to_ojmb": 0,
+      "normalization_problems": 0,
+      "swaps": 60,
+      "blocked_completions": 897,
+      "episodes": 40,
+      "infeasible": 0,
+      "below_cpsat": 0,
+      "mean_gap_vs_cpsat_expert": 0.19649584407895404,
+      "mean_gap_vs_cpsat_random": 0.408440087649217,
+      "decodable": false
+    }
+  },
+  "graph_sizes_first_instance": {
+    "ojmb": {
+      "node_types": {
+        "operation": [
+          68,
+          2
+        ],
+        "job": [
+          13,
+          4
+        ],
+        "machine": [
+          4,
+          3
+        ],
+        "buffer": [
+          8,
+          5
+        ]
+      },
+      "edge_types": {
+        "operation/belongs/job": 68,
+        "operation/prec/operation": 123,
+        "operation/exec/machine": 124,
+        "machine/exec/operation": 124,
+        "machine/listens/machine": 16,
+        "job/listens/job": 169,
+        "machine/exec/job": 21,
+        "operation/in/buffer": 0,
+        "buffer/holds/operation": 0,
+        "buffer/of/machine": 8,
+        "machine/has/buffer": 8,
+        "buffer/self/buffer": 8,
+        "job/exec/machine": 21
+      }
+    },
+    "ojmd": {
+      "node_types": {
+        "operation": [
+          68,
+          2
+        ],
+        "job": [
+          13,
+          4
+        ],
+        "machine": [
+          12,
+          9
+        ]
+      },
+      "edge_types": {
+        "operation/belongs/job": 68,
+        "operation/prec/operation": 123,
+        "operation/exec/machine": 124,
+        "machine/exec/operation": 124,
+        "machine/listens/machine": 24,
+        "job/listens/job": 169,
+        "machine/exec/job": 21,
+        "operation/in/machine": 0,
+        "machine/holds/operation": 0,
+        "machine/buffer_of/machine": 8,
+        "machine/has_buffer/machine": 8,
+        "job/exec/machine": 21
+      }
+    },
+    "ojmf": {
+      "node_types": {
+        "operation": [
+          68,
+          6
+        ],
+        "job": [
+          13,
+          4
+        ],
+        "machine": [
+          4,
+          14
+        ]
+      },
+      "edge_types": {
+        "operation/belongs/job": 68,
+        "operation/prec/operation": 123,
+        "operation/exec/machine": 124,
+        "machine/exec/operation": 124,
+        "machine/listens/machine": 16,
+        "job/listens/job": 169,
+        "machine/exec/job": 21,
+        "job/exec/machine": 21
+      }
+    },
+    "ojm_blk": {
+      "node_types": {
+        "operation": [
+          68,
+          2
+        ],
+        "job": [
+          13,
+          4
+        ],
+        "machine": [
+          4,
+          3
+        ]
+      },
+      "edge_types": {
+        "operation/belongs/job": 68,
+        "operation/prec/operation": 123,
+        "operation/exec/machine": 124,
+        "machine/exec/operation": 124,
+        "machine/listens/machine": 16,
+        "job/listens/job": 169,
+        "machine/exec/job": 21,
+        "job/exec/machine": 21
+      }
+    }
+  },
+  "exec_edge_normalization": {
+    "assigned_flag_raw": [
+      0.0,
+      1.0
+    ],
+    "assigned_flag_normalized": [
+      -1.0,
+      -0.9897
+    ],
+    "raw_edge_attr_max": 194.0
+  },
+  "examples": {},
+  "runs": [
+    {
+      "instance": "blk021",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 40,
+          "makespan": 2929.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.2214345287739783,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 6,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 40,
+          "makespan": 2929.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.2214345287739783,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 6,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 40,
+          "makespan": 2929.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.2214345287739783,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 6,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 40,
+          "makespan": 2929.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.2214345287739783,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 6,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk022",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 36,
+          "makespan": 1370.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.07198748043818459,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 36,
+          "makespan": 1370.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.07198748043818459,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 36,
+          "makespan": 1370.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.07198748043818459,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 36,
+          "makespan": 1370.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.07198748043818459,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk023",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 40,
+          "makespan": 1919.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.25097783572359833,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 21,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 40,
+          "makespan": 1919.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.25097783572359833,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 21,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 40,
+          "makespan": 1919.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.25097783572359833,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 21,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 40,
+          "makespan": 1919.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.25097783572359833,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 21,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk024",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 41,
+          "makespan": 2463.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.32277121374865736,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 28,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 41,
+          "makespan": 2463.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.32277121374865736,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 28,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 41,
+          "makespan": 2463.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.32277121374865736,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 28,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 41,
+          "makespan": 2463.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.32277121374865736,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 28,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk025",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 44,
+          "makespan": 2320.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.12950340798442062,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 44,
+          "makespan": 2320.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.12950340798442062,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 44,
+          "makespan": 2320.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.12950340798442062,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 44,
+          "makespan": 2320.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.12950340798442062,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk026",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 42,
+          "makespan": 2021.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2839898348157561,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 42,
+          "makespan": 2021.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2839898348157561,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 42,
+          "makespan": 2021.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2839898348157561,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 42,
+          "makespan": 2021.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2839898348157561,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk027",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 51,
+          "makespan": 1344.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.21299638989169667,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 51,
+          "makespan": 1344.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.21299638989169667,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 51,
+          "makespan": 1344.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.21299638989169667,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 51,
+          "makespan": 1344.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.21299638989169667,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk028",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 44,
+          "makespan": 1936.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.27368421052631575,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 7,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 44,
+          "makespan": 1936.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.27368421052631575,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 7,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 44,
+          "makespan": 1936.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.27368421052631575,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 7,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 44,
+          "makespan": 1936.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.27368421052631575,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 7,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk029",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 40,
+          "makespan": 1992.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.01632653061224487,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 40,
+          "makespan": 1992.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.01632653061224487,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 40,
+          "makespan": 1992.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.01632653061224487,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 40,
+          "makespan": 1992.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.01632653061224487,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk030",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 46,
+          "makespan": 2292.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.19126819126819128,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 46,
+          "makespan": 2292.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.19126819126819128,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 46,
+          "makespan": 2292.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.19126819126819128,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 46,
+          "makespan": 2292.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.19126819126819128,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk031",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 44,
+          "makespan": 2206.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.12665985699693572,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 44,
+          "makespan": 2206.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.12665985699693572,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 44,
+          "makespan": 2206.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.12665985699693572,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 44,
+          "makespan": 2206.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.12665985699693572,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 20,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk032",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 54,
+          "makespan": 2615.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.11181972789115657,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 54,
+          "makespan": 2615.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.11181972789115657,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 54,
+          "makespan": 2615.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.11181972789115657,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 54,
+          "makespan": 2615.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.11181972789115657,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 30,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk033",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 46,
+          "makespan": 1316.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.3319838056680162,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 11,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 46,
+          "makespan": 1316.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.3319838056680162,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 11,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 46,
+          "makespan": 1316.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.3319838056680162,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 11,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 46,
+          "makespan": 1316.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.3319838056680162,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 11,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk034",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 49,
+          "makespan": 2732.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.344488188976378,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 26,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 49,
+          "makespan": 2732.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.344488188976378,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 26,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 49,
+          "makespan": 2732.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.344488188976378,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 26,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 49,
+          "makespan": 2732.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.344488188976378,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 26,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk035",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 49,
+          "makespan": 2696.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.26930320150659126,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 49,
+          "makespan": 2696.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.26930320150659126,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 49,
+          "makespan": 2696.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.26930320150659126,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 49,
+          "makespan": 2696.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.26930320150659126,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk036",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 48,
+          "makespan": 1962.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 48,
+          "makespan": 1962.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 48,
+          "makespan": 1962.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 48,
+          "makespan": 1962.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 17,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk037",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 41,
+          "makespan": 1136.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 3,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 41,
+          "makespan": 1136.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 3,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 41,
+          "makespan": 1136.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 3,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 41,
+          "makespan": 1136.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.0,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 3,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk038",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 41,
+          "makespan": 3278.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.40085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 8,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 41,
+          "makespan": 3278.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.40085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 8,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 41,
+          "makespan": 3278.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.40085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 8,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 41,
+          "makespan": 3278.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.40085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 8,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk039",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 58,
+          "makespan": 1871.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.07528735632183903,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 58,
+          "makespan": 1871.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.07528735632183903,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 58,
+          "makespan": 1871.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.07528735632183903,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 58,
+          "makespan": 1871.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.07528735632183903,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk040",
+      "policy": "expert",
+      "results": {
+        "ojmb": {
+          "decisions": 36,
+          "makespan": 1481.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.2945804195804196,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 36,
+          "makespan": 1481.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.2945804195804196,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 36,
+          "makespan": 1481.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.2945804195804196,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 36,
+          "makespan": 1481.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.2945804195804196,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk021",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 35,
+          "makespan": 2897.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.20809007506255206,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 35,
+          "makespan": 2897.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.20809007506255206,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 35,
+          "makespan": 2897.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.20809007506255206,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 35,
+          "makespan": 2897.0,
+          "reference": 2398.0,
+          "gap_vs_cpsat": 0.20809007506255206,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 23,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk022",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 40,
+          "makespan": 2321.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.8161189358372456,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 13,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 40,
+          "makespan": 2321.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.8161189358372456,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 13,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 40,
+          "makespan": 2321.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.8161189358372456,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 13,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 40,
+          "makespan": 2321.0,
+          "reference": 1278.0,
+          "gap_vs_cpsat": 0.8161189358372456,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 13,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk023",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 46,
+          "makespan": 2623.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.7099087353324642,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 46,
+          "makespan": 2623.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.7099087353324642,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 46,
+          "makespan": 2623.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.7099087353324642,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 46,
+          "makespan": 2623.0,
+          "reference": 1534.0,
+          "gap_vs_cpsat": 0.7099087353324642,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk024",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 37,
+          "makespan": 2587.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.3893662728249194,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 37,
+          "makespan": 2587.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.3893662728249194,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 37,
+          "makespan": 2587.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.3893662728249194,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 37,
+          "makespan": 2587.0,
+          "reference": 1862.0,
+          "gap_vs_cpsat": 0.3893662728249194,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 27,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk025",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 46,
+          "makespan": 2653.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.2916260954235639,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 46,
+          "makespan": 2653.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.2916260954235639,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 46,
+          "makespan": 2653.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.2916260954235639,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 46,
+          "makespan": 2653.0,
+          "reference": 2054.0,
+          "gap_vs_cpsat": 0.2916260954235639,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 29,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk026",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 51,
+          "makespan": 1979.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2573062261753494,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 51,
+          "makespan": 1979.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2573062261753494,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 51,
+          "makespan": 1979.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2573062261753494,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 51,
+          "makespan": 1979.0,
+          "reference": 1574.0,
+          "gap_vs_cpsat": 0.2573062261753494,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 15,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk027",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 51,
+          "makespan": 1447.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.3059566787003609,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 51,
+          "makespan": 1447.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.3059566787003609,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 51,
+          "makespan": 1447.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.3059566787003609,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 51,
+          "makespan": 1447.0,
+          "reference": 1108.0,
+          "gap_vs_cpsat": 0.3059566787003609,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk028",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 36,
+          "makespan": 1906.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.2539473684210527,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 12,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 36,
+          "makespan": 1906.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.2539473684210527,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 12,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 36,
+          "makespan": 1906.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.2539473684210527,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 12,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 36,
+          "makespan": 1906.0,
+          "reference": 1520.0,
+          "gap_vs_cpsat": 0.2539473684210527,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 12,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk029",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 39,
+          "makespan": 2702.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.37857142857142856,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 24,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 39,
+          "makespan": 2702.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.37857142857142856,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 24,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 39,
+          "makespan": 2702.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.37857142857142856,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 24,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 39,
+          "makespan": 2702.0,
+          "reference": 1960.0,
+          "gap_vs_cpsat": 0.37857142857142856,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 24,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk030",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 35,
+          "makespan": 2899.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.5067567567567568,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 35,
+          "makespan": 2899.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.5067567567567568,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 35,
+          "makespan": 2899.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.5067567567567568,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 35,
+          "makespan": 2899.0,
+          "reference": 1924.0,
+          "gap_vs_cpsat": 0.5067567567567568,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk031",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 41,
+          "makespan": 2922.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.49233912155260473,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 41,
+          "makespan": 2922.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.49233912155260473,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 41,
+          "makespan": 2922.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.49233912155260473,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 41,
+          "makespan": 2922.0,
+          "reference": 1958.0,
+          "gap_vs_cpsat": 0.49233912155260473,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk032",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 46,
+          "makespan": 3290.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.3988095238095237,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 46,
+          "makespan": 3290.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.3988095238095237,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 46,
+          "makespan": 3290.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.3988095238095237,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 46,
+          "makespan": 3290.0,
+          "reference": 2352.0,
+          "gap_vs_cpsat": 0.3988095238095237,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 4,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk033",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 47,
+          "makespan": 1794.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.8157894736842106,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 18,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 47,
+          "makespan": 1794.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.8157894736842106,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 18,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 47,
+          "makespan": 1794.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.8157894736842106,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 18,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 47,
+          "makespan": 1794.0,
+          "reference": 988.0,
+          "gap_vs_cpsat": 0.8157894736842106,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 18,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk034",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 47,
+          "makespan": 2556.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.2578740157480315,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 36,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 47,
+          "makespan": 2556.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.2578740157480315,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 36,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 47,
+          "makespan": 2556.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.2578740157480315,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 36,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 47,
+          "makespan": 2556.0,
+          "reference": 2032.0,
+          "gap_vs_cpsat": 0.2578740157480315,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 36,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk035",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 47,
+          "makespan": 3028.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.4256120527306968,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 47,
+          "makespan": 3028.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.4256120527306968,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 47,
+          "makespan": 3028.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.4256120527306968,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 47,
+          "makespan": 3028.0,
+          "reference": 2124.0,
+          "gap_vs_cpsat": 0.4256120527306968,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 3,
+          "blocked_completions": 33,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk036",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 50,
+          "makespan": 2274.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.15902140672782883,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 50,
+          "makespan": 2274.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.15902140672782883,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 50,
+          "makespan": 2274.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.15902140672782883,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 50,
+          "makespan": 2274.0,
+          "reference": 1962.0,
+          "gap_vs_cpsat": 0.15902140672782883,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk037",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 38,
+          "makespan": 1979.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.7420774647887325,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 38,
+          "makespan": 1979.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.7420774647887325,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 38,
+          "makespan": 1979.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.7420774647887325,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 38,
+          "makespan": 1979.0,
+          "reference": 1136.0,
+          "gap_vs_cpsat": 0.7420774647887325,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 1,
+          "blocked_completions": 14,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk038",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 41,
+          "makespan": 2693.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.15085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 41,
+          "makespan": 2693.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.15085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 41,
+          "makespan": 2693.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.15085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 41,
+          "makespan": 2693.0,
+          "reference": 2340.0,
+          "gap_vs_cpsat": 0.15085470085470076,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 25,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk039",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 52,
+          "makespan": 1946.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.11839080459770113,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 52,
+          "makespan": 1946.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.11839080459770113,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 52,
+          "makespan": 1946.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.11839080459770113,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 52,
+          "makespan": 1946.0,
+          "reference": 1740.0,
+          "gap_vs_cpsat": 0.11839080459770113,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 0,
+          "blocked_completions": 32,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    },
+    {
+      "instance": "blk040",
+      "policy": "random",
+      "results": {
+        "ojmb": {
+          "decisions": 40,
+          "makespan": 1705.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.4903846153846154,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmd": {
+          "decisions": 40,
+          "makespan": 1705.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.4903846153846154,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojmf": {
+          "decisions": 40,
+          "makespan": 1705.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.4903846153846154,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        },
+        "ojm_blk": {
+          "decisions": 40,
+          "makespan": 1705.0,
+          "reference": 1144.0,
+          "gap_vs_cpsat": 0.4903846153846154,
+          "below_cpsat_reference": false,
+          "feasible": true,
+          "violations": {},
+          "swaps": 2,
+          "blocked_completions": 19,
+          "max_occupancy": {
+            "in": 2,
+            "out": 1
+          }
+        }
+      }
+    }
+  ],
+  "model_smoke": {
+    "ojmb": {
+      "params": 4004502,
+      "feasible": true,
+      "mean_relative_error_untrained": 0.39764422882396777
+    },
+    "ojmd": {
+      "params": 3696534,
+      "feasible": true,
+      "mean_relative_error_untrained": 0.35021000807924185
+    },
+    "ojmf": {
+      "params": 2464734,
+      "feasible": true,
+      "mean_relative_error_untrained": 0.49295937798974365
+    },
+    "ojm_blk": {
+      "params": 2464614,
+      "feasible": true,
+      "mean_relative_error_untrained": 0.31705281265948015
+    }
+  }
+}

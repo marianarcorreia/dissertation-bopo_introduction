@@ -1,0 +1,85 @@
+C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-09-29 13:07:18
+[MAIN] mode=optuna
+[MAIN] run_name=optuna_blocking
+[MAIN] representation(s)=['ojmb', 'ojmd', 'ojm_blk']
+[MAIN] gnn_type=gat
+[MAIN] overrides={'num_layers': 2}
+============================================================
+======================================================================
+[PARAM] Hyperparameter tuning runner (Optuna)
+[PARAM] Representations : ['OJMB', 'OJMD', 'OJM_BLK']
+[PARAM] Trials          : 10
+[PARAM] Max episodes    : 350
+[PARAM] Objective       : min(last_val_gap_Q80)
+[PARAM] Storage         : optuna_blocking.log
+======================================================================
+[I 2026-09-29 13:07:18,350] A new study created in Journal with name: fjsp_tuning_ojmb_L2
+[PARAM] Starting Optuna study for OJMB | gnn_type=gat | study_name=fjsp_tuning_ojmb_L2 | trials=10 | overrides={'num_layers': 2} | max_episodes=350 | objective=min(last_val_gap_Q80)
+[PARAM] Critical params (OJMB): ['lr', 'hidden_channels', 'batch_size', 'num_layers', 'heads', 'n_cases', 'new_freq', 'K', 'use_greedy', 'mask_option', 'sel_k']
+[PARAM][OJMB] Trial 0 | gnn_type=gat | episodes=350 | lr=1.03e-04 | hidden=128 | layers=2 | heads=3 | K=32 | use_greedy=True | tf=10
+============================================================
+[TRAIN] Training started at: 2026-09-29 13:07:18
+[TRAIN] Hyperparams | max_steps=350 | new_freq=100
+[TRAIN]             | n_cases=80 | B=64 | K=32 | use_greedy=True | lr=0.00010256691315437255 (decaying to 2.05e-05)
+[TRAIN]             | warm_start_steps=100 | checkpoint_smooth_window=3 | seed=None
+[TRAIN]             | hidden_channels=128 | num_layers=2 | heads=3
+[TRAIN]             | logp_norm=mean | exclude_greedy_from_loss=True
+[TRAIN] Representation | ojmb | GNN | gat | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=350
+============================================================
+[TRAIN] Output run folder: results\blocking\optuna_ojmb_gat_L2_1790683638\trial_0
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset_blocking.json (20 instances) - the requested sample_size=30 is ignored so every run stays comparable. Delete val/validation_dataset_blocking.json (and its paired val/test_dataset_blocking.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=10 steps | instances=20 (representative subset)
+[TRAIN] Blocking setting | buffers in=2 out=1 | instances={'range_jobs': (12, 15), 'range_machines': (4, 6), 'range_op_per_job': (5, 6), 'max_processing': 100, 'mas_per_ope_max': 3, 'n_bottlenecks': 1, 'bottleneck_prob': 0.7, 'bottleneck_factor': 2.0}
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 100 step(s)...
+[TRAIN][WARMSTART] step 5/100 | instance=26 | bc_loss=1.6732 | decisions=37
+[TRAIN][WARMSTART] step 10/100 | instance=69 | bc_loss=1.5302 | decisions=44
+[TRAIN][WARMSTART] step 15/100 | instance=52 | bc_loss=1.6486 | decisions=44
+[TRAIN][WARMSTART] step 20/100 | instance=1 | bc_loss=1.4832 | decisions=39
+[TRAIN][WARMSTART] step 25/100 | instance=48 | bc_loss=1.6816 | decisions=32
+[TRAIN][WARMSTART] step 30/100 | instance=35 | bc_loss=1.5633 | decisions=40
+[TRAIN][WARMSTART] step 35/100 | instance=42 | bc_loss=1.6235 | decisions=34
+[TRAIN][WARMSTART] step 40/100 | instance=22 | bc_loss=1.3184 | decisions=32
+[TRAIN][WARMSTART] step 45/100 | instance=0 | bc_loss=1.7699 | decisions=36
+[TRAIN][WARMSTART] step 50/100 | instance=18 | bc_loss=1.4222 | decisions=36
+[TRAIN][WARMSTART] step 55/100 | instance=78 | bc_loss=1.4403 | decisions=36
+[TRAIN][WARMSTART] step 60/100 | instance=20 | bc_loss=1.0926 | decisions=31
+[TRAIN][WARMSTART] step 65/100 | instance=64 | bc_loss=1.4895 | decisions=26
+[TRAIN][WARMSTART] step 70/100 | instance=30 | bc_loss=1.3141 | decisions=31
+[TRAIN][WARMSTART] step 75/100 | instance=24 | bc_loss=1.4396 | decisions=30
+[TRAIN][WARMSTART] step 80/100 | instance=55 | bc_loss=1.6794 | decisions=32
+[TRAIN][WARMSTART] step 85/100 | instance=57 | bc_loss=1.3260 | decisions=32
+[TRAIN][WARMSTART] step 90/100 | instance=49 | bc_loss=1.4084 | decisions=32
+[TRAIN][WARMSTART] step 95/100 | instance=3 | bc_loss=1.3285 | decisions=25
+[TRAIN][WARMSTART] step 100/100 | instance=43 | bc_loss=1.3003 | decisions=28
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 350 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/350 | 13:12:53
+[TRAIN] Step 1 | Loss=0.695294 | Best makespan in group=1524.00
+[TRAIN] Step 2/350 | 13:14:11
+[TRAIN] Step 2 | Loss=0.740588 | Best makespan in group=2412.00
+[TRAIN] Step 3/350 | 13:15:32
+[TRAIN] Step 3 | Loss=0.636949 | Best makespan in group=1900.00
+[TRAIN] Step 4/350 | 13:17:08
+[TRAIN] Step 4 | Loss=0.596483 | Best makespan in group=1964.00
+[TRAIN] Step 5/350 | 13:18:22
+[TRAIN] Step 5 | Loss=0.539862 | Best makespan in group=1608.00
+[TRAIN] Step 6/350 | 13:19:46
+[TRAIN] Step 6 | Loss=0.668646 | Best makespan in group=1794.00
+[TRAIN] Step 7/350 | 13:20:47
+[TRAIN] Step 7 | Loss=0.720102 | Best makespan in group=2464.00
+[TRAIN] Step 8/350 | 13:21:59
+[TRAIN] Step 8 | Loss=0.615148 | Best makespan in group=3232.00
+[TRAIN] Step 9/350 | 13:23:20
+[TRAIN] Step 9 | Loss=0.559007 | Best makespan in group=1540.00
+[TRAIN] Step 10/350 | 13:24:36
+[TRAIN] Step 10 | Loss=0.767655 | Best makespan in group=1800.00
+[TRAIN][VAL][ep 10] avg_gap=0.1504 | std_gap=0.1292 | q80_gap=0.2656 | n=20
+[TRAIN][VAL][ep 10] blocked_events=398 | swaps=19 in 9 instance(s)
+[TRAIN] Validation improved | smoothed_avg_gap=0.1504 (raw=0.1504) | saving candidate: 937762106570594.pth
+[TRAIN] Step 11/350 | 13:26:14

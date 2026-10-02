@@ -38,6 +38,8 @@ def _resolve_representation_modules(representation: str):
         # on the SAME blocking dynamics - the baseline for both
         "ojmb": ("src.env_blocking", "FJSPEnvBlocking", "src.bopo", "BOPO"),
         "ojmd": ("src.env_blocking", "FJSPEnvBlockingDummy", "src.bopo", "BOPO"),
+        # buffers as features of the existing machine/operation nodes (no new node/edge type)
+        "ojmf": ("src.env_blocking", "FJSPEnvBlockingFeatures", "src.bopo", "BOPO"),
         "ojm_blk": ("src.env_blocking", "FJSPEnvBlockingNoBuffer", "src.bopo", "BOPO"),
         # machine unavailability on the blocking problem (src/env_unavailability.py), with the
         # buffers as a node type (ojmb): windows as machine features ("uf"), as dummy
@@ -56,12 +58,40 @@ def _resolve_representation_modules(representation: str):
     bopo_class = getattr(bopo_module, bopo_class_name)
     return rep, env_class, bopo_class
 
+_NAME_RNG = random.SystemRandom()
+
+
+def _append_candidate(params_path, entry, timeout=600):
+    """Append one entry to a model_params.json list. Runs trained in parallel share this
+    file, so the read-append-write is done under a lock file (created exclusively, removed
+    after), so one process never reads a half-written file or drops another's entry."""
+    lock = params_path + ".lock"
+    start = time.time()
+    while True:
+        try:
+            fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError:
+            if time.time() - start > timeout:
+                raise TimeoutError(f"{lock} held for more than {timeout}s (stale lock file?)")
+            time.sleep(0.05)
+    try:
+        with open(params_path, 'r') as infile:
+            model_params = json.load(infile)
+        model_params.append(entry)
+        with open(params_path, 'w') as outfile:
+            json.dump(model_params, outfile)
+    finally:
+        os.close(fd)
+        os.remove(lock)
+
+
 #cria pasta para ficheiros se não existirem
 os.makedirs('candidate_models', exist_ok=True)
 os.makedirs('models', exist_ok=True)
 
 #cria lista de instancias sinteticas com base na configuração
-BLOCKING_REPRESENTATIONS = ("ojmb", "ojmd", "ojm_blk")
+BLOCKING_REPRESENTATIONS = ("ojmb", "ojmd", "ojmf", "ojm_blk")
 # The blocking representations solve a different problem on different instances, so their
 # runs and models are kept apart: results/blocking/, candidate_models/blocking/ and
 # models/blocking/ (each with its own model_params.json). The others keep the original folders.
@@ -305,12 +335,11 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
                 best_difference = max(best_difference, float(improvement))
                 best_avg_gap = smoothed_avg_gap
 
-                name = str(int(random.uniform(10**10, 10**15)))
+                # unseeded: two runs with the same seed draw the same `random` numbers and
+                # would otherwise pick the same checkpoint name and overwrite each other
+                name = str(int(_NAME_RNG.uniform(10**10, 10**15)))
                 print(f"[TRAIN] Validation improved | smoothed_avg_gap={best_avg_gap:.4f} (raw={validation_avg_gap:.4f}) | saving candidate: {name}.pth")
-                with open(candidate_params_path, 'r') as infile:
-                    model_params = json.load(infile)
-
-                model_params.append({
+                _append_candidate(candidate_params_path, {
                     "name": name + ".pth",
                     "representation": rep_name,
                     "sel_k": sel_k,
@@ -331,9 +360,6 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=1
                     "validation_instances": [v["name"] for v in validation_set],
                     "episode": step_number,
                 })
-
-                with open(candidate_params_path, 'w') as outfile:
-                    json.dump(model_params, outfile)
 
                 best_model_path = os.path.join(paths["candidate_models"], name + ".pth")
                 bopo_agent.save(best_model_path)

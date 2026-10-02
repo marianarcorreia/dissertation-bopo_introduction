@@ -58,7 +58,7 @@ def parse_args():
         nargs="+",
         default=None,
         help="Only evaluate the models of these representations (default: every model in "
-             "--models-file). Blocking (ojmb, ojmd, ojm_blk) and non-blocking models cannot be mixed.",
+             "--models-file). Blocking (ojmb, ojmd, ojmf, ojm_blk) and non-blocking models cannot be mixed.",
     )
     parser.add_argument(
         "--no-dashboard",
@@ -69,7 +69,7 @@ def parse_args():
 
 
 def expand_representations(representations):
-    """'all' -> oo om ojm, 'blocking' -> ojmb ojmd ojm_blk; None stays None (no filter)."""
+    """'all' -> oo om ojm, 'blocking' -> ojmb ojmd ojmf ojm_blk; None stays None (no filter)."""
     if not representations:
         return None
     groups = {"all": ("oo", "om", "ojm"), "blocking": BLOCKING_REPRESENTATIONS,
@@ -101,7 +101,7 @@ def select_models(model_params, representations=None):
                          "--folders val/test_dataset_unavailability.json")
     blocking = {p.get("representation", "oo") in BLOCKING_REPRESENTATIONS for p in model_params}
     if len(blocking) > 1:
-        raise ValueError("--models-file mixes blocking (ojmb/ojmd/ojm_blk) and non-blocking models; "
+        raise ValueError("--models-file mixes blocking (ojmb/ojmd/ojmf/ojm_blk) and non-blocking models; "
                          "select one group with --representation.")
     if blocking == {True}:
         print("[TEST] Blocking models: evaluate them on blocking instances, e.g. "

@@ -1,0 +1,70 @@
+[DIAG] 20 instance(s) from val/test_dataset_blocking.json | policies=['expert', 'random']
+[DIAG] expert blk021: ojmb mk=2929 | ojmd mk=2929 | ojmf mk=2929 | ojm_blk mk=2929
+[DIAG] expert blk022: ojmb mk=1370 | ojmd mk=1370 | ojmf mk=1370 | ojm_blk mk=1370
+[DIAG] expert blk023: ojmb mk=1919 | ojmd mk=1919 | ojmf mk=1919 | ojm_blk mk=1919
+[DIAG] expert blk024: ojmb mk=2463 | ojmd mk=2463 | ojmf mk=2463 | ojm_blk mk=2463
+[DIAG] expert blk025: ojmb mk=2320 | ojmd mk=2320 | ojmf mk=2320 | ojm_blk mk=2320
+[DIAG] expert blk026: ojmb mk=2021 | ojmd mk=2021 | ojmf mk=2021 | ojm_blk mk=2021
+[DIAG] expert blk027: ojmb mk=1344 | ojmd mk=1344 | ojmf mk=1344 | ojm_blk mk=1344
+[DIAG] expert blk028: ojmb mk=1936 | ojmd mk=1936 | ojmf mk=1936 | ojm_blk mk=1936
+[DIAG] expert blk029: ojmb mk=1992 | ojmd mk=1992 | ojmf mk=1992 | ojm_blk mk=1992
+[DIAG] expert blk030: ojmb mk=2292 | ojmd mk=2292 | ojmf mk=2292 | ojm_blk mk=2292
+[DIAG] expert blk031: ojmb mk=2206 | ojmd mk=2206 | ojmf mk=2206 | ojm_blk mk=2206
+[DIAG] expert blk032: ojmb mk=2615 | ojmd mk=2615 | ojmf mk=2615 | ojm_blk mk=2615
+[DIAG] expert blk033: ojmb mk=1316 | ojmd mk=1316 | ojmf mk=1316 | ojm_blk mk=1316
+[DIAG] expert blk034: ojmb mk=2732 | ojmd mk=2732 | ojmf mk=2732 | ojm_blk mk=2732
+[DIAG] expert blk035: ojmb mk=2696 | ojmd mk=2696 | ojmf mk=2696 | ojm_blk mk=2696
+[DIAG] expert blk036: ojmb mk=1962 | ojmd mk=1962 | ojmf mk=1962 | ojm_blk mk=1962
+[DIAG] expert blk037: ojmb mk=1136 | ojmd mk=1136 | ojmf mk=1136 | ojm_blk mk=1136
+[DIAG] expert blk038: ojmb mk=3278 | ojmd mk=3278 | ojmf mk=3278 | ojm_blk mk=3278
+[DIAG] expert blk039: ojmb mk=1871 | ojmd mk=1871 | ojmf mk=1871 | ojm_blk mk=1871
+[DIAG] expert blk040: ojmb mk=1481 | ojmd mk=1481 | ojmf mk=1481 | ojm_blk mk=1481
+[DIAG] random blk021: ojmb mk=2897 | ojmd mk=2897 | ojmf mk=2897 | ojm_blk mk=2897
+[DIAG] random blk022: ojmb mk=2321 | ojmd mk=2321 | ojmf mk=2321 | ojm_blk mk=2321
+[DIAG] random blk023: ojmb mk=2623 | ojmd mk=2623 | ojmf mk=2623 | ojm_blk mk=2623
+[DIAG] random blk024: ojmb mk=2587 | ojmd mk=2587 | ojmf mk=2587 | ojm_blk mk=2587
+[DIAG] random blk025: ojmb mk=2653 | ojmd mk=2653 | ojmf mk=2653 | ojm_blk mk=2653
+[DIAG] random blk026: ojmb mk=1979 | ojmd mk=1979 | ojmf mk=1979 | ojm_blk mk=1979
+[DIAG] random blk027: ojmb mk=1447 | ojmd mk=1447 | ojmf mk=1447 | ojm_blk mk=1447
+[DIAG] random blk028: ojmb mk=1906 | ojmd mk=1906 | ojmf mk=1906 | ojm_blk mk=1906
+[DIAG] random blk029: ojmb mk=2702 | ojmd mk=2702 | ojmf mk=2702 | ojm_blk mk=2702
+[DIAG] random blk030: ojmb mk=2899 | ojmd mk=2899 | ojmf mk=2899 | ojm_blk mk=2899
+[DIAG] random blk031: ojmb mk=2922 | ojmd mk=2922 | ojmf mk=2922 | ojm_blk mk=2922
+[DIAG] random blk032: ojmb mk=3290 | ojmd mk=3290 | ojmf mk=3290 | ojm_blk mk=3290
+[DIAG] random blk033: ojmb mk=1794 | ojmd mk=1794 | ojmf mk=1794 | ojm_blk mk=1794
+[DIAG] random blk034: ojmb mk=2556 | ojmd mk=2556 | ojmf mk=2556 | ojm_blk mk=2556
+[DIAG] random blk035: ojmb mk=3028 | ojmd mk=3028 | ojmf mk=3028 | ojm_blk mk=3028
+[DIAG] random blk036: ojmb mk=2274 | ojmd mk=2274 | ojmf mk=2274 | ojm_blk mk=2274
+[DIAG] random blk037: ojmb mk=1979 | ojmd mk=1979 | ojmf mk=1979 | ojm_blk mk=1979
+[DIAG] random blk038: ojmb mk=2693 | ojmd mk=2693 | ojmf mk=2693 | ojm_blk mk=2693
+[DIAG] random blk039: ojmb mk=1946 | ojmd mk=1946 | ojmf mk=1946 | ojm_blk mk=1946
+[DIAG] random blk040: ojmb mk=1705 | ojmd mk=1705 | ojmf mk=1705 | ojm_blk mk=1705
+[DIAG] model smoke test (untrained GAT policy, greedy)...
+
+====================================================================================================
+check                                     ojmb          ojmd          ojmf       ojm_blk
+episodes                                    40            40            40            40
+decisions                                 1755          1755          1755          1755
+action_mismatch                              0             0             0             0
+trajectory_divergence                        0             0             0             0
+invariant_violations                         0             0             0             0
+decode_mismatch                              0             0             0           n/a
+raw_not_equal_to_ojmb                      n/a             0             0           n/a
+normalized_not_equal_to_ojmb               n/a             0             0           n/a
+normalization_problems                       0             0             0             0
+infeasible                                   0             0             0             0
+below_cpsat                                  0             0             0             0
+mean_gap_vs_cpsat_expert                0.1965        0.1965        0.1965        0.1965
+mean_gap_vs_cpsat_random                0.4084        0.4084        0.4084        0.4084
+swaps / blocked completions           60 / 897      60 / 897      60 / 897      60 / 897
+----------------------------------------------------------------------------------------------------
+ojmb     nodes {'operation': [68, 2], 'job': [13, 4], 'machine': [4, 3], 'buffer': [8, 5]} | edge types 13
+ojmd     nodes {'operation': [68, 2], 'job': [13, 4], 'machine': [12, 9]} | edge types 12
+ojmf     nodes {'operation': [68, 6], 'job': [13, 4], 'machine': [4, 14]} | edge types 8
+ojm_blk  nodes {'operation': [68, 2], 'job': [13, 4], 'machine': [4, 3]} | edge types 8
+exec edge normalisation (all reprs): {'assigned_flag_raw': [0.0, 1.0], 'assigned_flag_normalized': [-1.0, -0.9897], 'raw_edge_attr_max': 194.0}
+model ojmb     params=4004502 feasible=True untrained_gap=0.3976
+model ojmd     params=3696534 feasible=True untrained_gap=0.3502
+model ojmf     params=2464734 feasible=True untrained_gap=0.4930
+model ojm_blk  params=2464614 feasible=True untrained_gap=0.3171
+[DIAG] report -> results/blocking/diagnostics/blocking_repr_diagnostic.json

@@ -17,6 +17,7 @@ ACTION_STORE = {
     # blocking representations (src/env_blocking.py) route jobs to machines like ojm
     "ojmb": ("machine", "exec", "job"),
     "ojmd": ("machine", "exec", "job"),
+    "ojmf": ("machine", "exec", "job"),
     "ojm_blk": ("machine", "exec", "job"),
     # machine unavailability on the blocking problem (src/env_unavailability.py)
     "ojmb_uf": ("machine", "exec", "job"),

@@ -239,7 +239,7 @@ def test_blocking_violations_are_detected():
 def test_evaluate_blocking_representations():
     from src.metrics.references import load_dataset
     instances = load_dataset("val/test_dataset_blocking.json")[:2]
-    for rep in ("ojmb", "ojmd", "ojm_blk"):
+    for rep in ("ojmb", "ojmd", "ojmf", "ojm_blk"):
         seed(0)
         rep, EnvClass, BOPOClass = _resolve_representation_modules(rep)
         env = EnvClass(instances, 0, 100)

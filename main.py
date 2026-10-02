@@ -11,8 +11,9 @@ from src.utils import open_dashboard
 
 ALL_REPRESENTATIONS = ["oo", "om", "ojm"]
 # blocking FJSP with finite buffers (src/env_blocking.py): buffers as a new node type (ojmb),
-# as dummy machines (ojmd), and the plain OJM graph on the same blocking problem (ojm_blk)
-BLOCKING_REPRESENTATIONS = ["ojmb", "ojmd", "ojm_blk"]
+# as dummy machines (ojmd), as machine/operation features (ojmf), and the plain OJM graph on
+# the same blocking problem (ojm_blk)
+BLOCKING_REPRESENTATIONS = ["ojmb", "ojmd", "ojmf", "ojm_blk"]
 # 'all' keeps its original meaning (the three non-blocking representations): the blocking
 # ones solve a different problem on different instances, so they are grouped separately
 # machine unavailability on the blocking problem (src/env_unavailability.py): windows as machine
@@ -60,8 +61,8 @@ def parse_args():
         choices=ALL_REPRESENTATIONS + BLOCKING_REPRESENTATIONS + UNAVAIL_REPRESENTATIONS + list(REPRESENTATION_GROUPS),
         help="Graph representation(s) to use: oo (operation-only), om (operation-machine), "
              "ojm (operation-job-machine); blocking FJSP: ojmb (buffer node type), ojmd (buffers "
-             "as dummy machines), ojm_blk (plain OJM graph on the blocking problem). Pass several "
-             "values, 'all' (oo om ojm) or 'blocking' (ojmb ojmd ojm_blk). Unavailability on the "
+             "as dummy machines), ojmf (buffers as machine/operation features), ojm_blk (plain OJM graph on the blocking problem). Pass several "
+             "values, 'all' (oo om ojm) or 'blocking' (ojmb ojmd ojmf ojm_blk). Unavailability on the "
              "blocking FJSP: ojmb_uf (machine features), ojmb_uo (dummy operations), ojmb_u0 "
              "(window-blind control), or 'unavailability' for the three. Default: oo. "
              "[test] Only the models of these representations in --models-file are evaluated "
@@ -127,6 +128,14 @@ def parse_args():
              "default). --no-exclude-greedy keeps it in, as before f1b12fe. The old loss is "
              "--logp-norm sum --no-exclude-greedy.",
     )
+    parser.add_argument(
+        "--seeds",
+        type=int,
+        nargs="+",
+        default=None,
+        help="[train] Train every representation once per seed (run name suffix _s<seed>). "
+             "Default: a single run without a fixed seed.",
+    )
     test_group = parser.add_argument_group("test mode")
     test_group.add_argument("--models-file", default=None,
                              help="[test] Path to model_params.json (default: models/model_params.json, "
@@ -189,11 +198,15 @@ def run_train(args):
     reps = _resolve_representations(args.representation)
     multi = len(reps) > 1
     overrides = _override_kwargs(args)
-    for rep in reps:
-        run_name = f"{args.run_name}_{rep}" if multi else args.run_name
-        print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type} | overrides={overrides}")
-        train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
-              **overrides)
+    for seed in args.seeds or [None]:
+        for rep in reps:
+            run_name = f"{args.run_name}_{rep}" if multi else args.run_name
+            if seed is not None:
+                run_name += f"_s{seed}"
+            print(f"[MAIN] Training representation={rep} | seed={seed} | run_name={run_name} | "
+                  f"gnn_type={args.gnn_type} | overrides={overrides}")
+            train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
+                  seed=seed, **overrides)
 
 
 def run_test(args):

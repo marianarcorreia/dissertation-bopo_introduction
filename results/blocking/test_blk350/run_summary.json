@@ -1,0 +1,1 @@
+{"run_name": "test_blk350", "run_dir": "results/blocking\\test_blk350", "models_file": "models/blocking/model_params_blk350.json", "source_folder": "val", "folders": ["blocking_test_instances"], "workers": 4, "total_runtime_sec": 368.6614077091217}

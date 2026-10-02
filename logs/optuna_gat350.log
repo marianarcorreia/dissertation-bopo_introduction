@@ -1,0 +1,31 @@
+C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+Traceback (most recent call last):
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\main.py", line 9, in <module>
+    from src.train import train
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\src\train.py", line 20, in <module>
+    from src.bopo_utils import run_behavior_cloning
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\src\bopo_utils.py", line 2, in <module>
+    from src.gat import GAT
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\src\gat.py", line 4, in <module>
+    from torch_geometric.nn import GATv2Conv, Linear #camadas do GNN
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch_geometric\__init__.py", line 22, in <module>
+    import torch_geometric.datasets
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch_geometric\datasets\__init__.py", line 85, in <module>
+    from .tag_dataset import TAGDataset
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\torch_geometric\datasets\tag_dataset.py", line 24, in <module>
+    from pandas import DataFrame, read_csv
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\pandas\__init__.py", line 56, in <module>
+    import pandas.core.config_init  # pyright: ignore[reportUnusedImport] # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\pandas\core\config_init.py", line 31, in <module>
+    from pandas.errors import Pandas4Warning
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\pandas\errors\__init__.py", line 12, in <module>
+    from pandas._libs.tslibs import (
+  File "C:\Users\maria\Desktop\dissertation-bopo_introduction\.venv\Lib\site-packages\pandas\_libs\__init__.py", line 18, in <module>
+    from pandas._libs.interval import Interval
+  File "pandas/_libs/interval.pyx", line 1, in init pandas._libs.interval
+  File "pandas/_libs/hashtable.pyx", line 1, in init pandas._libs.hashtable
+  File "pandas/_libs/missing.pyx", line 40, in init pandas._libs.missing
+AttributeError: partially initialized module 'pandas' has no attribute '_pandas_datetime_CAPI' (most likely due to a circular import)

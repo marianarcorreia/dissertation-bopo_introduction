@@ -63,6 +63,19 @@ blocking_repr="dummy" ("OJMD") - dummy machines:
     representations is therefore only structural: dedicated buffer parameters (node) versus
     parameters shared with the real machines, distinguished by a flag (dummy).
 
+blocking_repr="feature" ("OJMF") - features only:
+    no new node or edge type: the buffers are described by extra columns of the existing
+    'machine' and 'operation' nodes.
+    machine x += [in: capacity, occupancy, occupancy/capacity, full, free slots/capacity,
+                  out: the same 5, blocked] - the buffer features and the buffer<->machine link
+                  attributes of OJMB, with input/output told apart by the column instead of
+                  the is_output flag.
+    operation x += [in input buffer, in output buffer, priority (1 = next to leave), waiting time]
+                  - the part edge attributes of OJMB (zeros for an operation in no buffer).
+    WHICH machine's buffer an operation is in is given by its exec edge to the assigned machine
+    (column 3 = 1), present in every representation, which also carries its processing time on
+    that machine - so the same information as OJMB, placed only on base nodes and edges.
+
 blocking_repr="none" ("OJM_BLK") gives the plain OJM graph on the same blocking dynamics,
 so every graph is compared on exactly the same problem.
 """
@@ -95,8 +108,11 @@ def _attrs(rows, dim=5):
 
 
 class FJSPEnvBlocking(FJSSPEnv):
-    # "node": buffer node type | "dummy": buffers as dummy machines | "none": plain OJM graph
-    BLOCKING_REPRS = ("node", "dummy", "none")
+    # "node": buffer node type | "dummy": buffers as dummy machines |
+    # "feature": buffers as machine/operation features | "none": plain OJM graph
+    BLOCKING_REPRS = ("node", "dummy", "feature", "none")
+    # machine columns of the "feature" representation (after the 3 base columns)
+    N_BASE_MACHINE_FEATS = 3
 
     def __init__(self, instances, mask_option=3, sel_k=5, jm_design="edges",
                  in_cap=IN_CAP, out_cap=OUT_CAP, blocking_repr="node", avoid_deadlocks=True):
@@ -525,6 +541,8 @@ class FJSPEnvBlocking(FJSSPEnv):
             self._add_buffer_nodes(data, idx)
         elif self.blocking_repr == "dummy":
             self._add_dummy_machines(data, idx)
+        elif self.blocking_repr == "feature":
+            self._add_buffer_features(data, idx)
         self.state = data
         self._legal_matrix = legal
         self.calculate_mask(legal)
@@ -641,6 +659,25 @@ class FJSPEnvBlocking(FJSSPEnv):
         dummy_loops = torch.arange(M, 3 * M).repeat(2, 1)
         data['machine', 'listens', 'machine'].edge_index = torch.cat([listens, dummy_loops], dim=1)
 
+    def _add_buffer_features(self, data, idx):
+        """Representation 3 - features only: the output of _buffer_information() (the same
+        one OJMB and OJMD use) is written into extra columns of the existing nodes.
+        Machine m gets its input buffer's [capacity, occupancy, occupancy/capacity] and link
+        [full, free slots/capacity] in columns 3-7, its output buffer's in columns 8-12, and
+        blocked in column 13. An operation inside a buffer gets that part edge's
+        [in_buffer (as in input / in output), priority, waiting time]; the part's machine is
+        its assigned exec edge, which also carries the processing time (part column 3)."""
+        M = self.num_machines
+        feats, part_index, part_attr, _, link_attr = self._buffer_information(idx)
+        buf = torch.cat([feats[:, :3], link_attr[:, :2]], dim=1)  # per buffer, 5 columns
+        data['machine'].x = torch.cat([data['machine'].x, buf[:M], buf[M:], feats[M:, 4:5]], dim=1)
+        op_extra = torch.zeros((data['operation'].x.shape[0], 4))
+        for (i, b), a in zip(part_index.T.tolist(), part_attr.tolist()):
+            op_extra[i, 1 if b >= M else 0] = 1.0
+            op_extra[i, 2] = a[1]  # priority
+            op_extra[i, 3] = a[2]  # waiting time
+        data['operation'].x = torch.cat([data['operation'].x, op_extra], dim=1)
+
     def calculate_mask(self, legal: torch.Tensor | None = None):
         """Same per-job top-sel_k rule as src/env.py, restricted to the routings that the
         buffers currently allow (legal defaults to the matrix of the last _build_state)."""
@@ -682,8 +719,28 @@ class FJSPEnvBlocking(FJSSPEnv):
 
     def normalize_state(self, state):
         raw_machine_x = state['machine'].x
+        raw_op_x = state['operation'].x
         state = super().normalize_state(state)
         if self.blocking_repr == "none":
+            return state
+        if self.blocking_repr == "feature":
+            # the parent min-max ran over the buffer columns too: redo them with the scaling
+            # OJMB uses for the same values (fixed for buffers/links, min-max over the parts
+            # for the waiting time), so every representation sees identical numbers
+            B = self.N_BASE_MACHINE_FEATS
+            x = state['machine'].x.clone()
+            x[:, B:B + 5] = self._scale_buffer_feats(raw_machine_x[:, B:B + 5])
+            x[:, B + 5:B + 10] = self._scale_buffer_feats(raw_machine_x[:, B + 5:B + 10])
+            x[:, B + 10] = 2 * raw_machine_x[:, B + 10] - 1
+            state['machine'].x = x.float()
+            ox = state['operation'].x.clone()
+            ox[:, 2:5] = 2 * raw_op_x[:, 2:5] - 1
+            in_buf = (raw_op_x[:, 2] + raw_op_x[:, 3]) > 0
+            ox[:, 5] = -1.0
+            if in_buf.any():
+                w = raw_op_x[in_buf, 5]
+                ox[in_buf, 5] = 2 * (w - w.min()) / (w.max() - w.min() + 1e-7) - 1
+            state['operation'].x = ox.float()
             return state
         if self.blocking_repr == "node":
             state['buffer'].x = self._scale_buffer_feats(state['buffer'].x)
@@ -725,6 +782,15 @@ class FJSPEnvBlockingDummy(FJSPEnvBlocking):
 
     def __init__(self, instances, mask_option=3, sel_k=5, jm_design="edges",
                  in_cap=IN_CAP, out_cap=OUT_CAP, blocking_repr="dummy", avoid_deadlocks=True):
+        super().__init__(instances, mask_option, sel_k, jm_design, in_cap, out_cap, blocking_repr, avoid_deadlocks)
+
+
+class FJSPEnvBlockingFeatures(FJSPEnvBlocking):
+    """Blocking represented with features on the existing machine/operation nodes only
+    (representation "ojmf")."""
+
+    def __init__(self, instances, mask_option=3, sel_k=5, jm_design="edges",
+                 in_cap=IN_CAP, out_cap=OUT_CAP, blocking_repr="feature", avoid_deadlocks=True):
         super().__init__(instances, mask_option, sel_k, jm_design, in_cap, out_cap, blocking_repr, avoid_deadlocks)
 
 
