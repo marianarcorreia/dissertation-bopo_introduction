@@ -1,0 +1,40 @@
+[
+  {
+    "representation": "oo",
+    "gnn_type": "gin",
+    "study_name": "fjsp_tuning_oo_gin",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [
+      "lr",
+      "hidden_channels",
+      "batch_size",
+      "num_layers",
+      "heads",
+      "n_cases",
+      "new_freq",
+      "K",
+      "use_greedy"
+    ],
+    "n_trials": 10,
+    "best_value": 0.1649630864491546,
+    "best_params": {
+      "new_freq": 50,
+      "n_cases": 120,
+      "batch_size": 64,
+      "lr": 0.003048512648745716,
+      "hidden_channels": 256,
+      "num_layers": 1,
+      "heads": 4,
+      "K": 8,
+      "use_greedy": true
+    },
+    "best_user_attrs": {
+      "best_difference": 0.0015112591938983705,
+      "best_val_avg_gap": 0.1210844439828131,
+      "gnn_type": "gin",
+      "run_dir": "results\\optuna_oo_gin_1790138182\\trial_5",
+      "run_name": "optuna_oo_gin_1790138182/trial_5",
+      "total_runtime_sec": 2477.1592264175415
+    }
+  }
+]

@@ -1,0 +1,1 @@
+[{"episode": 1, "actor_loss": 10.863229751586914, "lr": 0.0007965261308120511, "update_duration_sec": 57.01346707344055, "action_entropy": 1.9543949269824523, "action_entropy_random_ref": 2.2804534159533123, "action_entropy_max_entropy_normalized": 0.85089749456552, "action_entropy_effective_action_count": 8.047701478790644, "actor_grad_norm": 15.778070102588595}]

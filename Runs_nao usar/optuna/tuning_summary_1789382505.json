@@ -1,0 +1,50 @@
+[
+  {
+    "representation": "oo",
+    "study_name": "fjsp_tuning_oo",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [],
+    "n_trials": 1,
+    "best_value": 1.5357181136120044,
+    "best_params": {},
+    "best_user_attrs": {
+      "run_name": "optuna_oo_1789382472/trial_0",
+      "run_dir": "results\\optuna_oo_1789382472\\trial_0",
+      "best_difference": 0.00038580246913588745,
+      "total_runtime_sec": 7.850934982299805,
+      "best_val_avg_gap": 1.2784144675221845
+    }
+  },
+  {
+    "representation": "om",
+    "study_name": "fjsp_tuning_om",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [],
+    "n_trials": 1,
+    "best_value": 0.7763978206502324,
+    "best_params": {},
+    "best_user_attrs": {
+      "run_name": "optuna_om_1789382491/trial_0",
+      "run_dir": "results\\optuna_om_1789382491\\trial_0",
+      "best_difference": 0.0,
+      "total_runtime_sec": 5.370661735534668,
+      "best_val_avg_gap": 0.5421199937880002
+    }
+  },
+  {
+    "representation": "ojm",
+    "study_name": "fjsp_tuning_ojm",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [],
+    "n_trials": 1,
+    "best_value": 0.6519173514350363,
+    "best_params": {},
+    "best_user_attrs": {
+      "run_name": "optuna_ojm_1789382496/trial_0",
+      "run_dir": "results\\optuna_ojm_1789382496\\trial_0",
+      "best_difference": 0.014660493827160503,
+      "total_runtime_sec": 8.784571886062622,
+      "best_val_avg_gap": 0.5076412157065961
+    }
+  }
+]

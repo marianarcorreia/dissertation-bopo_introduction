@@ -1,0 +1,20 @@
+[
+  {
+    "representation": "oo",
+    "gnn_type": "transformer",
+    "study_name": "fjsp_tuning_oo_transformer",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [],
+    "n_trials": 1,
+    "best_value": 0.7589977932704514,
+    "best_params": {},
+    "best_user_attrs": {
+      "best_difference": 0.0,
+      "best_val_avg_gap": 0.6026533565266602,
+      "gnn_type": "transformer",
+      "run_dir": "results\\optuna_oo_transformer_1790083331\\trial_0",
+      "run_name": "optuna_oo_transformer_1790083331/trial_0",
+      "total_runtime_sec": 63.53713893890381
+    }
+  }
+]

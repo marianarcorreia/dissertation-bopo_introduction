@@ -1,0 +1,44 @@
+[
+  {
+    "representation": "om",
+    "gnn_type": "gat",
+    "study_name": "fjsp_tuning_om",
+    "objective": "last_val_gap_Q80",
+    "critical_params": [
+      "lr",
+      "hidden_channels",
+      "batch_size",
+      "num_layers",
+      "heads",
+      "n_cases",
+      "new_freq",
+      "K",
+      "use_greedy",
+      "mask_option",
+      "sel_k"
+    ],
+    "n_trials": 8,
+    "best_value": 0.2605882352941176,
+    "best_params": {
+      "new_freq": 10,
+      "n_cases": 40,
+      "batch_size": 128,
+      "lr": 0.0007965261308120511,
+      "hidden_channels": 256,
+      "num_layers": 1,
+      "heads": 4,
+      "K": 8,
+      "use_greedy": true,
+      "mask_option": 1,
+      "sel_k": 2
+    },
+    "best_user_attrs": {
+      "best_difference": 0.039371405940082094,
+      "best_val_avg_gap": 0.20891272686203988,
+      "gnn_type": "gat",
+      "run_dir": "results\\optuna_om_gat_1790086373\\trial_2",
+      "run_name": "optuna_om_gat_1790086373/trial_2",
+      "total_runtime_sec": 11387.728132247925
+    }
+  }
+]
