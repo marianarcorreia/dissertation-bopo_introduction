@@ -129,6 +129,14 @@ def parse_args():
              "--logp-norm sum --no-exclude-greedy.",
     )
     parser.add_argument(
+        "--jm-design",
+        default=None,
+        choices=["baseline", "edges", "attn"],
+        help="[train] Job-machine action edge design for ojm and the blocking representations "
+             "(see src/env.py:FJSSPEnv.JM_DESIGNS). Default: train() default ('baseline', which "
+             "the blocking envs treat as 'edges').",
+    )
+    parser.add_argument(
         "--seeds",
         type=int,
         nargs="+",
@@ -190,7 +198,8 @@ def parse_args():
 def _override_kwargs(args):
     """Only the flags the user actually passed, so train()/param.py defaults apply otherwise."""
     overrides = {"mask_option": args.mask_option, "sel_k": args.sel_k, "num_layers": args.num_layers,
-                 "logp_norm": args.logp_norm, "exclude_greedy_from_loss": args.exclude_greedy}
+                 "logp_norm": args.logp_norm, "exclude_greedy_from_loss": args.exclude_greedy,
+                 "jm_design": args.jm_design}
     return {k: v for k, v in overrides.items() if v is not None}
 
 

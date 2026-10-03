@@ -296,7 +296,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
     # space, so they get their own study instead of resuming/mixing with the default one.
     overrides = getattr(args, "overrides", None) or {}
     short = {"num_layers": "L", "mask_option": "mask", "sel_k": "selk",
-             "logp_norm": "logp", "exclude_greedy_from_loss": "exgreedy"}
+             "logp_norm": "logp", "exclude_greedy_from_loss": "exgreedy", "jm_design": "jm"}
     override_suffix = "".join(f"_{short[k]}{v}" for k, v in sorted(overrides.items()))
     sel_k_choices = getattr(args, "sel_k_choices", None)
     if sel_k_choices and "sel_k" not in overrides and list(sel_k_choices) != DEFAULT_SEL_K_CHOICES:
