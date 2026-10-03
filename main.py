@@ -33,9 +33,11 @@ def parse_args():
     parser.add_argument(
         "--mode",
         default="train",
-        choices=["train", "test", "optuna"],
+        choices=["train", "test", "train_test", "optuna"],
         help="Mode to run: 'train' (BOPO training), 'test' (evaluate saved models in --models-file "
-             "against --source-folder/--folders), 'optuna' (hyperparameter tuning per representation).",
+             "against --source-folder/--folders), 'train_test' (train, then test that run's best "
+             "checkpoint against --source-folder/--folders, saving the results in the run's "
+             "test/ subfolder), 'optuna' (hyperparameter tuning per representation).",
     )
     parser.add_argument(
         "--run-name",
@@ -118,16 +120,16 @@ def parse_args():
     test_group.add_argument("--models-file", default="models/model_params.json",
                              help="[test] Path to model_params.json.")
     test_group.add_argument("--source-folder", default="val",
-                             help="[test] Base folder containing test subfolders "
+                             help="[test/train_test] Base folder containing test subfolders "
                                   "(e.g. val, data/test, data/benchmarks).")
     test_group.add_argument("--folders", default="instances",
-                             help="[test] Comma-separated subfolder names inside --source-folder.")
+                             help="[test/train_test] Comma-separated subfolder names inside --source-folder.")
     test_group.add_argument("--output-dir", default="results",
                              help="[test] Folder where result JSON files are written.")
     test_group.add_argument("--output-prefix", default="results",
-                             help="[test] Prefix used in output file names.")
+                             help="[test/train_test] Prefix used in output file names.")
     test_group.add_argument("--workers", type=int, default=0,
-                             help="[test] Parallel workers. 0 means one worker per model.")
+                             help="[test/train_test] Parallel workers. 0 means one worker per model.")
 
     optuna_group = parser.add_argument_group("optuna mode")
     optuna_group.add_argument("--trials", type=int, default=30,
@@ -193,6 +195,37 @@ def run_test(args):
     )
 
 
+def run_train_test(args):
+    """Train each representation, then test that run's best checkpoint only (looked up in
+    candidate_models/, where train() records it) and write the results to <run_dir>/test/."""
+    import test as test_cli
+    reps = _resolve_representations(args.representation)
+    multi = len(reps) > 1
+    overrides = _override_kwargs(args)
+    for rep in reps:
+        run_name = f"{args.run_name}_{rep}" if multi else args.run_name
+        print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type} | overrides={overrides}")
+        summary = train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
+                        return_summary=True, **overrides)
+        best_model_path = summary["best_model_path"]
+        if best_model_path is None:
+            print(f"[MAIN] {run_name}: no checkpoint was saved - skipping the test.")
+            continue
+        # train() may have suffixed the folder with a timestamp, so nest under the actual run_dir
+        test_run_name = os.path.join(os.path.relpath(summary["run_dir"], "results"), "test")
+        print(f"[MAIN] Testing {os.path.basename(best_model_path)} | run_name={test_run_name}")
+        test_cli.run_tests(
+            run_name=test_run_name,
+            models_file=os.path.join(os.path.dirname(best_model_path), "model_params.json"),
+            source_folder=args.source_folder,
+            folders=args.folders,
+            output_dir="results",
+            output_prefix=args.output_prefix,
+            workers=args.workers,
+            model_names=[os.path.basename(best_model_path)],
+        )
+
+
 def run_optuna(args):
     import param as param_cli  # sibling param.py
     reps = _resolve_representations(args.representation)
@@ -214,7 +247,7 @@ def run_optuna(args):
     param_cli.run_tuning(optuna_args)
 
 
-_DISPATCH = {"train": run_train, "test": run_test, "optuna": run_optuna}
+_DISPATCH = {"train": run_train, "test": run_test, "train_test": run_train_test, "optuna": run_optuna}
 
 
 if __name__ == "__main__":
@@ -223,9 +256,9 @@ if __name__ == "__main__":
     print(f"[MAIN] Run started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"[MAIN] mode={args.mode}")
     print(f"[MAIN] run_name={args.run_name}")
-    if args.mode in ("train", "optuna"):
+    if args.mode in ("train", "train_test", "optuna"):
         print(f"[MAIN] representation(s)={_resolve_representations(args.representation)}")
-    if args.mode in ("train", "optuna"):
+    if args.mode in ("train", "train_test", "optuna"):
         print(f"[MAIN] gnn_type={args.gnn_type}")
         print(f"[MAIN] overrides={_override_kwargs(args)}")
     print("=" * 60)

@@ -97,9 +97,11 @@ def run_tests(
     output_dir="results",
     output_prefix="results",
     workers=0,
+    model_names=None,
 ):
     """Programmatic entry point for testing (used by both this script's CLI and
-    main.py). Returns the OutputManager's run_dir for the completed run."""
+    main.py). Returns the OutputManager's run_dir for the completed run.
+    model_names, when given, restricts the test to those entries of models_file."""
     start = time.time()
 
     output_manager = OutputManager(output_dir=output_dir, run_name=run_name)
@@ -108,6 +110,11 @@ def run_tests(
 
     with open(models_file, "r") as infile:
         model_params = json.load(infile)
+    if model_names is not None:
+        model_params = [p for p in model_params if p["name"] in model_names]
+        missing = set(model_names) - {p["name"] for p in model_params}
+        if missing:
+            raise ValueError(f"Model(s) not found in {models_file}: {sorted(missing)}")
 
     folder_paths = _parse_folders(folders)
     if not folder_paths:
