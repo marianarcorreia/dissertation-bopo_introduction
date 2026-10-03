@@ -1,0 +1,40 @@
+[QUEUE 10-02 19:22:50] 21 job(s)
+[QUEUE 10-02 19:22:51] [1/21] start csv_ojm_gat_L1_k1_m1_e30_s42
+[QUEUE 10-02 19:23:50] [1/21] FAILED (exit 3221225786) csv_ojm_gat_L1_k1_m1_e30_s42 in 0.02h
+[QUEUE 10-02 19:23:50] [2/21] start csv_ojm_gat_L2_k1_m1_e30_s42
+[QUEUE] --- restarted (detached child processes) ---
+[QUEUE 10-02 19:24:12] 21 job(s)
+[QUEUE 10-02 19:24:12] [1/21] start csv_ojm_gat_L1_k1_m1_e30_s42
+[QUEUE] --- restarted after the D: disconnect ---
+[QUEUE 10-02 22:12:39] 21 job(s)
+[QUEUE 10-02 22:12:39] [1/21] start csv_ojm_gat_L1_k1_m1_e30_s42
+[QUEUE] --- driver swapped (blocking run names fixed); resumes after the current job ---
+[QUEUE 10-02 22:28:37] 21 job(s)
+[QUEUE 10-02 22:28:37] [1/21] skip csv_ojm_gat_L1_k1_m1_e30_s42 (already complete)
+[QUEUE 10-02 22:28:37] [2/21] start csv_ojm_gat_L2_k1_m1_e30_s42
+[QUEUE 10-02 22:48:30] [2/21] done csv_ojm_gat_L2_k1_m1_e30_s42 in 0.33h
+[QUEUE 10-02 22:48:30] [3/21] start csv_ojm_gat_L3_k1_m1_e30_s42
+[QUEUE 10-02 23:12:47] [3/21] done csv_ojm_gat_L3_k1_m1_e30_s42 in 0.40h
+[QUEUE 10-02 23:12:47] [4/21] start csv_ojm_gat_L2_k1_m0_e30_s42
+[QUEUE 10-02 23:31:22] [4/21] done csv_ojm_gat_L2_k1_m0_e30_s42 in 0.31h
+[QUEUE 10-02 23:31:22] [5/21] start csv_ojm_gat_L2_k100_m1_e30_s42
+[QUEUE] --- driver swapped: blocking runs dropped, queue ends after batching; resumes after the current job ---
+[QUEUE 10-02 23:50:35] 13 job(s)
+[QUEUE 10-02 23:50:35] [1/13] skip csv_ojm_gat_L1_k1_m1_e30_s42 (already complete)
+[QUEUE 10-02 23:50:35] [2/13] skip csv_ojm_gat_L2_k1_m1_e30_s42 (already complete)
+[QUEUE 10-02 23:50:35] [3/13] skip csv_ojm_gat_L3_k1_m1_e30_s42 (already complete)
+[QUEUE 10-02 23:50:35] [4/13] skip csv_ojm_gat_L2_k1_m0_e30_s42 (already complete)
+[QUEUE 10-02 23:50:35] [5/13] skip csv_ojm_gat_L2_k100_m1_e30_s42 (already complete)
+[QUEUE 10-02 23:50:35] [6/13] start csv_ojm_gat_L2_k10_m0_e30_s42
+[QUEUE 10-03 00:08:44] [6/13] done csv_ojm_gat_L2_k10_m0_e30_s42 in 0.30h
+[QUEUE 10-03 00:08:44] [7/13] start diag_ojm_gat_L3_selk1_newloss
+[QUEUE 10-03 00:29:36] [7/13] done diag_ojm_gat_L3_selk1_newloss in 0.35h
+[QUEUE 10-03 00:29:36] [8/13] start csv_ojm_gat_L2_k1_m1_e400_s42
+[QUEUE 10-03 02:27:37] [8/13] done csv_ojm_gat_L2_k1_m1_e400_s42 in 1.97h
+[QUEUE 10-03 02:27:37] [9/13] start csv_ojm_gin_L2_k1_m1_e400_s42
+[QUEUE 10-03 04:18:30] [9/13] done csv_ojm_gin_L2_k1_m1_e400_s42 in 1.85h
+[QUEUE 10-03 04:18:30] [10/13] start csv_ojm_transformer_L2_k1_m1_e400_s42
+[QUEUE 10-03 06:19:53] [10/13] done csv_ojm_transformer_L2_k1_m1_e400_s42 in 2.02h
+[QUEUE 10-03 06:19:53] [11/13] start batching sweep gat:3 s42
+[QUEUE 10-03 16:57:55] [11/13] done batching sweep gat:3 s42 in 10.63h
+[QUEUE 10-03 16:57:55] [12/13] start batching sweep gin:3 s42

@@ -56,3 +56,24 @@
 [SWEEP 10-02 16:02:34] start report_metrics_batching_v2_gin_L3_k5_s43_steps on {'ojmb_node_v2': '411825325582948.pth', 'ojmb_edge_v2': '681929219451006.pth', 'ojmb_base_v2': '948172624102402.pth', 'ojmb_feat_v2': '537660859795754.pth'}
 [SWEEP 10-02 16:09:18] done report_metrics_batching_v2_gin_L3_k5_s43_steps in 7 min
 [SWEEP 10-02 16:09:18] start batching_gat_L2_ojmb_node_v2_s44_steps
+[LAUNCHER] restarted 2026-10-02 after the D: drive disconnect (s44 node run restarts from step 0)
+[SWEEP 10-02 19:58:09] skip batching_gat_L2_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gat_L2_ojmb_node_v2_s43_steps: best=candidate_models/896415652061583.pth | val_gap=0.16513149615162678 | test_gap=0.149810347893998
+[SWEEP 10-02 19:58:10] skip batching_gat_L2_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gat_L2_ojmb_edge_v2_s43_steps: best=candidate_models/353679720639032.pth | val_gap=0.14706266167774829 | test_gap=0.12560979907148942
+[SWEEP 10-02 19:58:10] skip batching_gat_L2_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gat_L2_ojmb_base_v2_s43_steps: best=candidate_models/17360939543554.pth | val_gap=0.13681653876021516 | test_gap=0.13448326347718903
+[SWEEP 10-02 19:58:10] skip batching_gat_L2_ojmb_feat_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gat_L2_ojmb_feat_v2_s43_steps: best=candidate_models/482729522553108.pth | val_gap=0.15218438184416933 | test_gap=0.12464904135660566
+[SWEEP 10-02 19:58:10] skip report_metrics_batching_v2_gat_L2_s43_steps (already exists)
+[SWEEP 10-02 19:58:10] skip batching_gin_L3_k5_ojmb_node_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gin_L3_k5_ojmb_node_v2_s43_steps: best=candidate_models/411825325582948.pth | val_gap=0.16734882444798363 | test_gap=0.1275868111409697
+[SWEEP 10-02 19:58:10] skip batching_gin_L3_k5_ojmb_edge_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gin_L3_k5_ojmb_edge_v2_s43_steps: best=candidate_models/681929219451006.pth | val_gap=0.19006457179169253 | test_gap=0.14759768508042556
+[SWEEP 10-02 19:58:10] skip batching_gin_L3_k5_ojmb_base_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gin_L3_k5_ojmb_base_v2_s43_steps: best=candidate_models/948172624102402.pth | val_gap=0.18130398592890526 | test_gap=0.15862114349046072
+[SWEEP 10-02 19:58:10] skip batching_gin_L3_k5_ojmb_feat_v2_s43_steps (already complete)
+[SWEEP 10-02 19:58:10]   batching_gin_L3_k5_ojmb_feat_v2_s43_steps: best=candidate_models/537660859795754.pth | val_gap=0.19550332991426833 | test_gap=0.14916599105878467
+[SWEEP 10-02 19:58:10] skip report_metrics_batching_v2_gin_L3_k5_s43_steps (already exists)
+[SWEEP 10-02 19:58:10] start batching_gat_L2_ojmb_node_v2_s44_steps
+[LAUNCHER] stopped 2026-10-03 14:55 on request: s44 node run hung at step 163 since the D: disconnect; only the seed-42 queue continues

@@ -1,0 +1,42 @@
+{
+    "run_name": "csv_ojm_gat_L2_k1_m0_e30_s42",
+    "representation": "ojm",
+    "gnn_type": "gat",
+    "num_layers": 2,
+    "mask_option": 0,
+    "sel_k": 1,
+    "seed": 42,
+    "logp_norm": "sum",
+    "exclude_greedy_from_loss": false,
+    "jm_design": "baseline",
+    "run_dir": "results\\csv_ojm_gat_L2_k1_m0_e30_s42",
+    "max_episodes": 30,
+    "episodes_completed": 30,
+    "updates_completed": 30,
+    "best_validation_avg_gap": 0.12936549869375863,
+    "best_validation_q80_gap": 0.1604236174887527,
+    "best_model_path": "candidate_models/538796864594147.pth",
+    "test_avg_gap": 0.13726762622503055,
+    "test_std_gap": 0.053584714692059915,
+    "test_q80_gap": 0.17693861910402006,
+    "teacher_val_avg_gap": 0.28501441649749903,
+    "teacher_val_q80_gap": 0.37365152945889496,
+    "teacher_test_avg_gap": 0.30751159183336735,
+    "teacher_test_q80_gap": 0.4045224820504592,
+    "model_version": 2,
+    "actor_param_count": 2803206,
+    "best_difference": 0.0,
+    "total_runtime_sec": 1108.0347843170166,
+    "validation_metrics_file": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\validation_history.json",
+    "episode_metrics_file": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\episode_metrics.json",
+    "update_metrics_file": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\update_metrics.json",
+    "plot_episode_outputs": {
+        "makespan": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\plots\\episode_makespan_curve.png",
+        "duration": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\plots\\episode_duration_curve.png",
+        "validation_avg_gap": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\plots\\validation_avg_gap_points.png"
+    },
+    "plot_update_outputs": {
+        "actor_loss": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\plots\\actor_loss_curve.png",
+        "update_duration": "results\\csv_ojm_gat_L2_k1_m0_e30_s42\\plots\\update_duration_curve.png"
+    }
+}

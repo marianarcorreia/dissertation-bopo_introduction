@@ -1,0 +1,58 @@
+pleRuns from run.txt (seed 42) that were NOT run
+Generated 2026-10-02. The queue was stopped after the batching runs (inclusive).
+
+=====================================================================
+1) BLOCKING - not run (8 runs, about 8-9 h each, about 68 h in total)
+=====================================================================
+Branch: blocking-constraint (worktree already checked out at C:\Users\maria\wt_blocking)
+Setup: same as the existing blk350_* runs - main.py train defaults (lr 5e-4, n_cases 100,
+B 64, K 16, new_freq 500), 350 steps, logp_norm mean, greedy excluded from the loss,
+mask_option 0, jm_design baseline, hidden_channels 128, heads 3, seed 42.
+Representation mapping (code): node = ojmb, feature = ojmf, dummy = ojmd, base = ojm_blk.
+Results go to C:\Users\maria\wt_blocking\results\blocking\<run name>\
+
+CSV row               GNN  Layers sel_k Rep      Run name
+BLOCKING/node         GAT  3      1     ojmb     blk350_gat_L3_selk1_ojmb_s42
+Blocking/feature      GAT  3      1     ojmf     blk350_gat_L3_selk1_ojmf_s42
+Blocking/dummy        GAT  3      1     ojmd     blk350_gat_L3_selk1_ojmd_s42
+Blocking/base         GAT  3      1     ojm_blk  blk350_gat_L3_selk1_ojm_blk_s42
+BLOCKING/node         GINE 3      1     ojmb     blk350_gin_L3_selk1_ojmb_s42
+Blocking/feature      GINE 3      1     ojmf     blk350_gin_L3_selk1_ojmf_s42
+Blocking/dummy        GINE 3      1     ojmd     blk350_gin_L3_selk1_ojmd_s42
+Blocking/base         GINE 3      1     ojm_blk  blk350_gin_L3_selk1_ojm_blk_s42
+
+Commands (run from C:\Users\maria\wt_blocking; "GINE" is the gin backbone, built on GINEConv):
+python main.py --mode train --run-name blk350_gat_L3_selk1_ojmb    --representation ojmb    --gnn-type gat --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+python main.py --mode train --run-name blk350_gat_L3_selk1_ojmf    --representation ojmf    --gnn-type gat --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+python main.py --mode train --run-name blk350_gat_L3_selk1_ojmd    --representation ojmd    --gnn-type gat --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+python main.py --mode train --run-name blk350_gat_L3_selk1_ojm_blk --representation ojm_blk --gnn-type gat --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+python main.py --mode train --run-name blk350_gin_L3_selk1_ojmb    --representation ojmb    --gnn-type gin --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+python main.py --mode train --run-name blk350_gin_L3_selk1_ojmf    --representation ojmf    --gnn-type gin --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+python main.py --mode train --run-name blk350_gin_L3_selk1_ojmd    --representation ojmd    --gnn-type gin --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+python main.py --mode train --run-name blk350_gin_L3_selk1_ojm_blk --representation ojm_blk --gnn-type gin --sel-k 1 --num-layers 3 --max-episodes 350 --seeds 42
+(main.py appends _s42 to the run name.)
+
+Notes on how run.txt differs:
+- run.txt says logp_norm SUM / exclude_greedy FALSE / mask_option 1; the existing blk350 runs
+  used mean / TRUE / 0, so the commands above follow blk350 to stay comparable.
+  To follow run.txt literally instead, add: --logp-norm sum --no-exclude-greedy --mask-option 1
+- run.txt's last 8 blocking rows pair node=ojm_blk, feature=ojmb, base=ojmf; the code defines
+  ojmb = buffer node type, ojmf = buffers as features, ojm_blk = plain OJM graph (baseline).
+
+Blocking rows from run.txt that already exist (not rerun; trained without a fixed seed):
+  GAT L2 sel_k 1 -> blk350_gat_L2_selk1_{ojmb,ojmd,ojmf,ojm_blk}
+  GIN L3 sel_k 5 -> blk350_gin_L3_selk5_{ojmb,ojmd,ojmf,ojm_blk}
+  (results/blocking/ on the blocking-constraint branch)
+
+=====================================================================
+2) Also not run (other reasons)
+=====================================================================
+optuna_ojm_gat_L2_1790500154  gat ojm L2 sel_k 10 mask 1 hidden 128, no seed, 30 eps
+optuna_ojm_gat_L2_1790500154  gat ojm L2 sel_k 1  mask 1 hidden 256, no seed, 30 eps
+  -> Optuna trials: their other hyperparameters (lr, batch size, ...) come from the trial,
+     and hidden_channels 256 cannot be set through run_diagnostic_job.py.
+
+Rows skipped because the run already exists:
+  reseed_ojm_gat_s43, seeds_oo_gat_L2_s42 (Runs_a questionar/), train_run_ojm (results/),
+  Batching GAT L2 sel_k 1 seed 42 (results/batching_gat_L2_ojmb_*_v2_s42_steps).
+Row 6 of run.txt duplicates row 4 (GAT OJM L2 sel_k 1 mask 0, 30 eps) and was run once.
