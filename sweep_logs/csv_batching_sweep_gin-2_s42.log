@@ -1,0 +1,15 @@
+[SWEEP 10-04 01:20:50] start batching_gin_L2_ojmb_node_v2_s42
+[SWEEP 10-04 03:30:13] done batching_gin_L2_ojmb_node_v2_s42 in 2.16 h
+[SWEEP 10-04 03:30:13]   batching_gin_L2_ojmb_node_v2_s42: best=candidate_models/87572601051817.pth | val_gap=0.13211212530381314 | test_gap=0.10701447012546997
+[SWEEP 10-04 03:30:13] start batching_gin_L2_ojmb_edge_v2_s42
+[SWEEP 10-04 05:25:47] done batching_gin_L2_ojmb_edge_v2_s42 in 1.93 h
+[SWEEP 10-04 05:25:47]   batching_gin_L2_ojmb_edge_v2_s42: best=candidate_models/656861295438343.pth | val_gap=0.1336355340701668 | test_gap=0.12375968754410967
+[SWEEP 10-04 05:25:47] start batching_gin_L2_ojmb_base_v2_s42
+[SWEEP 10-04 07:06:58] done batching_gin_L2_ojmb_base_v2_s42 in 1.69 h
+[SWEEP 10-04 07:06:58]   batching_gin_L2_ojmb_base_v2_s42: best=candidate_models/607799136706282.pth | val_gap=0.1224983735648662 | test_gap=0.10165144733647553
+[SWEEP 10-04 07:06:58] start batching_gin_L2_ojmb_feat_v2_s42
+[SWEEP 10-04 09:04:05] done batching_gin_L2_ojmb_feat_v2_s42 in 1.95 h
+[SWEEP 10-04 09:04:05]   batching_gin_L2_ojmb_feat_v2_s42: best=candidate_models/255641086077630.pth | val_gap=0.14008645816074744 | test_gap=0.10613710737689482
+[SWEEP 10-04 09:04:05] start report_metrics_batching_v2_gin_L2_s42 on {'ojmb_node_v2': '87572601051817.pth', 'ojmb_edge_v2': '656861295438343.pth', 'ojmb_base_v2': '607799136706282.pth', 'ojmb_feat_v2': '255641086077630.pth'}
+[SWEEP 10-04 09:07:16] done report_metrics_batching_v2_gin_L2_s42 in 3 min
+[SWEEP 10-04 09:07:16] sweep finished

@@ -38,3 +38,8 @@
 [QUEUE 10-03 06:19:53] [11/13] start batching sweep gat:3 s42
 [QUEUE 10-03 16:57:55] [11/13] done batching sweep gat:3 s42 in 10.63h
 [QUEUE 10-03 16:57:55] [12/13] start batching sweep gin:3 s42
+[QUEUE 10-04 01:20:50] [12/13] done batching sweep gin:3 s42 in 8.38h
+[QUEUE 10-04 01:20:50] [13/13] start batching sweep gin:2 s42
+[QUEUE 10-04 09:07:16] [13/13] done batching sweep gin:2 s42 in 7.77h
+[QUEUE 10-04 09:07:16] queue finished, resuming the suspended seed-43/44 sweep
+[QUEUE 10-04 09:07:17] done

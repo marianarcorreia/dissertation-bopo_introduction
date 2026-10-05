@@ -1,0 +1,14 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+[METRICS] data/batching/batching_test_split.json: 20 instance(s), 20 with a CP-SAT reference
+[METRICS] 87572601051817.pth (ojmb_node_v2) on data/batching/batching_test_split.json ...
+[METRICS]   makespan=396.4 | RE=0.1070 | RE_lb=0.1647 | score=0.9092 | feasible=1.0000 | ms/decision=26.0365
+[METRICS] 656861295438343.pth (ojmb_edge_v2) on data/batching/batching_test_split.json ...
+[METRICS]   makespan=402.4 | RE=0.1238 | RE_lb=0.1820 | score=0.8983 | feasible=1.0000 | ms/decision=20.5536
+[METRICS] 607799136706282.pth (ojmb_base_v2) on data/batching/batching_test_split.json ...
+[METRICS]   makespan=394.4 | RE=0.1017 | RE_lb=0.1584 | score=0.9104 | feasible=1.0000 | ms/decision=18.5698
+[METRICS] 255641086077630.pth (ojmb_feat_v2) on data/batching/batching_test_split.json ...
+[METRICS]   makespan=396.6 | RE=0.1061 | RE_lb=0.1629 | score=0.9088 | feasible=1.0000 | ms/decision=19.5221
+[METRICS] Report: results/metrics\report_metrics_batching_v2_gin_L2_s42.json
+[METRICS] Summary: results/metrics\report_metrics_batching_v2_gin_L2_s42.md
+[METRICS] Chart: results/metrics\report_metrics_batching_v2_gin_L2_s42.png
