@@ -116,6 +116,12 @@ def parse_args():
              "default). --no-exclude-greedy keeps it in, as before f1b12fe. The old loss is "
              "--logp-norm sum --no-exclude-greedy.",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="[train/train_test] Seed for random/numpy/torch. Default: unseeded (train() default).",
+    )
     test_group = parser.add_argument_group("test mode")
     test_group.add_argument("--models-file", default="models/model_params.json",
                              help="[test] Path to model_params.json.")
@@ -179,7 +185,7 @@ def run_train(args):
         run_name = f"{args.run_name}_{rep}" if multi else args.run_name
         print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type} | overrides={overrides}")
         train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
-              **overrides)
+              seed=args.seed, **overrides)
 
 
 def run_test(args):
@@ -206,7 +212,7 @@ def run_train_test(args):
         run_name = f"{args.run_name}_{rep}" if multi else args.run_name
         print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type} | overrides={overrides}")
         summary = train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
-                        return_summary=True, **overrides)
+                        seed=args.seed, return_summary=True, **overrides)
         best_model_path = summary["best_model_path"]
         if best_model_path is None:
             print(f"[MAIN] {run_name}: no checkpoint was saved - skipping the test.")
@@ -261,6 +267,8 @@ if __name__ == "__main__":
     if args.mode in ("train", "train_test", "optuna"):
         print(f"[MAIN] gnn_type={args.gnn_type}")
         print(f"[MAIN] overrides={_override_kwargs(args)}")
+    if args.mode in ("train", "train_test"):
+        print(f"[MAIN] seed={args.seed}")
     print("=" * 60)
 
     _DISPATCH[args.mode](args)
