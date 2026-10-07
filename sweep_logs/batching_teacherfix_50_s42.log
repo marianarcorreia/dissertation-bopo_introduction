@@ -38,6 +38,7 @@ D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_
 [TRAIN][WARMSTART] step 130/200 | instance=26 | bc_loss=1.8281 | decisions=52
 [TRAIN][WARMSTART] step 140/200 | instance=99 | bc_loss=1.4999 | decisions=47
 [TRAIN][WARMSTART] step 150/200 | instance=53 | bc_loss=1.5784 | decisions=51
+<<<<<<< Updated upstream
 [TRAIN][WARMSTART] step 160/200 | instance=9 | bc_loss=1.7505 | decisions=43
 [TRAIN][WARMSTART] step 170/200 | instance=44 | bc_loss=2.0161 | decisions=52
 [TRAIN][WARMSTART] step 180/200 | instance=93 | bc_loss=1.3693 | decisions=46
@@ -306,3 +307,5 @@ D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_
 [TRAIN][23:41:15] Training ended. Validation history and plots updated.
 [MAIN] Run finished at 2026-09-26 23:41:15
 ============================================================
+=======
+>>>>>>> Stashed changes
