@@ -1,0 +1,430 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-10-06 11:41:56
+[MAIN] mode=train_test
+[MAIN] run_name=gat_ojm_L2_selk10_mask1_mean_exg_s42
+[MAIN] representation(s)=['ojm']
+[MAIN] gnn_type=gat
+[MAIN] overrides={'mask_option': 1, 'sel_k': 10, 'num_layers': 2, 'logp_norm': 'mean', 'exclude_greedy_from_loss': True}
+[MAIN] seed=42
+============================================================
+[MAIN] Training representation=ojm | run_name=gat_ojm_L2_selk10_mask1_mean_exg_s42 | gnn_type=gat | overrides={'mask_option': 1, 'sel_k': 10, 'num_layers': 2, 'logp_norm': 'mean', 'exclude_greedy_from_loss': True}
+============================================================
+[TRAIN] Training started at: 2026-10-06 11:41:56
+[TRAIN] Hyperparams | max_steps=30 | new_freq=500
+[TRAIN]             | n_cases=100 | B=64 | K=16 | use_greedy=True | lr=0.0005 (decaying to 1.00e-04)
+[TRAIN]             | warm_start_steps=200 | checkpoint_smooth_window=3 | seed=42
+[TRAIN]             | hidden_channels=128 | num_layers=2 | heads=3
+[TRAIN]             | logp_norm=mean | exclude_greedy_from_loss=True
+[TRAIN] Representation | ojm | GNN | gat | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\gat_ojm_L2_selk10_mask1_mean_exg_s42
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=20 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 200 step(s)...
+[TRAIN][WARMSTART] step 10/200 | instance=48 | bc_loss=3.1688 | decisions=55
+[TRAIN][WARMSTART] step 20/200 | instance=83 | bc_loss=2.6645 | decisions=44
+[TRAIN][WARMSTART] step 30/200 | instance=1 | bc_loss=3.1982 | decisions=45
+[TRAIN][WARMSTART] step 40/200 | instance=87 | bc_loss=2.6392 | decisions=56
+[TRAIN][WARMSTART] step 50/200 | instance=67 | bc_loss=2.7888 | decisions=44
+[TRAIN][WARMSTART] step 60/200 | instance=55 | bc_loss=3.1332 | decisions=42
+[TRAIN][WARMSTART] step 70/200 | instance=89 | bc_loss=3.2508 | decisions=44
+[TRAIN][WARMSTART] step 80/200 | instance=77 | bc_loss=2.9217 | decisions=55
+[TRAIN][WARMSTART] step 90/200 | instance=39 | bc_loss=3.2052 | decisions=56
+[TRAIN][WARMSTART] step 100/200 | instance=88 | bc_loss=2.5205 | decisions=50
+[TRAIN][WARMSTART] step 110/200 | instance=72 | bc_loss=2.8144 | decisions=47
+[TRAIN][WARMSTART] step 120/200 | instance=29 | bc_loss=2.5196 | decisions=49
+[TRAIN][WARMSTART] step 130/200 | instance=13 | bc_loss=2.5435 | decisions=46
+[TRAIN][WARMSTART] step 140/200 | instance=4 | bc_loss=2.9416 | decisions=57
+[TRAIN][WARMSTART] step 150/200 | instance=23 | bc_loss=2.7609 | decisions=50
+[TRAIN][WARMSTART] step 160/200 | instance=8 | bc_loss=2.3971 | decisions=46
+[TRAIN][WARMSTART] step 170/200 | instance=95 | bc_loss=2.7950 | decisions=53
+[TRAIN][WARMSTART] step 180/200 | instance=56 | bc_loss=2.6728 | decisions=48
+[TRAIN][WARMSTART] step 190/200 | instance=44 | bc_loss=2.2143 | decisions=45
+[TRAIN][WARMSTART] step 200/200 | instance=28 | bc_loss=2.6729 | decisions=56
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 30 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/30 | 11:50:17
+[TRAIN] Step 1 | Loss=0.987231 | Best makespan in group=509.00
+[TRAIN] Step 2/30 | 11:51:02
+[TRAIN] Step 2 | Loss=0.774852 | Best makespan in group=650.00
+[TRAIN] Step 3/30 | 11:51:48
+[TRAIN] Step 3 | Loss=0.872216 | Best makespan in group=645.00
+[TRAIN] Step 4/30 | 11:52:24
+[TRAIN] Step 4 | Loss=0.856883 | Best makespan in group=634.00
+[TRAIN] Step 5/30 | 11:53:08
+[TRAIN] Step 5 | Loss=0.760415 | Best makespan in group=561.00
+[TRAIN] Step 6/30 | 11:53:46
+[TRAIN] Step 6 | Loss=0.625833 | Best makespan in group=441.00
+[TRAIN] Step 7/30 | 11:54:21
+[TRAIN] Step 7 | Loss=0.712282 | Best makespan in group=547.00
+[TRAIN] Step 8/30 | 11:54:52
+[TRAIN] Step 8 | Loss=0.754131 | Best makespan in group=684.00
+[TRAIN] Step 9/30 | 11:55:34
+[TRAIN] Step 9 | Loss=0.922862 | Best makespan in group=468.00
+[TRAIN] Step 10/30 | 11:56:12
+[TRAIN] Step 10 | Loss=0.718051 | Best makespan in group=585.00
+[TRAIN] Step 11/30 | 11:56:53
+[TRAIN] Step 11 | Loss=0.797166 | Best makespan in group=580.00
+[TRAIN] Step 12/30 | 11:57:28
+[TRAIN] Step 12 | Loss=0.710231 | Best makespan in group=407.00
+[TRAIN] Step 13/30 | 11:58:09
+[TRAIN] Step 13 | Loss=0.712624 | Best makespan in group=529.00
+[TRAIN] Step 14/30 | 11:58:43
+[TRAIN] Step 14 | Loss=0.764898 | Best makespan in group=510.00
+[TRAIN] Step 15/30 | 11:59:16
+[TRAIN] Step 15 | Loss=0.617145 | Best makespan in group=440.00
+[TRAIN] Step 16/30 | 11:59:53
+[TRAIN] Step 16 | Loss=0.854019 | Best makespan in group=383.00
+[TRAIN] Step 17/30 | 12:00:29
+[TRAIN] Step 17 | Loss=0.609462 | Best makespan in group=590.00
+[TRAIN] Step 18/30 | 12:01:01
+[TRAIN] Step 18 | Loss=0.584119 | Best makespan in group=508.00
+[TRAIN] Step 19/30 | 12:01:43
+[TRAIN] Step 19 | Loss=0.706874 | Best makespan in group=601.00
+[TRAIN] Step 20/30 | 12:02:22
+[TRAIN] Step 20 | Loss=0.545704 | Best makespan in group=592.00
+[TRAIN][VAL][ep 20] avg_gap=0.8630 | std_gap=0.5772 | q80_gap=1.2394 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.8630 (raw=0.8630) | saving candidate: 401522769685059.pth
+[TRAIN] Step 21/30 | 12:04:37
+[TRAIN] Step 21 | Loss=0.759045 | Best makespan in group=425.00
+[TRAIN] Step 22/30 | 12:05:11
+[TRAIN] Step 22 | Loss=0.689648 | Best makespan in group=532.00
+[TRAIN] Step 23/30 | 12:05:59
+[TRAIN] Step 23 | Loss=0.741080 | Best makespan in group=488.00
+[TRAIN] Step 24/30 | 12:06:41
+[TRAIN] Step 24 | Loss=0.632194 | Best makespan in group=599.00
+[TRAIN] Step 25/30 | 12:07:25
+[TRAIN] Step 25 | Loss=0.531267 | Best makespan in group=453.00
+[TRAIN] Step 26/30 | 12:08:05
+[TRAIN] Step 26 | Loss=0.711842 | Best makespan in group=601.00
+[TRAIN] Step 27/30 | 12:08:43
+[TRAIN] Step 27 | Loss=0.766531 | Best makespan in group=504.00
+[TRAIN] Step 28/30 | 12:09:23
+[TRAIN] Step 28 | Loss=0.657416 | Best makespan in group=560.00
+[TRAIN] Step 29/30 | 12:10:11
+[TRAIN] Step 29 | Loss=0.510820 | Best makespan in group=540.00
+[TRAIN] Step 30/30 | 12:10:42
+[TRAIN] Step 30 | Loss=0.720000 | Best makespan in group=413.00
+[TRAIN][VAL][ep 30] avg_gap=0.8447 | std_gap=0.6426 | q80_gap=1.2563 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.8539 (raw=0.8447) | saving candidate: 611873475891641.pth
+[TRAIN] Evaluating best checkpoint (candidate_models/611873475891641.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.8399 | std_gap=0.5954 | q80_gap=1.3318 | n=40
+[TRAIN][12:14:26] Training ended. Validation history and plots updated.
+[MAIN] Testing 611873475891641.pth | run_name=gat_ojm_L2_selk10_mask1_mean_exg_s42\test
+[TEST] run_name=gat_ojm_L2_selk10_mask1_mean_exg_s42\test
+[TEST] Output run folder: results\gat_ojm_L2_selk10_mask1_mean_exg_s42\test
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val001.fjs 664.0 1.8886749744415283
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val002.fjs 627.0 1.8366734981536865
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val003.fjs 983.0 1.8981635570526123
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val004.fjs 626.0 1.8356842994689941
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val005.fjs 713.0 1.8838768005371094
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val006.fjs 733.0 1.839848279953003
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val007.fjs 1063.0 1.8242990970611572
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val008 - Cópia.fjs 438.0 1.7961413860321045
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val008.fjs 438.0 1.7706129550933838
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val009.fjs 884.0 1.7841670513153076
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val010.fjs 696.0 1.7847306728363037
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val011.fjs 460.0 1.7056303024291992
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val012.fjs 448.0 1.7308905124664307
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val013.fjs 510.0 1.7359163761138916
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val014.fjs 516.0 1.708721399307251
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val015.fjs 519.0 1.757741928100586
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val016.fjs 474.0 1.7258820533752441
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val017.fjs 424.0 1.7967917919158936
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val018.fjs 440.0 1.711334228515625
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val019.fjs 538.0 1.7362546920776367
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val020.fjs 559.0 1.7115254402160645
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val021.fjs 653.0 1.627622365951538
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val022.fjs 708.0 1.6194157600402832
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val023.fjs 648.0 1.6158943176269531
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val024.fjs 566.0 1.6285452842712402
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val025.fjs 661.0 1.6862742900848389
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val026.fjs 647.0 1.6068897247314453
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val027.fjs 615.0 1.623033046722412
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val028.fjs 629.0 1.590679407119751
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val029.fjs 715.0 1.6001265048980713
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val030.fjs 669.0 1.632399082183838
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val031.fjs 901.0 1.671593427658081
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val032.fjs 888.0 1.7118549346923828
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val033.fjs 1051.0 1.7273752689361572
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val034.fjs 880.0 1.6747775077819824
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val035.fjs 640.0 1.7379810810089111
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val036.fjs 1051.0 1.6983551979064941
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val037.fjs 788.0 1.6766486167907715
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val038.fjs 637.0 1.6562168598175049
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val039.fjs 802.0 1.6729538440704346
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val040.fjs 812.0 1.6524696350097656
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val041.fjs 1143.0 2.7705841064453125
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val042.fjs 985.0 2.763946294784546
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val043.fjs 642.0 2.7767157554626465
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val044.fjs 746.0 2.707035779953003
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val045.fjs 974.0 2.779999017715454
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val046.fjs 620.0 2.7486319541931152
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val047.fjs 798.0 2.7845468521118164
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val048.fjs 735.0 2.6917271614074707
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val049.fjs 763.0 2.77022647857666
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val050.fjs 651.0 2.783236265182495
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val051.fjs 558.0 2.5511245727539062
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val052.fjs 566.0 2.5360541343688965
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val053.fjs 611.0 2.6080477237701416
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val054.fjs 601.0 2.579651355743408
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val055.fjs 641.0 2.6379177570343018
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val056.fjs 772.0 2.537567377090454
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val057.fjs 590.0 2.5337941646575928
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val058.fjs 540.0 2.5236899852752686
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val059.fjs 634.0 2.552957773208618
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val060.fjs 523.0 2.554297685623169
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val061.fjs 980.0 3.6930060386657715
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val062.fjs 848.0 3.7263998985290527
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val063.fjs 913.0 3.6506614685058594
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val064.fjs 1506.0 3.7179577350616455
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val065.fjs 911.0 3.670565605163574
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val066.fjs 1523.0 3.766596794128418
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val067.fjs 1347.0 3.6847925186157227
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val068.fjs 945.0 3.8035733699798584
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val069.fjs 1216.0 3.6898579597473145
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val070.fjs 1005.0 3.7341206073760986
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val071.fjs 888.0 3.4276442527770996
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val072.fjs 673.0 3.41845440864563
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val073.fjs 692.0 3.5148894786834717
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val074.fjs 739.0 3.3858320713043213
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val075.fjs 724.0 3.3768246173858643
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val076.fjs 760.0 3.4116897583007812
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val077.fjs 811.0 3.4222445487976074
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val078.fjs 673.0 3.4451491832733154
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val079.fjs 778.0 3.388908863067627
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val080.fjs 732.0 3.436694383621216
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val081.fjs 1062.0 3.2444636821746826
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val082.fjs 1085.0 3.32850980758667
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val083.fjs 1091.0 3.3085598945617676
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val084.fjs 1052.0 3.3057944774627686
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val085.fjs 1031.0 3.3982045650482178
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val086.fjs 1121.0 3.27555251121521
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val087.fjs 1125.0 3.284440755844116
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val088.fjs 1119.0 3.2861733436584473
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val089.fjs 1159.0 3.309896945953369
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val090.fjs 1137.0 3.2602763175964355
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val091 - Cópia.fjs 1211.0 3.387101411819458
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val091.fjs 1211.0 3.350722074508667
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val092.fjs 1231.0 3.465358257293701
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val093.fjs 1343.0 3.430604934692383
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val094.fjs 1163.0 3.4014127254486084
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val095.fjs 1503.0 3.4783823490142822
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val096.fjs 1584.0 3.3798723220825195
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val097.fjs 1285.0 3.349731206893921
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val098.fjs 1269.0 3.370912790298462
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val099.fjs 1020.0 3.3566911220550537
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val100.fjs 1451.0 3.3692939281463623
+[OK] Saved: results\gat_ojm_L2_selk10_mask1_mean_exg_s42\test\results_instances.json
+[DONE] Total elapsed time: 951.67s
+[MAIN] Run finished at 2026-10-06 12:30:17
+============================================================

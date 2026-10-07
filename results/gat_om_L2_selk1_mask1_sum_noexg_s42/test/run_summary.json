@@ -1,0 +1,1 @@
+{"run_name": "gat_om_L2_selk1_mask1_sum_noexg_s42\\test", "run_dir": "results\\gat_om_L2_selk1_mask1_sum_noexg_s42\\test", "models_file": "candidate_models\\model_params.json", "source_folder": "val", "folders": ["instances"], "workers": 0, "total_runtime_sec": 715.3625011444092}

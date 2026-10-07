@@ -1,0 +1,1196 @@
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+============================================================
+[MAIN] Run started at 2026-10-06 18:25:22
+[MAIN] mode=train_test
+[MAIN] run_name=gat_ojm_L2_selk10_mask0_sum_noexg_s42
+[MAIN] representation(s)=['ojm']
+[MAIN] gnn_type=gat
+[MAIN] overrides={'mask_option': 0, 'sel_k': 10, 'num_layers': 2, 'logp_norm': 'sum', 'exclude_greedy_from_loss': False}
+[MAIN] seed=42
+============================================================
+[MAIN] Training representation=ojm | run_name=gat_ojm_L2_selk10_mask0_sum_noexg_s42 | gnn_type=gat | overrides={'mask_option': 0, 'sel_k': 10, 'num_layers': 2, 'logp_norm': 'sum', 'exclude_greedy_from_loss': False}
+============================================================
+[TRAIN] Training started at: 2026-10-06 18:25:23
+[TRAIN] Hyperparams | max_steps=400 | new_freq=500
+[TRAIN]             | n_cases=100 | B=64 | K=16 | use_greedy=True | lr=0.0005 (decaying to 1.00e-04)
+[TRAIN]             | warm_start_steps=200 | checkpoint_smooth_window=3 | seed=42
+[TRAIN]             | hidden_channels=128 | num_layers=2 | heads=3
+[TRAIN]             | logp_norm=sum | exclude_greedy_from_loss=False
+[TRAIN] Representation | ojm | GNN | gat | jm_design | baseline
+[TRAIN] Problem size | jobs=[8,10] | machines=[5,10] | ops_per_job=[5,6] | max_proc=100
+============================================================
+[TRAIN] Output run folder: results\gat_ojm_L2_selk10_mask0_sum_noexg_s42
+[VALIDATION] Note: using the existing fixed validation dataset at val/validation_dataset.json (40 instances) - the requested sample_size=20 is ignored so every run stays comparable. Delete val/validation_dataset.json (and its paired val/test_dataset.json) to regenerate both splits at a new size.
+[TRAIN] Validation config | every=20 steps | instances=40 (representative subset)
+[TRAIN] Warm-start (behavior cloning vs. dispatch heuristic) | 200 step(s)...
+[TRAIN][WARMSTART] step 10/200 | instance=45 | bc_loss=3.3433 | decisions=55
+[TRAIN][WARMSTART] step 20/200 | instance=48 | bc_loss=3.2391 | decisions=55
+[TRAIN][WARMSTART] step 30/200 | instance=33 | bc_loss=3.1186 | decisions=52
+[TRAIN][WARMSTART] step 40/200 | instance=74 | bc_loss=2.6380 | decisions=49
+[TRAIN][WARMSTART] step 50/200 | instance=15 | bc_loss=3.0565 | decisions=57
+[TRAIN][WARMSTART] step 60/200 | instance=67 | bc_loss=2.5491 | decisions=44
+[TRAIN][WARMSTART] step 70/200 | instance=92 | bc_loss=3.2670 | decisions=44
+[TRAIN][WARMSTART] step 80/200 | instance=26 | bc_loss=3.5181 | decisions=47
+[TRAIN][WARMSTART] step 90/200 | instance=85 | bc_loss=2.5345 | decisions=43
+[TRAIN][WARMSTART] step 100/200 | instance=94 | bc_loss=2.7901 | decisions=50
+[TRAIN][WARMSTART] step 110/200 | instance=15 | bc_loss=2.7665 | decisions=57
+[TRAIN][WARMSTART] step 120/200 | instance=45 | bc_loss=2.5854 | decisions=55
+[TRAIN][WARMSTART] step 130/200 | instance=14 | bc_loss=2.1504 | decisions=53
+[TRAIN][WARMSTART] step 140/200 | instance=39 | bc_loss=2.3869 | decisions=56
+[TRAIN][WARMSTART] step 150/200 | instance=77 | bc_loss=2.3961 | decisions=56
+[TRAIN][WARMSTART] step 160/200 | instance=21 | bc_loss=2.1214 | decisions=43
+[TRAIN][WARMSTART] step 170/200 | instance=85 | bc_loss=2.0110 | decisions=43
+[TRAIN][WARMSTART] step 180/200 | instance=29 | bc_loss=1.5272 | decisions=50
+[TRAIN][WARMSTART] step 190/200 | instance=82 | bc_loss=1.6763 | decisions=44
+[TRAIN][WARMSTART] step 200/200 | instance=87 | bc_loss=1.6970 | decisions=56
+[TRAIN] Warm-start complete, switching to BOPO preference optimization.
+------------------------------------------------------------
+[TRAIN] BOPO agent ready. Starting training loop for 400 step(s)...
+------------------------------------------------------------
+[TRAIN] Step 1/400 | 18:32:41
+[TRAIN] Step 1 | Loss=1.305606 | Best makespan in group=383.00
+[TRAIN] Step 2/400 | 18:33:15
+[TRAIN] Step 2 | Loss=-0.000000 | Best makespan in group=394.00
+[TRAIN] Step 3/400 | 18:33:49
+[TRAIN] Step 3 | Loss=1.226614 | Best makespan in group=508.00
+[TRAIN] Step 4/400 | 18:34:19
+[TRAIN] Step 4 | Loss=2.187555 | Best makespan in group=394.00
+[TRAIN] Step 5/400 | 18:34:50
+[TRAIN] Step 5 | Loss=-0.000000 | Best makespan in group=430.00
+[TRAIN] Step 6/400 | 18:35:26
+[TRAIN] Step 6 | Loss=0.000011 | Best makespan in group=531.00
+[TRAIN] Step 7/400 | 18:35:55
+[TRAIN] Step 7 | Loss=1.435005 | Best makespan in group=531.00
+[TRAIN] Step 8/400 | 18:36:26
+[TRAIN] Step 8 | Loss=1.764517 | Best makespan in group=439.00
+[TRAIN] Step 9/400 | 18:37:06
+[TRAIN] Step 9 | Loss=0.001670 | Best makespan in group=494.00
+[TRAIN] Step 10/400 | 18:37:43
+[TRAIN] Step 10 | Loss=-0.000000 | Best makespan in group=433.00
+[TRAIN] Step 11/400 | 18:38:18
+[TRAIN] Step 11 | Loss=0.091355 | Best makespan in group=466.00
+[TRAIN] Step 12/400 | 18:38:46
+[TRAIN] Step 12 | Loss=2.501722 | Best makespan in group=379.00
+[TRAIN] Step 13/400 | 18:39:19
+[TRAIN] Step 13 | Loss=-0.000000 | Best makespan in group=472.00
+[TRAIN] Step 14/400 | 18:39:53
+[TRAIN] Step 14 | Loss=-0.000000 | Best makespan in group=528.00
+[TRAIN] Step 15/400 | 18:40:26
+[TRAIN] Step 15 | Loss=-0.000000 | Best makespan in group=518.00
+[TRAIN] Step 16/400 | 18:40:55
+[TRAIN] Step 16 | Loss=-0.000000 | Best makespan in group=320.00
+[TRAIN] Step 17/400 | 18:41:24
+[TRAIN] Step 17 | Loss=0.011932 | Best makespan in group=498.00
+[TRAIN] Step 18/400 | 18:41:57
+[TRAIN] Step 18 | Loss=0.000000 | Best makespan in group=475.00
+[TRAIN] Step 19/400 | 18:42:25
+[TRAIN] Step 19 | Loss=0.000001 | Best makespan in group=518.00
+[TRAIN] Step 20/400 | 18:42:59
+[TRAIN] Step 20 | Loss=0.000005 | Best makespan in group=515.00
+[TRAIN][VAL][ep 20] avg_gap=0.4738 | std_gap=0.4567 | q80_gap=0.7923 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.4738 (raw=0.4738) | saving candidate: 53305626639103.pth
+[TRAIN] Step 21/400 | 18:45:11
+[TRAIN] Step 21 | Loss=-0.000000 | Best makespan in group=522.00
+[TRAIN] Step 22/400 | 18:45:48
+[TRAIN] Step 22 | Loss=0.480146 | Best makespan in group=476.00
+[TRAIN] Step 23/400 | 18:46:16
+[TRAIN] Step 23 | Loss=0.242569 | Best makespan in group=402.00
+[TRAIN] Step 24/400 | 18:46:48
+[TRAIN] Step 24 | Loss=-0.000000 | Best makespan in group=406.00
+[TRAIN] Step 25/400 | 18:47:17
+[TRAIN] Step 25 | Loss=1.887134 | Best makespan in group=385.00
+[TRAIN] Step 26/400 | 18:47:49
+[TRAIN] Step 26 | Loss=-0.000000 | Best makespan in group=483.00
+[TRAIN] Step 27/400 | 18:48:28
+[TRAIN] Step 27 | Loss=-0.000000 | Best makespan in group=438.00
+[TRAIN] Step 28/400 | 18:48:56
+[TRAIN] Step 28 | Loss=0.002542 | Best makespan in group=484.00
+[TRAIN] Step 29/400 | 18:49:38
+[TRAIN] Step 29 | Loss=-0.000000 | Best makespan in group=422.00
+[TRAIN] Step 30/400 | 18:50:11
+[TRAIN] Step 30 | Loss=0.350558 | Best makespan in group=518.00
+[TRAIN] Step 31/400 | 18:50:50
+[TRAIN] Step 31 | Loss=-0.000000 | Best makespan in group=431.00
+[TRAIN] Step 32/400 | 18:51:22
+[TRAIN] Step 32 | Loss=0.001304 | Best makespan in group=481.00
+[TRAIN] Step 33/400 | 18:51:50
+[TRAIN] Step 33 | Loss=0.067518 | Best makespan in group=487.00
+[TRAIN] Step 34/400 | 18:52:22
+[TRAIN] Step 34 | Loss=-0.000000 | Best makespan in group=387.00
+[TRAIN] Step 35/400 | 18:52:52
+[TRAIN] Step 35 | Loss=0.012822 | Best makespan in group=448.00
+[TRAIN] Step 36/400 | 18:53:23
+[TRAIN] Step 36 | Loss=-0.000000 | Best makespan in group=503.00
+[TRAIN] Step 37/400 | 18:53:58
+[TRAIN] Step 37 | Loss=-0.000000 | Best makespan in group=409.00
+[TRAIN] Step 38/400 | 18:54:27
+[TRAIN] Step 38 | Loss=-0.000000 | Best makespan in group=393.00
+[TRAIN] Step 39/400 | 18:54:58
+[TRAIN] Step 39 | Loss=-0.000000 | Best makespan in group=479.00
+[TRAIN] Step 40/400 | 18:55:36
+[TRAIN] Step 40 | Loss=-0.000000 | Best makespan in group=480.00
+[TRAIN][VAL][ep 40] avg_gap=0.4018 | std_gap=0.2884 | q80_gap=0.5455 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.4378 (raw=0.4018) | saving candidate: 380785950657604.pth
+[TRAIN] Step 41/400 | 18:57:38
+[TRAIN] Step 41 | Loss=-0.000000 | Best makespan in group=444.00
+[TRAIN] Step 42/400 | 18:58:13
+[TRAIN] Step 42 | Loss=2.259406 | Best makespan in group=534.00
+[TRAIN] Step 43/400 | 18:58:47
+[TRAIN] Step 43 | Loss=0.001648 | Best makespan in group=397.00
+[TRAIN] Step 44/400 | 18:59:17
+[TRAIN] Step 44 | Loss=-0.000000 | Best makespan in group=481.00
+[TRAIN] Step 45/400 | 18:59:50
+[TRAIN] Step 45 | Loss=0.040729 | Best makespan in group=617.00
+[TRAIN] Step 46/400 | 19:00:25
+[TRAIN] Step 46 | Loss=-0.000000 | Best makespan in group=404.00
+[TRAIN] Step 47/400 | 19:01:32
+[TRAIN] Step 47 | Loss=-0.000000 | Best makespan in group=468.00
+[TRAIN] Step 48/400 | 19:02:08
+[TRAIN] Step 48 | Loss=0.000736 | Best makespan in group=547.00
+[TRAIN] Step 49/400 | 19:09:52
+[TRAIN] Step 49 | Loss=-0.000000 | Best makespan in group=397.00
+[TRAIN] Step 50/400 | 19:10:26
+[TRAIN] Step 50 | Loss=-0.000000 | Best makespan in group=407.00
+[TRAIN] Step 51/400 | 19:10:55
+[TRAIN] Step 51 | Loss=-0.000000 | Best makespan in group=493.00
+[TRAIN] Step 52/400 | 19:11:28
+[TRAIN] Step 52 | Loss=2.638783 | Best makespan in group=400.00
+[TRAIN] Step 53/400 | 19:12:04
+[TRAIN] Step 53 | Loss=-0.000000 | Best makespan in group=448.00
+[TRAIN] Step 54/400 | 19:12:38
+[TRAIN] Step 54 | Loss=-0.000000 | Best makespan in group=361.00
+[TRAIN] Step 55/400 | 19:13:12
+[TRAIN] Step 55 | Loss=-0.000000 | Best makespan in group=396.00
+[TRAIN] Step 56/400 | 19:13:44
+[TRAIN] Step 56 | Loss=0.001571 | Best makespan in group=561.00
+[TRAIN] Step 57/400 | 19:14:11
+[TRAIN] Step 57 | Loss=-0.000000 | Best makespan in group=390.00
+[TRAIN] Step 58/400 | 19:14:40
+[TRAIN] Step 58 | Loss=-0.000000 | Best makespan in group=451.00
+[TRAIN] Step 59/400 | 19:15:09
+[TRAIN] Step 59 | Loss=-0.000000 | Best makespan in group=448.00
+[TRAIN] Step 60/400 | 19:15:46
+[TRAIN] Step 60 | Loss=-0.000000 | Best makespan in group=401.00
+[TRAIN][VAL][ep 60] avg_gap=0.3454 | std_gap=0.2999 | q80_gap=0.4003 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.4070 (raw=0.3454) | saving candidate: 864369737089166.pth
+[TRAIN] Step 61/400 | 19:17:40
+[TRAIN] Step 61 | Loss=1.196882 | Best makespan in group=504.00
+[TRAIN] Step 62/400 | 19:18:16
+[TRAIN] Step 62 | Loss=-0.000000 | Best makespan in group=351.00
+[TRAIN] Step 63/400 | 19:18:44
+[TRAIN] Step 63 | Loss=-0.000000 | Best makespan in group=529.00
+[TRAIN] Step 64/400 | 19:19:16
+[TRAIN] Step 64 | Loss=-0.000000 | Best makespan in group=394.00
+[TRAIN] Step 65/400 | 19:19:43
+[TRAIN] Step 65 | Loss=-0.000000 | Best makespan in group=511.00
+[TRAIN] Step 66/400 | 19:20:19
+[TRAIN] Step 66 | Loss=-0.000000 | Best makespan in group=421.00
+[TRAIN] Step 67/400 | 19:20:55
+[TRAIN] Step 67 | Loss=0.140921 | Best makespan in group=492.00
+[TRAIN] Step 68/400 | 19:21:31
+[TRAIN] Step 68 | Loss=-0.000000 | Best makespan in group=569.00
+[TRAIN] Step 69/400 | 19:22:05
+[TRAIN] Step 69 | Loss=-0.000000 | Best makespan in group=545.00
+[TRAIN] Step 70/400 | 19:22:38
+[TRAIN] Step 70 | Loss=3.333433 | Best makespan in group=362.00
+[TRAIN] Step 71/400 | 19:23:08
+[TRAIN] Step 71 | Loss=-0.000000 | Best makespan in group=519.00
+[TRAIN] Step 72/400 | 19:23:44
+[TRAIN] Step 72 | Loss=1.239265 | Best makespan in group=359.00
+[TRAIN] Step 73/400 | 19:24:13
+[TRAIN] Step 73 | Loss=0.000066 | Best makespan in group=558.00
+[TRAIN] Step 74/400 | 19:24:42
+[TRAIN] Step 74 | Loss=3.658299 | Best makespan in group=419.00
+[TRAIN] Step 75/400 | 19:25:16
+[TRAIN] Step 75 | Loss=1.851049 | Best makespan in group=530.00
+[TRAIN] Step 76/400 | 19:25:47
+[TRAIN] Step 76 | Loss=1.390231 | Best makespan in group=424.00
+[TRAIN] Step 77/400 | 19:26:15
+[TRAIN] Step 77 | Loss=0.000005 | Best makespan in group=399.00
+[TRAIN] Step 78/400 | 19:26:46
+[TRAIN] Step 78 | Loss=-0.000000 | Best makespan in group=541.00
+[TRAIN] Step 79/400 | 19:27:19
+[TRAIN] Step 79 | Loss=-0.000000 | Best makespan in group=467.00
+[TRAIN] Step 80/400 | 19:27:53
+[TRAIN] Step 80 | Loss=-0.000000 | Best makespan in group=499.00
+[TRAIN][VAL][ep 80] avg_gap=0.2204 | std_gap=0.1538 | q80_gap=0.2331 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.3225 (raw=0.2204) | saving candidate: 287311861057068.pth
+[TRAIN] Step 81/400 | 19:29:48
+[TRAIN] Step 81 | Loss=6.901853 | Best makespan in group=401.00
+[TRAIN] Step 82/400 | 19:30:21
+[TRAIN] Step 82 | Loss=0.456655 | Best makespan in group=496.00
+[TRAIN] Step 83/400 | 19:30:57
+[TRAIN] Step 83 | Loss=-0.000000 | Best makespan in group=388.00
+[TRAIN] Step 84/400 | 19:31:27
+[TRAIN] Step 84 | Loss=-0.000000 | Best makespan in group=445.00
+[TRAIN] Step 85/400 | 19:31:55
+[TRAIN] Step 85 | Loss=-0.000000 | Best makespan in group=543.00
+[TRAIN] Step 86/400 | 19:32:30
+[TRAIN] Step 86 | Loss=-0.000000 | Best makespan in group=488.00
+[TRAIN] Step 87/400 | 19:33:01
+[TRAIN] Step 87 | Loss=-0.000000 | Best makespan in group=329.00
+[TRAIN] Step 88/400 | 19:33:39
+[TRAIN] Step 88 | Loss=-0.000000 | Best makespan in group=457.00
+[TRAIN] Step 89/400 | 19:34:09
+[TRAIN] Step 89 | Loss=5.449089 | Best makespan in group=449.00
+[TRAIN] Step 90/400 | 19:34:40
+[TRAIN] Step 90 | Loss=-0.000000 | Best makespan in group=547.00
+[TRAIN] Step 91/400 | 19:35:09
+[TRAIN] Step 91 | Loss=-0.000000 | Best makespan in group=439.00
+[TRAIN] Step 92/400 | 19:35:33
+[TRAIN] Step 92 | Loss=-0.000000 | Best makespan in group=445.00
+[TRAIN] Step 93/400 | 19:36:12
+[TRAIN] Step 93 | Loss=-0.000000 | Best makespan in group=381.00
+[TRAIN] Step 94/400 | 19:36:40
+[TRAIN] Step 94 | Loss=-0.000000 | Best makespan in group=465.00
+[TRAIN] Step 95/400 | 19:37:16
+[TRAIN] Step 95 | Loss=0.000477 | Best makespan in group=405.00
+[TRAIN] Step 96/400 | 19:37:48
+[TRAIN] Step 96 | Loss=0.579712 | Best makespan in group=458.00
+[TRAIN] Step 97/400 | 19:38:21
+[TRAIN] Step 97 | Loss=0.001643 | Best makespan in group=582.00
+[TRAIN] Step 98/400 | 19:38:49
+[TRAIN] Step 98 | Loss=-0.000000 | Best makespan in group=489.00
+[TRAIN] Step 99/400 | 19:39:25
+[TRAIN] Step 99 | Loss=-0.000000 | Best makespan in group=494.00
+[TRAIN] Step 100/400 | 19:39:55
+[TRAIN] Step 100 | Loss=-0.000000 | Best makespan in group=367.00
+[TRAIN][VAL][ep 100] avg_gap=0.2099 | std_gap=0.1111 | q80_gap=0.2730 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2586 (raw=0.2099) | saving candidate: 785848285569047.pth
+[TRAIN] Step 101/400 | 19:41:42
+[TRAIN] Step 101 | Loss=-0.000000 | Best makespan in group=453.00
+[TRAIN] Step 102/400 | 19:42:15
+[TRAIN] Step 102 | Loss=-0.000000 | Best makespan in group=532.00
+[TRAIN] Step 103/400 | 19:42:52
+[TRAIN] Step 103 | Loss=0.004865 | Best makespan in group=477.00
+[TRAIN] Step 104/400 | 19:43:27
+[TRAIN] Step 104 | Loss=1.844120 | Best makespan in group=549.00
+[TRAIN] Step 105/400 | 19:44:02
+[TRAIN] Step 105 | Loss=1.105534 | Best makespan in group=358.00
+[TRAIN] Step 106/400 | 19:44:31
+[TRAIN] Step 106 | Loss=-0.000000 | Best makespan in group=385.00
+[TRAIN] Step 107/400 | 19:44:58
+[TRAIN] Step 107 | Loss=-0.000000 | Best makespan in group=549.00
+[TRAIN] Step 108/400 | 19:45:27
+[TRAIN] Step 108 | Loss=-0.000000 | Best makespan in group=410.00
+[TRAIN] Step 109/400 | 19:46:05
+[TRAIN] Step 109 | Loss=0.671055 | Best makespan in group=370.00
+[TRAIN] Step 110/400 | 19:46:37
+[TRAIN] Step 110 | Loss=-0.000000 | Best makespan in group=406.00
+[TRAIN] Step 111/400 | 19:47:15
+[TRAIN] Step 111 | Loss=-0.000000 | Best makespan in group=473.00
+[TRAIN] Step 112/400 | 19:47:50
+[TRAIN] Step 112 | Loss=0.000011 | Best makespan in group=571.00
+[TRAIN] Step 113/400 | 19:48:24
+[TRAIN] Step 113 | Loss=-0.000000 | Best makespan in group=365.00
+[TRAIN] Step 114/400 | 19:48:53
+[TRAIN] Step 114 | Loss=2.160721 | Best makespan in group=420.00
+[TRAIN] Step 115/400 | 19:49:20
+[TRAIN] Step 115 | Loss=-0.000000 | Best makespan in group=515.00
+[TRAIN] Step 116/400 | 19:49:48
+[TRAIN] Step 116 | Loss=-0.000000 | Best makespan in group=476.00
+[TRAIN] Step 117/400 | 19:50:24
+[TRAIN] Step 117 | Loss=0.437531 | Best makespan in group=461.00
+[TRAIN] Step 118/400 | 19:50:51
+[TRAIN] Step 118 | Loss=-0.000000 | Best makespan in group=431.00
+[TRAIN] Step 119/400 | 19:51:25
+[TRAIN] Step 119 | Loss=0.186054 | Best makespan in group=400.00
+[TRAIN] Step 120/400 | 19:51:54
+[TRAIN] Step 120 | Loss=-0.000000 | Best makespan in group=435.00
+[TRAIN][VAL][ep 120] avg_gap=0.1789 | std_gap=0.1122 | q80_gap=0.2145 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.2031 (raw=0.1789) | saving candidate: 851427109601752.pth
+[TRAIN] Step 121/400 | 19:53:40
+[TRAIN] Step 121 | Loss=-0.000000 | Best makespan in group=470.00
+[TRAIN] Step 122/400 | 19:54:12
+[TRAIN] Step 122 | Loss=-0.000000 | Best makespan in group=401.00
+[TRAIN] Step 123/400 | 19:54:45
+[TRAIN] Step 123 | Loss=-0.000000 | Best makespan in group=479.00
+[TRAIN] Step 124/400 | 19:55:16
+[TRAIN] Step 124 | Loss=-0.000000 | Best makespan in group=388.00
+[TRAIN] Step 125/400 | 19:55:42
+[TRAIN] Step 125 | Loss=0.534624 | Best makespan in group=519.00
+[TRAIN] Step 126/400 | 19:56:13
+[TRAIN] Step 126 | Loss=-0.000000 | Best makespan in group=354.00
+[TRAIN] Step 127/400 | 19:56:39
+[TRAIN] Step 127 | Loss=0.847337 | Best makespan in group=372.00
+[TRAIN] Step 128/400 | 19:57:14
+[TRAIN] Step 128 | Loss=0.992334 | Best makespan in group=592.00
+[TRAIN] Step 129/400 | 19:57:41
+[TRAIN] Step 129 | Loss=0.463252 | Best makespan in group=365.00
+[TRAIN] Step 130/400 | 19:58:12
+[TRAIN] Step 130 | Loss=-0.000000 | Best makespan in group=454.00
+[TRAIN] Step 131/400 | 19:58:50
+[TRAIN] Step 131 | Loss=-0.000000 | Best makespan in group=497.00
+[TRAIN] Step 132/400 | 19:59:19
+[TRAIN] Step 132 | Loss=-0.000000 | Best makespan in group=409.00
+[TRAIN] Step 133/400 | 19:59:52
+[TRAIN] Step 133 | Loss=0.508282 | Best makespan in group=445.00
+[TRAIN] Step 134/400 | 20:00:27
+[TRAIN] Step 134 | Loss=2.251832 | Best makespan in group=377.00
+[TRAIN] Step 135/400 | 20:01:00
+[TRAIN] Step 135 | Loss=-0.000000 | Best makespan in group=392.00
+[TRAIN] Step 136/400 | 20:01:34
+[TRAIN] Step 136 | Loss=-0.000000 | Best makespan in group=408.00
+[TRAIN] Step 137/400 | 20:02:00
+[TRAIN] Step 137 | Loss=0.173887 | Best makespan in group=515.00
+[TRAIN] Step 138/400 | 20:02:28
+[TRAIN] Step 138 | Loss=-0.000000 | Best makespan in group=399.00
+[TRAIN] Step 139/400 | 20:02:55
+[TRAIN] Step 139 | Loss=0.004146 | Best makespan in group=441.00
+[TRAIN] Step 140/400 | 20:03:24
+[TRAIN] Step 140 | Loss=-0.000000 | Best makespan in group=398.00
+[TRAIN][VAL][ep 140] avg_gap=0.1837 | std_gap=0.1343 | q80_gap=0.2179 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1908 (raw=0.1837) | saving candidate: 397807714954374.pth
+[TRAIN] Step 141/400 | 20:05:13
+[TRAIN] Step 141 | Loss=-0.000000 | Best makespan in group=476.00
+[TRAIN] Step 142/400 | 20:05:44
+[TRAIN] Step 142 | Loss=-0.000000 | Best makespan in group=413.00
+[TRAIN] Step 143/400 | 20:06:23
+[TRAIN] Step 143 | Loss=-0.000000 | Best makespan in group=491.00
+[TRAIN] Step 144/400 | 20:06:56
+[TRAIN] Step 144 | Loss=0.151809 | Best makespan in group=464.00
+[TRAIN] Step 145/400 | 20:07:28
+[TRAIN] Step 145 | Loss=1.225390 | Best makespan in group=472.00
+[TRAIN] Step 146/400 | 20:08:05
+[TRAIN] Step 146 | Loss=-0.000000 | Best makespan in group=512.00
+[TRAIN] Step 147/400 | 20:08:37
+[TRAIN] Step 147 | Loss=0.000027 | Best makespan in group=388.00
+[TRAIN] Step 148/400 | 20:09:07
+[TRAIN] Step 148 | Loss=0.298498 | Best makespan in group=517.00
+[TRAIN] Step 149/400 | 20:09:38
+[TRAIN] Step 149 | Loss=-0.000000 | Best makespan in group=451.00
+[TRAIN] Step 150/400 | 20:10:12
+[TRAIN] Step 150 | Loss=-0.000000 | Best makespan in group=354.00
+[TRAIN] Step 151/400 | 20:10:42
+[TRAIN] Step 151 | Loss=0.417776 | Best makespan in group=472.00
+[TRAIN] Step 152/400 | 20:11:18
+[TRAIN] Step 152 | Loss=0.258415 | Best makespan in group=529.00
+[TRAIN] Step 153/400 | 20:11:47
+[TRAIN] Step 153 | Loss=0.003620 | Best makespan in group=491.00
+[TRAIN] Step 154/400 | 20:12:15
+[TRAIN] Step 154 | Loss=-0.000000 | Best makespan in group=430.00
+[TRAIN] Step 155/400 | 20:12:41
+[TRAIN] Step 155 | Loss=-0.000000 | Best makespan in group=458.00
+[TRAIN] Step 156/400 | 20:13:14
+[TRAIN] Step 156 | Loss=-0.000000 | Best makespan in group=415.00
+[TRAIN] Step 157/400 | 20:13:43
+[TRAIN] Step 157 | Loss=-0.000000 | Best makespan in group=399.00
+[TRAIN] Step 158/400 | 20:14:16
+[TRAIN] Step 158 | Loss=-0.000000 | Best makespan in group=411.00
+[TRAIN] Step 159/400 | 20:14:53
+[TRAIN] Step 159 | Loss=-0.000000 | Best makespan in group=437.00
+[TRAIN] Step 160/400 | 20:15:23
+[TRAIN] Step 160 | Loss=-0.000000 | Best makespan in group=506.00
+[TRAIN][VAL][ep 160] avg_gap=0.1677 | std_gap=0.0696 | q80_gap=0.2142 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1768 (raw=0.1677) | saving candidate: 650541987299891.pth
+[TRAIN] Step 161/400 | 20:17:09
+[TRAIN] Step 161 | Loss=-0.000000 | Best makespan in group=537.00
+[TRAIN] Step 162/400 | 20:17:39
+[TRAIN] Step 162 | Loss=-0.000000 | Best makespan in group=387.00
+[TRAIN] Step 163/400 | 20:18:09
+[TRAIN] Step 163 | Loss=-0.000000 | Best makespan in group=461.00
+[TRAIN] Step 164/400 | 20:18:45
+[TRAIN] Step 164 | Loss=-0.000000 | Best makespan in group=503.00
+[TRAIN] Step 165/400 | 20:19:18
+[TRAIN] Step 165 | Loss=-0.000000 | Best makespan in group=375.00
+[TRAIN] Step 166/400 | 20:19:50
+[TRAIN] Step 166 | Loss=-0.000000 | Best makespan in group=433.00
+[TRAIN] Step 167/400 | 20:20:25
+[TRAIN] Step 167 | Loss=2.635824 | Best makespan in group=346.00
+[TRAIN] Step 168/400 | 20:20:54
+[TRAIN] Step 168 | Loss=-0.000000 | Best makespan in group=398.00
+[TRAIN] Step 169/400 | 20:21:22
+[TRAIN] Step 169 | Loss=-0.000000 | Best makespan in group=361.00
+[TRAIN] Step 170/400 | 20:21:53
+[TRAIN] Step 170 | Loss=1.684270 | Best makespan in group=490.00
+[TRAIN] Step 171/400 | 20:22:30
+[TRAIN] Step 171 | Loss=-0.000000 | Best makespan in group=434.00
+[TRAIN] Step 172/400 | 20:23:09
+[TRAIN] Step 172 | Loss=-0.000000 | Best makespan in group=397.00
+[TRAIN] Step 173/400 | 20:23:38
+[TRAIN] Step 173 | Loss=-0.000000 | Best makespan in group=495.00
+[TRAIN] Step 174/400 | 20:24:13
+[TRAIN] Step 174 | Loss=-0.000000 | Best makespan in group=401.00
+[TRAIN] Step 175/400 | 20:24:44
+[TRAIN] Step 175 | Loss=-0.000000 | Best makespan in group=389.00
+[TRAIN] Step 176/400 | 20:25:12
+[TRAIN] Step 176 | Loss=-0.000000 | Best makespan in group=512.00
+[TRAIN] Step 177/400 | 20:25:46
+[TRAIN] Step 177 | Loss=-0.000000 | Best makespan in group=307.00
+[TRAIN] Step 178/400 | 20:26:15
+[TRAIN] Step 178 | Loss=0.157041 | Best makespan in group=582.00
+[TRAIN] Step 179/400 | 20:26:48
+[TRAIN] Step 179 | Loss=1.230429 | Best makespan in group=558.00
+[TRAIN] Step 180/400 | 20:27:20
+[TRAIN] Step 180 | Loss=-0.000000 | Best makespan in group=435.00
+[TRAIN][VAL][ep 180] avg_gap=0.1719 | std_gap=0.0768 | q80_gap=0.2191 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1744 (raw=0.1719) | saving candidate: 473586210735781.pth
+[TRAIN] Step 181/400 | 20:29:10
+[TRAIN] Step 181 | Loss=-0.000000 | Best makespan in group=355.00
+[TRAIN] Step 182/400 | 20:29:37
+[TRAIN] Step 182 | Loss=-0.000000 | Best makespan in group=333.00
+[TRAIN] Step 183/400 | 20:30:04
+[TRAIN] Step 183 | Loss=1.197875 | Best makespan in group=402.00
+[TRAIN] Step 184/400 | 20:30:33
+[TRAIN] Step 184 | Loss=0.000097 | Best makespan in group=461.00
+[TRAIN] Step 185/400 | 20:31:00
+[TRAIN] Step 185 | Loss=-0.000000 | Best makespan in group=401.00
+[TRAIN] Step 186/400 | 20:31:31
+[TRAIN] Step 186 | Loss=-0.000000 | Best makespan in group=389.00
+[TRAIN] Step 187/400 | 20:32:06
+[TRAIN] Step 187 | Loss=-0.000000 | Best makespan in group=411.00
+[TRAIN] Step 188/400 | 20:32:41
+[TRAIN] Step 188 | Loss=-0.000000 | Best makespan in group=369.00
+[TRAIN] Step 189/400 | 20:33:16
+[TRAIN] Step 189 | Loss=0.319126 | Best makespan in group=524.00
+[TRAIN] Step 190/400 | 20:33:48
+[TRAIN] Step 190 | Loss=-0.000000 | Best makespan in group=455.00
+[TRAIN] Step 191/400 | 20:34:24
+[TRAIN] Step 191 | Loss=0.213468 | Best makespan in group=429.00
+[TRAIN] Step 192/400 | 20:34:48
+[TRAIN] Step 192 | Loss=-0.000000 | Best makespan in group=442.00
+[TRAIN] Step 193/400 | 20:35:25
+[TRAIN] Step 193 | Loss=0.000006 | Best makespan in group=471.00
+[TRAIN] Step 194/400 | 20:35:51
+[TRAIN] Step 194 | Loss=-0.000000 | Best makespan in group=421.00
+[TRAIN] Step 195/400 | 20:36:21
+[TRAIN] Step 195 | Loss=-0.000000 | Best makespan in group=447.00
+[TRAIN] Step 196/400 | 20:36:57
+[TRAIN] Step 196 | Loss=0.016857 | Best makespan in group=416.00
+[TRAIN] Step 197/400 | 20:37:27
+[TRAIN] Step 197 | Loss=2.689084 | Best makespan in group=579.00
+[TRAIN] Step 198/400 | 20:38:02
+[TRAIN] Step 198 | Loss=-0.000000 | Best makespan in group=435.00
+[TRAIN] Step 199/400 | 20:38:37
+[TRAIN] Step 199 | Loss=-0.000000 | Best makespan in group=411.00
+[TRAIN] Step 200/400 | 20:39:16
+[TRAIN] Step 200 | Loss=0.022484 | Best makespan in group=478.00
+[TRAIN][VAL][ep 200] avg_gap=0.1689 | std_gap=0.0900 | q80_gap=0.2008 | n=40
+[TRAIN] Validation improved | smoothed_avg_gap=0.1695 (raw=0.1689) | saving candidate: 621797013209355.pth
+[TRAIN] Step 201/400 | 20:41:01
+[TRAIN] Step 201 | Loss=-0.000000 | Best makespan in group=532.00
+[TRAIN] Step 202/400 | 20:41:34
+[TRAIN] Step 202 | Loss=-0.000000 | Best makespan in group=358.00
+[TRAIN] Step 203/400 | 20:42:08
+[TRAIN] Step 203 | Loss=4.071809 | Best makespan in group=407.00
+[TRAIN] Step 204/400 | 20:42:41
+[TRAIN] Step 204 | Loss=-0.000000 | Best makespan in group=415.00
+[TRAIN] Step 205/400 | 20:43:09
+[TRAIN] Step 205 | Loss=2.288471 | Best makespan in group=332.00
+[TRAIN] Step 206/400 | 20:43:39
+[TRAIN] Step 206 | Loss=-0.000000 | Best makespan in group=397.00
+[TRAIN] Step 207/400 | 20:44:09
+[TRAIN] Step 207 | Loss=-0.000000 | Best makespan in group=395.00
+[TRAIN] Step 208/400 | 20:44:43
+[TRAIN] Step 208 | Loss=-0.000000 | Best makespan in group=355.00
+[TRAIN] Step 209/400 | 20:45:10
+[TRAIN] Step 209 | Loss=-0.000000 | Best makespan in group=497.00
+[TRAIN] Step 210/400 | 20:45:47
+[TRAIN] Step 210 | Loss=-0.000000 | Best makespan in group=418.00
+[TRAIN] Step 211/400 | 20:46:24
+[TRAIN] Step 211 | Loss=-0.000000 | Best makespan in group=405.00
+[TRAIN] Step 212/400 | 20:46:51
+[TRAIN] Step 212 | Loss=0.042369 | Best makespan in group=412.00
+[TRAIN] Step 213/400 | 20:47:18
+[TRAIN] Step 213 | Loss=-0.000000 | Best makespan in group=456.00
+[TRAIN] Step 214/400 | 20:47:46
+[TRAIN] Step 214 | Loss=0.114429 | Best makespan in group=470.00
+[TRAIN] Step 215/400 | 20:48:22
+[TRAIN] Step 215 | Loss=0.000016 | Best makespan in group=506.00
+[TRAIN] Step 216/400 | 20:48:50
+[TRAIN] Step 216 | Loss=-0.000000 | Best makespan in group=552.00
+[TRAIN] Step 217/400 | 20:49:23
+[TRAIN] Step 217 | Loss=-0.000000 | Best makespan in group=428.00
+[TRAIN] Step 218/400 | 20:49:52
+[TRAIN] Step 218 | Loss=-0.000000 | Best makespan in group=467.00
+[TRAIN] Step 219/400 | 20:50:18
+[TRAIN] Step 219 | Loss=-0.000000 | Best makespan in group=508.00
+[TRAIN] Step 220/400 | 20:50:51
+[TRAIN] Step 220 | Loss=2.034402 | Best makespan in group=566.00
+[TRAIN][VAL][ep 220] avg_gap=0.1847 | std_gap=0.1028 | q80_gap=0.2165 | n=40
+[TRAIN] Step 221/400 | 20:52:39
+[TRAIN] Step 221 | Loss=0.441709 | Best makespan in group=365.00
+[TRAIN] Step 222/400 | 20:53:07
+[TRAIN] Step 222 | Loss=-0.000000 | Best makespan in group=398.00
+[TRAIN] Step 223/400 | 20:53:41
+[TRAIN] Step 223 | Loss=-0.000000 | Best makespan in group=393.00
+[TRAIN] Step 224/400 | 20:54:13
+[TRAIN] Step 224 | Loss=-0.000000 | Best makespan in group=409.00
+[TRAIN] Step 225/400 | 20:54:52
+[TRAIN] Step 225 | Loss=-0.000000 | Best makespan in group=483.00
+[TRAIN] Step 226/400 | 20:55:26
+[TRAIN] Step 226 | Loss=-0.000000 | Best makespan in group=493.00
+[TRAIN] Step 227/400 | 20:55:58
+[TRAIN] Step 227 | Loss=-0.000000 | Best makespan in group=452.00
+[TRAIN] Step 228/400 | 20:56:34
+[TRAIN] Step 228 | Loss=-0.000000 | Best makespan in group=421.00
+[TRAIN] Step 229/400 | 20:57:04
+[TRAIN] Step 229 | Loss=-0.000000 | Best makespan in group=379.00
+[TRAIN] Step 230/400 | 20:57:34
+[TRAIN] Step 230 | Loss=-0.000000 | Best makespan in group=395.00
+[TRAIN] Step 231/400 | 20:58:07
+[TRAIN] Step 231 | Loss=-0.000000 | Best makespan in group=438.00
+[TRAIN] Step 232/400 | 20:58:39
+[TRAIN] Step 232 | Loss=-0.000000 | Best makespan in group=502.00
+[TRAIN] Step 233/400 | 20:59:14
+[TRAIN] Step 233 | Loss=-0.000000 | Best makespan in group=399.00
+[TRAIN] Step 234/400 | 20:59:40
+[TRAIN] Step 234 | Loss=0.000002 | Best makespan in group=381.00
+[TRAIN] Step 235/400 | 21:00:12
+[TRAIN] Step 235 | Loss=0.025323 | Best makespan in group=478.00
+[TRAIN] Step 236/400 | 21:00:50
+[TRAIN] Step 236 | Loss=-0.000000 | Best makespan in group=429.00
+[TRAIN] Step 237/400 | 21:01:24
+[TRAIN] Step 237 | Loss=1.253029 | Best makespan in group=382.00
+[TRAIN] Step 238/400 | 21:01:52
+[TRAIN] Step 238 | Loss=-0.000000 | Best makespan in group=413.00
+[TRAIN] Step 239/400 | 21:02:28
+[TRAIN] Step 239 | Loss=0.000840 | Best makespan in group=387.00
+[TRAIN] Step 240/400 | 21:03:02
+[TRAIN] Step 240 | Loss=-0.000000 | Best makespan in group=342.00
+[TRAIN][VAL][ep 240] avg_gap=0.1854 | std_gap=0.1035 | q80_gap=0.2212 | n=40
+[TRAIN] Step 241/400 | 21:04:50
+[TRAIN] Step 241 | Loss=-0.000000 | Best makespan in group=375.00
+[TRAIN] Step 242/400 | 21:05:23
+[TRAIN] Step 242 | Loss=-0.000000 | Best makespan in group=425.00
+[TRAIN] Step 243/400 | 21:05:46
+[TRAIN] Step 243 | Loss=5.056850 | Best makespan in group=574.00
+[TRAIN] Step 244/400 | 21:06:22
+[TRAIN] Step 244 | Loss=-0.000000 | Best makespan in group=547.00
+[TRAIN] Step 245/400 | 21:06:56
+[TRAIN] Step 245 | Loss=-0.000000 | Best makespan in group=415.00
+[TRAIN] Step 246/400 | 21:07:29
+[TRAIN] Step 246 | Loss=-0.000000 | Best makespan in group=492.00
+[TRAIN] Step 247/400 | 21:08:02
+[TRAIN] Step 247 | Loss=-0.000000 | Best makespan in group=449.00
+[TRAIN] Step 248/400 | 21:08:32
+[TRAIN] Step 248 | Loss=-0.000000 | Best makespan in group=467.00
+[TRAIN] Step 249/400 | 21:09:06
+[TRAIN] Step 249 | Loss=3.731723 | Best makespan in group=404.00
+[TRAIN] Step 250/400 | 21:09:36
+[TRAIN] Step 250 | Loss=-0.000000 | Best makespan in group=308.00
+[TRAIN] Step 251/400 | 21:10:05
+[TRAIN] Step 251 | Loss=-0.000000 | Best makespan in group=449.00
+[TRAIN] Step 252/400 | 21:10:37
+[TRAIN] Step 252 | Loss=-0.000000 | Best makespan in group=433.00
+[TRAIN] Step 253/400 | 21:11:14
+[TRAIN] Step 253 | Loss=0.000001 | Best makespan in group=459.00
+[TRAIN] Step 254/400 | 21:11:45
+[TRAIN] Step 254 | Loss=-0.000000 | Best makespan in group=387.00
+[TRAIN] Step 255/400 | 21:12:14
+[TRAIN] Step 255 | Loss=-0.000000 | Best makespan in group=459.00
+[TRAIN] Step 256/400 | 21:12:46
+[TRAIN] Step 256 | Loss=-0.000000 | Best makespan in group=439.00
+[TRAIN] Step 257/400 | 21:13:17
+[TRAIN] Step 257 | Loss=-0.000000 | Best makespan in group=445.00
+[TRAIN] Step 258/400 | 21:13:43
+[TRAIN] Step 258 | Loss=-0.000000 | Best makespan in group=419.00
+[TRAIN] Step 259/400 | 21:14:22
+[TRAIN] Step 259 | Loss=0.020727 | Best makespan in group=526.00
+[TRAIN] Step 260/400 | 21:14:51
+[TRAIN] Step 260 | Loss=-0.000000 | Best makespan in group=541.00
+[TRAIN][VAL][ep 260] avg_gap=0.1826 | std_gap=0.1031 | q80_gap=0.2170 | n=40
+[TRAIN] Step 261/400 | 21:16:42
+[TRAIN] Step 261 | Loss=-0.000000 | Best makespan in group=398.00
+[TRAIN] Step 262/400 | 21:17:16
+[TRAIN] Step 262 | Loss=0.227314 | Best makespan in group=396.00
+[TRAIN] Step 263/400 | 21:17:45
+[TRAIN] Step 263 | Loss=0.136942 | Best makespan in group=450.00
+[TRAIN] Step 264/400 | 21:18:22
+[TRAIN] Step 264 | Loss=-0.000000 | Best makespan in group=386.00
+[TRAIN] Step 265/400 | 21:18:54
+[TRAIN] Step 265 | Loss=0.715449 | Best makespan in group=402.00
+[TRAIN] Step 266/400 | 21:19:21
+[TRAIN] Step 266 | Loss=0.100237 | Best makespan in group=454.00
+[TRAIN] Step 267/400 | 21:19:59
+[TRAIN] Step 267 | Loss=-0.000000 | Best makespan in group=523.00
+[TRAIN] Step 268/400 | 21:20:29
+[TRAIN] Step 268 | Loss=-0.000000 | Best makespan in group=468.00
+[TRAIN] Step 269/400 | 21:20:55
+[TRAIN] Step 269 | Loss=-0.000000 | Best makespan in group=565.00
+[TRAIN] Step 270/400 | 21:21:25
+[TRAIN] Step 270 | Loss=-0.000000 | Best makespan in group=351.00
+[TRAIN] Step 271/400 | 21:21:53
+[TRAIN] Step 271 | Loss=-0.000000 | Best makespan in group=474.00
+[TRAIN] Step 272/400 | 21:22:19
+[TRAIN] Step 272 | Loss=-0.000000 | Best makespan in group=486.00
+[TRAIN] Step 273/400 | 21:22:56
+[TRAIN] Step 273 | Loss=-0.000000 | Best makespan in group=490.00
+[TRAIN] Step 274/400 | 21:23:27
+[TRAIN] Step 274 | Loss=0.000002 | Best makespan in group=570.00
+[TRAIN] Step 275/400 | 21:23:55
+[TRAIN] Step 275 | Loss=-0.000000 | Best makespan in group=409.00
+[TRAIN] Step 276/400 | 21:24:21
+[TRAIN] Step 276 | Loss=-0.000000 | Best makespan in group=476.00
+[TRAIN] Step 277/400 | 21:24:57
+[TRAIN] Step 277 | Loss=4.278293 | Best makespan in group=475.00
+[TRAIN] Step 278/400 | 21:25:27
+[TRAIN] Step 278 | Loss=-0.000000 | Best makespan in group=341.00
+[TRAIN] Step 279/400 | 21:25:56
+[TRAIN] Step 279 | Loss=-0.000000 | Best makespan in group=461.00
+[TRAIN] Step 280/400 | 21:26:22
+[TRAIN] Step 280 | Loss=3.993736 | Best makespan in group=528.00
+[TRAIN][VAL][ep 280] avg_gap=0.1705 | std_gap=0.0823 | q80_gap=0.2239 | n=40
+[TRAIN] Step 281/400 | 21:28:17
+[TRAIN] Step 281 | Loss=0.238972 | Best makespan in group=501.00
+[TRAIN] Step 282/400 | 21:28:55
+[TRAIN] Step 282 | Loss=-0.000000 | Best makespan in group=465.00
+[TRAIN] Step 283/400 | 21:29:32
+[TRAIN] Step 283 | Loss=-0.000000 | Best makespan in group=475.00
+[TRAIN] Step 284/400 | 21:30:11
+[TRAIN] Step 284 | Loss=3.516668 | Best makespan in group=506.00
+[TRAIN] Step 285/400 | 21:30:41
+[TRAIN] Step 285 | Loss=-0.000000 | Best makespan in group=368.00
+[TRAIN] Step 286/400 | 21:31:11
+[TRAIN] Step 286 | Loss=0.000000 | Best makespan in group=368.00
+[TRAIN] Step 287/400 | 21:31:40
+[TRAIN] Step 287 | Loss=0.000001 | Best makespan in group=409.00
+[TRAIN] Step 288/400 | 21:32:13
+[TRAIN] Step 288 | Loss=0.028798 | Best makespan in group=410.00
+[TRAIN] Step 289/400 | 21:32:43
+[TRAIN] Step 289 | Loss=0.203716 | Best makespan in group=586.00
+[TRAIN] Step 290/400 | 21:33:11
+[TRAIN] Step 290 | Loss=0.821759 | Best makespan in group=575.00
+[TRAIN] Step 291/400 | 21:33:46
+[TRAIN] Step 291 | Loss=0.136343 | Best makespan in group=537.00
+[TRAIN] Step 292/400 | 21:34:14
+[TRAIN] Step 292 | Loss=-0.000000 | Best makespan in group=577.00
+[TRAIN] Step 293/400 | 21:34:46
+[TRAIN] Step 293 | Loss=-0.000000 | Best makespan in group=474.00
+[TRAIN] Step 294/400 | 21:35:15
+[TRAIN] Step 294 | Loss=-0.000000 | Best makespan in group=375.00
+[TRAIN] Step 295/400 | 21:35:53
+[TRAIN] Step 295 | Loss=-0.000000 | Best makespan in group=547.00
+[TRAIN] Step 296/400 | 21:36:23
+[TRAIN] Step 296 | Loss=-0.000000 | Best makespan in group=461.00
+[TRAIN] Step 297/400 | 21:36:59
+[TRAIN] Step 297 | Loss=0.090186 | Best makespan in group=410.00
+[TRAIN] Step 298/400 | 21:37:27
+[TRAIN] Step 298 | Loss=2.529691 | Best makespan in group=443.00
+[TRAIN] Step 299/400 | 21:38:02
+[TRAIN] Step 299 | Loss=-0.000000 | Best makespan in group=363.00
+[TRAIN] Step 300/400 | 21:38:34
+[TRAIN] Step 300 | Loss=-0.000000 | Best makespan in group=506.00
+[TRAIN][VAL][ep 300] avg_gap=0.1618 | std_gap=0.0648 | q80_gap=0.1917 | n=40
+[TRAIN] Step 301/400 | 21:40:23
+[TRAIN] Step 301 | Loss=0.165656 | Best makespan in group=543.00
+[TRAIN] Step 302/400 | 21:40:51
+[TRAIN] Step 302 | Loss=-0.000000 | Best makespan in group=454.00
+[TRAIN] Step 303/400 | 21:41:22
+[TRAIN] Step 303 | Loss=-0.000000 | Best makespan in group=420.00
+[TRAIN] Step 304/400 | 21:41:59
+[TRAIN] Step 304 | Loss=-0.000000 | Best makespan in group=429.00
+[TRAIN] Step 305/400 | 21:42:25
+[TRAIN] Step 305 | Loss=-0.000000 | Best makespan in group=497.00
+[TRAIN] Step 306/400 | 21:42:59
+[TRAIN] Step 306 | Loss=-0.000000 | Best makespan in group=396.00
+[TRAIN] Step 307/400 | 21:43:27
+[TRAIN] Step 307 | Loss=-0.000000 | Best makespan in group=388.00
+[TRAIN] Step 308/400 | 21:44:01
+[TRAIN] Step 308 | Loss=-0.000000 | Best makespan in group=489.00
+[TRAIN] Step 309/400 | 21:44:31
+[TRAIN] Step 309 | Loss=-0.000000 | Best makespan in group=325.00
+[TRAIN] Step 310/400 | 21:44:58
+[TRAIN] Step 310 | Loss=-0.000000 | Best makespan in group=466.00
+[TRAIN] Step 311/400 | 21:45:33
+[TRAIN] Step 311 | Loss=-0.000000 | Best makespan in group=576.00
+[TRAIN] Step 312/400 | 21:46:06
+[TRAIN] Step 312 | Loss=-0.000000 | Best makespan in group=490.00
+[TRAIN] Step 313/400 | 21:46:41
+[TRAIN] Step 313 | Loss=0.566480 | Best makespan in group=462.00
+[TRAIN] Step 314/400 | 21:47:11
+[TRAIN] Step 314 | Loss=-0.000000 | Best makespan in group=396.00
+[TRAIN] Step 315/400 | 21:47:39
+[TRAIN] Step 315 | Loss=-0.000000 | Best makespan in group=381.00
+[TRAIN] Step 316/400 | 21:48:08
+[TRAIN] Step 316 | Loss=0.000024 | Best makespan in group=428.00
+[TRAIN] Step 317/400 | 21:48:38
+[TRAIN] Step 317 | Loss=-0.000000 | Best makespan in group=428.00
+[TRAIN] Step 318/400 | 21:49:14
+[TRAIN] Step 318 | Loss=0.009493 | Best makespan in group=344.00
+[TRAIN] Step 319/400 | 21:49:43
+[TRAIN] Step 319 | Loss=-0.000000 | Best makespan in group=480.00
+[TRAIN] Step 320/400 | 21:50:18
+[TRAIN] Step 320 | Loss=-0.000000 | Best makespan in group=353.00
+[TRAIN][VAL][ep 320] avg_gap=0.2008 | std_gap=0.1257 | q80_gap=0.2581 | n=40
+[TRAIN] Step 321/400 | 21:52:06
+[TRAIN] Step 321 | Loss=-0.000000 | Best makespan in group=458.00
+[TRAIN] Step 322/400 | 21:52:41
+[TRAIN] Step 322 | Loss=-0.000000 | Best makespan in group=369.00
+[TRAIN] Step 323/400 | 21:53:10
+[TRAIN] Step 323 | Loss=0.075474 | Best makespan in group=525.00
+[TRAIN] Step 324/400 | 21:53:41
+[TRAIN] Step 324 | Loss=-0.000000 | Best makespan in group=413.00
+[TRAIN] Step 325/400 | 21:54:19
+[TRAIN] Step 325 | Loss=-0.000000 | Best makespan in group=455.00
+[TRAIN] Step 326/400 | 21:54:49
+[TRAIN] Step 326 | Loss=2.278730 | Best makespan in group=565.00
+[TRAIN] Step 327/400 | 21:55:18
+[TRAIN] Step 327 | Loss=-0.000000 | Best makespan in group=488.00
+[TRAIN] Step 328/400 | 21:55:54
+[TRAIN] Step 328 | Loss=0.332967 | Best makespan in group=402.00
+[TRAIN] Step 329/400 | 21:56:22
+[TRAIN] Step 329 | Loss=0.924646 | Best makespan in group=591.00
+[TRAIN] Step 330/400 | 21:56:52
+[TRAIN] Step 330 | Loss=-0.000000 | Best makespan in group=477.00
+[TRAIN] Step 331/400 | 21:57:19
+[TRAIN] Step 331 | Loss=-0.000000 | Best makespan in group=355.00
+[TRAIN] Step 332/400 | 21:57:47
+[TRAIN] Step 332 | Loss=-0.000000 | Best makespan in group=377.00
+[TRAIN] Step 333/400 | 21:58:18
+[TRAIN] Step 333 | Loss=-0.000000 | Best makespan in group=457.00
+[TRAIN] Step 334/400 | 21:58:49
+[TRAIN] Step 334 | Loss=-0.000000 | Best makespan in group=489.00
+[TRAIN] Step 335/400 | 21:59:16
+[TRAIN] Step 335 | Loss=-0.000000 | Best makespan in group=408.00
+[TRAIN] Step 336/400 | 21:59:47
+[TRAIN] Step 336 | Loss=-0.000000 | Best makespan in group=405.00
+[TRAIN] Step 337/400 | 22:00:15
+[TRAIN] Step 337 | Loss=-0.000000 | Best makespan in group=438.00
+[TRAIN] Step 338/400 | 22:00:46
+[TRAIN] Step 338 | Loss=-0.000000 | Best makespan in group=520.00
+[TRAIN] Step 339/400 | 22:01:20
+[TRAIN] Step 339 | Loss=-0.000000 | Best makespan in group=386.00
+[TRAIN] Step 340/400 | 22:01:49
+[TRAIN] Step 340 | Loss=3.604002 | Best makespan in group=507.00
+[TRAIN][VAL][ep 340] avg_gap=0.1924 | std_gap=0.1191 | q80_gap=0.2188 | n=40
+[TRAIN] Step 341/400 | 22:03:45
+[TRAIN] Step 341 | Loss=-0.000000 | Best makespan in group=518.00
+[TRAIN] Step 342/400 | 22:04:18
+[TRAIN] Step 342 | Loss=-0.000000 | Best makespan in group=355.00
+[TRAIN] Step 343/400 | 22:04:47
+[TRAIN] Step 343 | Loss=-0.000000 | Best makespan in group=421.00
+[TRAIN] Step 344/400 | 22:05:17
+[TRAIN] Step 344 | Loss=0.001153 | Best makespan in group=518.00
+[TRAIN] Step 345/400 | 22:05:53
+[TRAIN] Step 345 | Loss=0.009542 | Best makespan in group=555.00
+[TRAIN] Step 346/400 | 22:06:21
+[TRAIN] Step 346 | Loss=0.018986 | Best makespan in group=494.00
+[TRAIN] Step 347/400 | 22:06:47
+[TRAIN] Step 347 | Loss=-0.000000 | Best makespan in group=435.00
+[TRAIN] Step 348/400 | 22:07:13
+[TRAIN] Step 348 | Loss=-0.000000 | Best makespan in group=470.00
+[TRAIN] Step 349/400 | 22:07:50
+[TRAIN] Step 349 | Loss=-0.000000 | Best makespan in group=500.00
+[TRAIN] Step 350/400 | 22:08:29
+[TRAIN] Step 350 | Loss=0.144318 | Best makespan in group=438.00
+[TRAIN] Step 351/400 | 22:09:02
+[TRAIN] Step 351 | Loss=-0.000000 | Best makespan in group=363.00
+[TRAIN] Step 352/400 | 22:09:34
+[TRAIN] Step 352 | Loss=-0.000000 | Best makespan in group=416.00
+[TRAIN] Step 353/400 | 22:10:08
+[TRAIN] Step 353 | Loss=-0.000000 | Best makespan in group=391.00
+[TRAIN] Step 354/400 | 22:10:39
+[TRAIN] Step 354 | Loss=-0.000000 | Best makespan in group=489.00
+[TRAIN] Step 355/400 | 22:11:14
+[TRAIN] Step 355 | Loss=7.669780 | Best makespan in group=584.00
+[TRAIN] Step 356/400 | 22:11:42
+[TRAIN] Step 356 | Loss=1.160459 | Best makespan in group=497.00
+[TRAIN] Step 357/400 | 22:12:19
+[TRAIN] Step 357 | Loss=-0.000000 | Best makespan in group=428.00
+[TRAIN] Step 358/400 | 22:12:51
+[TRAIN] Step 358 | Loss=3.408606 | Best makespan in group=383.00
+[TRAIN] Step 359/400 | 22:13:24
+[TRAIN] Step 359 | Loss=3.872947 | Best makespan in group=399.00
+[TRAIN] Step 360/400 | 22:13:52
+[TRAIN] Step 360 | Loss=-0.000000 | Best makespan in group=462.00
+[TRAIN][VAL][ep 360] avg_gap=0.2299 | std_gap=0.1695 | q80_gap=0.2950 | n=40
+[TRAIN] Step 361/400 | 22:15:48
+[TRAIN] Step 361 | Loss=-0.000000 | Best makespan in group=433.00
+[TRAIN] Step 362/400 | 22:16:20
+[TRAIN] Step 362 | Loss=-0.000000 | Best makespan in group=427.00
+[TRAIN] Step 363/400 | 22:16:54
+[TRAIN] Step 363 | Loss=-0.000000 | Best makespan in group=417.00
+[TRAIN] Step 364/400 | 22:17:23
+[TRAIN] Step 364 | Loss=0.591443 | Best makespan in group=367.00
+[TRAIN] Step 365/400 | 22:17:57
+[TRAIN] Step 365 | Loss=-0.000000 | Best makespan in group=557.00
+[TRAIN] Step 366/400 | 22:18:31
+[TRAIN] Step 366 | Loss=-0.000000 | Best makespan in group=424.00
+[TRAIN] Step 367/400 | 22:19:10
+[TRAIN] Step 367 | Loss=-0.000000 | Best makespan in group=447.00
+[TRAIN] Step 368/400 | 22:19:39
+[TRAIN] Step 368 | Loss=0.000079 | Best makespan in group=443.00
+[TRAIN] Step 369/400 | 22:20:12
+[TRAIN] Step 369 | Loss=-0.000000 | Best makespan in group=394.00
+[TRAIN] Step 370/400 | 22:20:38
+[TRAIN] Step 370 | Loss=-0.000000 | Best makespan in group=424.00
+[TRAIN] Step 371/400 | 22:21:11
+[TRAIN] Step 371 | Loss=-0.000000 | Best makespan in group=525.00
+[TRAIN] Step 372/400 | 22:21:42
+[TRAIN] Step 372 | Loss=-0.000000 | Best makespan in group=379.00
+[TRAIN] Step 373/400 | 22:22:11
+[TRAIN] Step 373 | Loss=-0.000000 | Best makespan in group=364.00
+[TRAIN] Step 374/400 | 22:22:49
+[TRAIN] Step 374 | Loss=0.115714 | Best makespan in group=593.00
+[TRAIN] Step 375/400 | 22:23:23
+[TRAIN] Step 375 | Loss=0.537249 | Best makespan in group=439.00
+[TRAIN] Step 376/400 | 22:23:58
+[TRAIN] Step 376 | Loss=-0.000000 | Best makespan in group=339.00
+[TRAIN] Step 377/400 | 22:24:32
+[TRAIN] Step 377 | Loss=-0.000000 | Best makespan in group=560.00
+[TRAIN] Step 378/400 | 22:25:02
+[TRAIN] Step 378 | Loss=-0.000000 | Best makespan in group=500.00
+[TRAIN] Step 379/400 | 22:25:35
+[TRAIN] Step 379 | Loss=-0.000000 | Best makespan in group=443.00
+[TRAIN] Step 380/400 | 22:26:06
+[TRAIN] Step 380 | Loss=-0.000000 | Best makespan in group=378.00
+[TRAIN][VAL][ep 380] avg_gap=0.2167 | std_gap=0.1818 | q80_gap=0.2461 | n=40
+[TRAIN] Step 381/400 | 22:27:52
+[TRAIN] Step 381 | Loss=0.000758 | Best makespan in group=493.00
+[TRAIN] Step 382/400 | 22:28:19
+[TRAIN] Step 382 | Loss=-0.000000 | Best makespan in group=422.00
+[TRAIN] Step 383/400 | 22:28:48
+[TRAIN] Step 383 | Loss=-0.000000 | Best makespan in group=452.00
+[TRAIN] Step 384/400 | 22:29:26
+[TRAIN] Step 384 | Loss=-0.000000 | Best makespan in group=470.00
+[TRAIN] Step 385/400 | 22:29:57
+[TRAIN] Step 385 | Loss=0.002173 | Best makespan in group=593.00
+[TRAIN] Step 386/400 | 22:30:32
+[TRAIN] Step 386 | Loss=-0.000000 | Best makespan in group=376.00
+[TRAIN] Step 387/400 | 22:31:05
+[TRAIN] Step 387 | Loss=7.485735 | Best makespan in group=394.00
+[TRAIN] Step 388/400 | 22:31:34
+[TRAIN] Step 388 | Loss=1.952528 | Best makespan in group=485.00
+[TRAIN] Step 389/400 | 22:32:10
+[TRAIN] Step 389 | Loss=-0.000000 | Best makespan in group=489.00
+[TRAIN] Step 390/400 | 22:32:41
+[TRAIN] Step 390 | Loss=-0.000000 | Best makespan in group=384.00
+[TRAIN] Step 391/400 | 22:33:19
+[TRAIN] Step 391 | Loss=-0.000000 | Best makespan in group=438.00
+[TRAIN] Step 392/400 | 22:33:43
+[TRAIN] Step 392 | Loss=0.094064 | Best makespan in group=455.00
+[TRAIN] Step 393/400 | 22:34:13
+[TRAIN] Step 393 | Loss=-0.000000 | Best makespan in group=499.00
+[TRAIN] Step 394/400 | 22:34:47
+[TRAIN] Step 394 | Loss=-0.000000 | Best makespan in group=461.00
+[TRAIN] Step 395/400 | 22:35:20
+[TRAIN] Step 395 | Loss=-0.000000 | Best makespan in group=442.00
+[TRAIN] Step 396/400 | 22:35:46
+[TRAIN] Step 396 | Loss=-0.000000 | Best makespan in group=453.00
+[TRAIN] Step 397/400 | 22:36:21
+[TRAIN] Step 397 | Loss=-0.000000 | Best makespan in group=401.00
+[TRAIN] Step 398/400 | 22:36:48
+[TRAIN] Step 398 | Loss=0.010264 | Best makespan in group=424.00
+[TRAIN] Step 399/400 | 22:37:15
+[TRAIN] Step 399 | Loss=-0.000000 | Best makespan in group=555.00
+[TRAIN] Step 400/400 | 22:37:44
+[TRAIN] Step 400 | Loss=0.000000 | Best makespan in group=402.00
+[TRAIN][VAL][ep 400] avg_gap=0.2136 | std_gap=0.1208 | q80_gap=0.2826 | n=40
+[TRAIN] Evaluating best checkpoint (candidate_models/621797013209355.pth) on the held-out test split...
+[TRAIN][TEST] avg_gap=0.1581 | std_gap=0.0588 | q80_gap=0.2031 | n=40
+[TRAIN][22:40:52] Training ended. Validation history and plots updated.
+[MAIN] Testing 621797013209355.pth | run_name=gat_ojm_L2_selk10_mask0_sum_noexg_s42\test
+[TEST] run_name=gat_ojm_L2_selk10_mask0_sum_noexg_s42\test
+[TEST] Output run folder: results\gat_ojm_L2_selk10_mask0_sum_noexg_s42\test
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val001.fjs 355.0 6.371925115585327
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val002.fjs 314.0 1.6879081726074219
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val003.fjs 409.0 1.597827672958374
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val004.fjs 332.0 1.6442961692810059
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val005.fjs 331.0 1.6235487461090088
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val006.fjs 345.0 1.4895706176757812
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val007.fjs 345.0 1.658200740814209
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val008 - Cópia.fjs 309.0 1.6525051593780518
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val008.fjs 309.0 1.6382274627685547
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val009.fjs 287.0 1.6216976642608643
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val010.fjs 344.0 1.5915441513061523
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val011.fjs 443.0 1.4800899028778076
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val012.fjs 341.0 1.5479638576507568
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val013.fjs 498.0 1.4101603031158447
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val014.fjs 380.0 1.4783592224121094
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val015.fjs 362.0 1.398465871810913
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val016.fjs 430.0 1.5240402221679688
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val017.fjs 317.0 1.3970770835876465
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val018.fjs 356.0 1.3958256244659424
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val019.fjs 467.0 1.4141261577606201
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val020.fjs 412.0 1.4078974723815918
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val021.fjs 608.0 1.3843390941619873
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val022.fjs 524.0 1.3820295333862305
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val023.fjs 518.0 1.348466396331787
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val024.fjs 526.0 1.3583033084869385
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val025.fjs 489.0 1.365593433380127
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val026.fjs 593.0 1.3610918521881104
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val027.fjs 543.0 1.368147850036621
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val028.fjs 540.0 1.3843731880187988
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val029.fjs 560.0 1.4014792442321777
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val030.fjs 558.0 1.3864424228668213
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val031.fjs 578.0 1.4159491062164307
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val032.fjs 485.0 1.4077832698822021
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val033.fjs 502.0 1.384746789932251
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val034.fjs 519.0 1.3841667175292969
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val035.fjs 488.0 1.3809788227081299
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val036.fjs 504.0 1.4051244258880615
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val037.fjs 526.0 1.3923344612121582
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val038.fjs 477.0 1.3954472541809082
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val039.fjs 575.0 1.3655118942260742
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val040.fjs 489.0 1.4403064250946045
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val041.fjs 375.0 2.184622287750244
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val042.fjs 398.0 2.314598798751831
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val043.fjs 369.0 2.282259464263916
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val044.fjs 434.0 2.331986904144287
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val045.fjs 411.0 2.241286039352417
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val046.fjs 403.0 2.329667329788208
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val047.fjs 353.0 2.2673115730285645
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val048.fjs 388.0 2.3150956630706787
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val049.fjs 392.0 2.3215978145599365
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val050.fjs 370.0 2.3207998275756836
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val051.fjs 420.0 2.241981029510498
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val052.fjs 459.0 2.1928770542144775
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val053.fjs 413.0 2.157087564468384
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val054.fjs 453.0 2.122267723083496
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val055.fjs 447.0 2.136563777923584
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val056.fjs 508.0 3.094489574432373
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val057.fjs 435.0 2.3146958351135254
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val058.fjs 405.0 2.0776472091674805
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val059.fjs 480.0 2.091017484664917
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val060.fjs 436.0 2.02034854888916
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val061.fjs 545.0 2.979290246963501
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val062.fjs 505.0 2.9830985069274902
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val063.fjs 509.0 3.2382171154022217
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val064.fjs 498.0 2.9893665313720703
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val065.fjs 456.0 3.049614429473877
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val066.fjs 477.0 2.963765859603882
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val067.fjs 519.0 2.961984395980835
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val068.fjs 529.0 3.0079898834228516
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val069.fjs 535.0 3.084714412689209
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val070.fjs 485.0 2.9911694526672363
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val071.fjs 619.0 2.7485663890838623
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val072.fjs 549.0 2.713484764099121
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val073.fjs 560.0 2.7431187629699707
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val074.fjs 558.0 2.7311198711395264
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val075.fjs 533.0 2.751831293106079
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val076.fjs 573.0 2.8170363903045654
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val077.fjs 561.0 2.7879176139831543
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val078.fjs 505.0 2.6698648929595947
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val079.fjs 582.0 2.745821237564087
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val080.fjs 562.0 2.801997423171997
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val081.fjs 992.0 2.612687110900879
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val082.fjs 988.0 2.641160488128662
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val083.fjs 1003.0 2.62375807762146
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val084.fjs 996.0 2.921919584274292
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val085.fjs 959.0 2.6251652240753174
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val086.fjs 989.0 2.6386120319366455
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val087.fjs 1025.0 2.647289276123047
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val088.fjs 1064.0 2.6027445793151855
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val089.fjs 1115.0 2.6231279373168945
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val090.fjs 1102.0 2.661620855331421
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val091 - Cópia.fjs 1034.0 2.788628578186035
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val091.fjs 1034.0 2.7323646545410156
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val092.fjs 1082.0 2.702991008758545
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val093.fjs 1024.0 2.7077791690826416
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val094.fjs 997.0 2.6900384426116943
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val095.fjs 1067.0 2.7017858028411865
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val096.fjs 1042.0 2.7275636196136475
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val097.fjs 1088.0 2.7193984985351562
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val098.fjs 1023.0 2.780825614929199
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val099.fjs 909.0 2.748774290084839
+D:\Dissertação\dissertation-bopo_introduction\venv\Lib\site-packages\torch\jit\_script.py:1485: FutureWarning: `torch.jit.script` is not supported in Python 3.14+ and may break. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+val100.fjs 985.0 2.6951141357421875
+[OK] Saved: results\gat_ojm_L2_selk10_mask0_sum_noexg_s42\test\results_instances.json
+[DONE] Total elapsed time: 873.08s
+[MAIN] Run finished at 2026-10-06 22:55:25
+============================================================

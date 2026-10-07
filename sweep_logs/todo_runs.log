@@ -1,0 +1,12 @@
+[TODO] 2026-10-06 10:58:35 START gat_ojm_L1_selk1_mask1_mean_exg_s42
+[TODO] 2026-10-06 11:41:50 END gat_ojm_L1_selk1_mask1_mean_exg_s42 exit=0
+[TODO] 2026-10-06 11:41:50 START gat_ojm_L2_selk10_mask1_mean_exg_s42
+[TODO] 2026-10-06 12:30:19 END gat_ojm_L2_selk10_mask1_mean_exg_s42 exit=0
+[TODO] 2026-10-06 12:30:19 START gat_ojm_L2_selk1_mask0_sum_noexg_s42
+[TODO] 2026-10-06 18:25:14 END gat_ojm_L2_selk1_mask0_sum_noexg_s42 exit=0
+[TODO] 2026-10-06 18:25:14 START gat_ojm_L2_selk10_mask0_sum_noexg_s42
+/c/Users/maria/wt_main/run_todo_runs.sh: line 7:  2669 Segmentation fault         "$PY" -u main.py $COMMON --run-name "$name" "$@" > "sweep_logs/$name.log" 2>&1
+[TODO] 2026-10-06 22:55:25 END gat_ojm_L2_selk10_mask0_sum_noexg_s42 exit=0
+[TODO] 2026-10-06 22:55:25 START gat_om_L2_selk1_mask1_sum_noexg_s42
+[TODO] 2026-10-07 01:34:56 END gat_om_L2_selk1_mask1_sum_noexg_s42 exit=0
+[TODO] all runs finished
