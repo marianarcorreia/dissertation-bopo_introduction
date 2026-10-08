@@ -1,0 +1,1 @@
+{"run_name": "test_blk400_gin_L2_edges", "run_dir": "results/blocking\\test_blk400_gin_L2_edges", "models_file": "models/blocking/model_params_blk400_gin_L2_edges.json", "source_folder": "val", "folders": ["blocking_test_instances"], "workers": 4, "total_runtime_sec": 320.64568400382996}

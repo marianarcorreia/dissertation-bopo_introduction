@@ -1,0 +1,1 @@
+{"run_name": "test_blk350_L3_edges", "run_dir": "results/blocking\\test_blk350_L3_edges", "models_file": "models/blocking/model_params_blk350_L3_edges.json", "source_folder": "val", "folders": ["blocking_test_instances"], "workers": 4, "total_runtime_sec": 304.97102332115173}
