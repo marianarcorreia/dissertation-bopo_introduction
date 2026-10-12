@@ -137,7 +137,7 @@ def evaluate_step_metrics(agent, env, instances, representation):
 
 
 def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=0, sel_k=100, B=64, K=16, use_greedy=True,lr=0.0005, hidden_channels=128,num_layers = 3, heads = 3,j_max = 10, j_min = 8, m_max = 10, m_min = 5, op_max = 6, max_processing = 100,
-         checkpoint_smooth_window=3, warm_start_steps=200, lr_min_ratio=0.2, seed=None, logp_norm="mean", exclude_greedy_from_loss=True, jm_design=None, representation="oo", gnn_type="gat", validation_freq=20, validation_size=20, dbg_fn=None, run_name="train_run",
+         checkpoint_smooth_window=3, warm_start_steps=200, lr_min_ratio=0.2, seed=42, logp_norm="mean", exclude_greedy_from_loss=False, jm_design=None, representation="oo", gnn_type="gat", validation_freq=20, validation_size=20, dbg_fn=None, run_name="train_run",
          step_metrics_size=0):
     # step_metrics_size > 0: after every BOPO step, evaluate the policy with every src/metrics
     # metric on the first step_metrics_size validation instances (the same ones every step) and
