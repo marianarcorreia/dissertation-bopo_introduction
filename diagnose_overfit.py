@@ -101,8 +101,16 @@ def report(run_dir):
     grad_mean = window_mean(grad_norm, len(grad_norm), True)
     grad_start, grad_end = window_mean(grad_norm, n, False), window_mean(grad_norm, n, True)
 
-    entropy_drop = None if entropy_start in (None, 0) else (entropy_start - entropy_end) / entropy_start
-    ms_improve = None if ms_start in (None, 0) else (ms_start - ms_end) / ms_start
+    entropy_drop = (
+        None
+        if entropy_start in (None, 0) or entropy_end is None
+        else (entropy_start - entropy_end) / entropy_start
+    )
+    ms_improve = (
+        None
+        if ms_start in (None, 0) or ms_end is None
+        else (ms_start - ms_end) / ms_start
+    )
 
     entropy_line = f"  action_entropy_max_entropy_normalized : start={entropy_start:.4f}  end={entropy_end:.4f}"
     if entropy_drop is not None:
