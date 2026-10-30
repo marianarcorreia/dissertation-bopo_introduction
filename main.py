@@ -2,6 +2,7 @@
 import os
 import sys
 import argparse
+from typing import Any, Dict, cast
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(__file__))
 from datetime import datetime
@@ -211,8 +212,10 @@ def run_train_test(args):
     for rep in reps:
         run_name = f"{args.run_name}_{rep}" if multi else args.run_name
         print(f"[MAIN] Training representation={rep} | run_name={run_name} | gnn_type={args.gnn_type} | overrides={overrides}")
-        summary = train(run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
-                        seed=args.seed, return_summary=True, **overrides)
+        summary = cast(Dict[str, Any], train(
+            run_name=run_name, representation=rep, max_episodes=args.max_episodes, gnn_type=args.gnn_type,
+            seed=args.seed, return_summary=True, **overrides
+        ))
         best_model_path = summary["best_model_path"]
         if best_model_path is None:
             print(f"[MAIN] {run_name}: no checkpoint was saved - skipping the test.")

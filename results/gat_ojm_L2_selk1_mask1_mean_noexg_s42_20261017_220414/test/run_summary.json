@@ -1,0 +1,1 @@
+{"run_name": "gat_ojm_L2_selk1_mask1_mean_noexg_s42_20261017_220414\\test", "run_dir": "results\\gat_ojm_L2_selk1_mask1_mean_noexg_s42_20261017_220414\\test", "models_file": "candidate_models\\model_params.json", "source_folder": "val", "folders": ["instances"], "workers": 0, "total_runtime_sec": 863.0912394523621}
