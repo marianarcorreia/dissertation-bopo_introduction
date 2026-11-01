@@ -221,9 +221,12 @@ def get_test_dataset(sample_size=20, instances_dir="val/instances", solutions_di
                               val_path=val_path, test_path=test_path)
     return load_fixed_dataset(test_path)
 
+def plain(value):
+    return value.item() if hasattr(value, "item") else value
 
 def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_fn=None, print_fn=print):
     all_val_results = []
+    schedule = []
     with torch.no_grad():
         for i in range(len(validation_set)):
             v_state = val_env.reset(sel_index=i)
@@ -234,6 +237,13 @@ def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_
                     ref = float(validation_set[i]["score"])
                     gap = val_env.mk / ref - 1.0
                     all_val_results.append(float(gap))
+                    schedule.append({
+                        "name": validation_set[i].get("name", str(i)),
+                        "makespan": float(val_env.mk),
+                        "reference": ref,
+                        "gap": float(gap),
+                        "schedule": [{k: plain(v) for k, v in r.items()} for r in val_env.schedule]
+                    })
                     if dbg_fn is not None:
                         dbg_fn(1, f"  val instance {i+1}/{len(validation_set)} ({validation_set[i]['name']}) | makespan={val_env.mk} | ref={ref:.2f} | gap={gap:.4f}")
                     break
@@ -249,4 +259,5 @@ def run_validation(ppo_agent, val_env, validation_set, episode_number=None, dbg_
         "std_gap": std_gap,
         "q80_gap": q80_gap,
         "all_gaps": all_val_results,
+        "schedule": schedule,
     }

@@ -302,6 +302,12 @@ def train(max_episodes = 100,new_freq=500, n_cases = 100, mask_option=1, sel_k=1
             "all_gaps": test_all_gaps,
             "instances": [t["name"] for t in test_set],
         })
+        output_manager.save_best_schedule({
+            "best_model_path": best_model_path,
+            "split": "test",
+            "best_instance": min(test_metrics["schedule"], key=lambda s: s["gap"])["name"],
+            "instances": test_metrics["schedule"],
+        })
     else:
         print("[TRAIN] No checkpoint ever improved validation avg_gap - skipping held-out test evaluation.")
 

@@ -210,6 +210,55 @@ def load_study_data(study_dir_str: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     )
     return summary_df, long_df
 
+def render_best_schedule(study_dir: Path, filtered_summary: pd.DataFrame) -> None:
+    st.subheader("Best schedule (Gantt chart)")
+    ranked = filtered_summary .sort_values("best_validation_avg_gap", na_position="last")
+    trials = [t for t in ranked["trial"] if (study_dir / t / "best_schedule.json").exists()]
+    if not trials:
+        st.info("No best_schedule.json in the selected trials. It is only saved by trials run after the Gantt chart change.")
+        return
+
+    trial = st.selectbox("Trial", trials, key="gantt_trials")
+    data = load_json(str(study_dir / trial / "best_schedule.json")) # type: ignore
+    instances = data.get("instances", [])
+    if not instances:
+        st.info("This trial's best_schedule.json has no instances")
+        return
+
+    names = [inst["name"] for inst in instances]
+    default = names.index(data["best_instance"]) if data.get("best_instance") in names else 0
+    idx = st.selectbox(
+        "Instance", range(len(names)), index=default, key="gantt_instances",
+        format_func=lambda i: f"{names[i]}(gap {instances[i]['gap']:.4f})",
+    )
+    inst = instances[idx]
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Makespan", f"{inst['makespan']:.1f}")
+    c2.metric("CP-SAT reference", f"{inst['reference']:.1f}")
+    c3.metric("Gap", f"{inst['gap']:.4f}")
+    c4.metric("Operations", len(inst["schedule"]))
+
+    df = pd.DataFrame(inst["schedule"])
+    df["duration"] = df["end"] - df["start"]
+    df["machine_label"] = "M" + df["machine"].astype(int).astype(str)
+    df["job_label"] = "J" + df["job"].astype(int).astype(str)
+    machine_order = [f"M{m}" for m in sorted(df["machine"].astype(int).unique())]
+    job_order = [f"J{j}" for j in sorted(df["job"].astype(int).unique())]
+
+    bars = alt.Chart(df).mark_bar(stroke="white", strokeWidth=0.5).encode(
+        x = alt.X("start:Q", title="Start time"),
+        x2 = "end:Q",
+        y = alt.Y("machine_label:N", title="Machine", sort=machine_order),
+        color = alt.Color("job_label:N", sort=job_order, scale=alt.Scale(scheme="tableau10"), title="Job"),
+        tooltip =["job", "operation", "machine", "start", "end", "duration"],
+    )
+    ref_rule = alt.Chart(pd.DataFrame({"reference": [inst["reference"]]})).mark_rule(color="red", strokeDash=[4, 4]).encode(x="reference:Q", 
+                                                                                                                            tooltip=[alt.Tooltip("reference:Q", title="CP-SAT reference")])
+    st.altair_chart(
+        (bars + ref_rule).properties(height=max(200, 28 * len(machine_order))).interactive(bind_y=False),
+        width='stretch',
+    )
 
 def main() -> None:
     try:
@@ -261,7 +310,7 @@ def main() -> None:
         else "n/a",
     )
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Trial Overview", "Metric Curves", "Distribution", "Raw Data"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Trial Overview", "Best Schedule", "Metric Curves", "Distribution", "Raw Data"])
 
     with tab1:
         st.subheader("Trial summary")
@@ -301,6 +350,9 @@ def main() -> None:
                 st.altair_chart(bar, width='stretch')
 
     with tab2:
+        render_best_schedule(selected_study, filtered_summary)
+    
+    with tab3:
         st.subheader("Metric curves across trials")
         if filtered_long.empty:
             st.info("No numeric metric history found for selected trials.")
@@ -349,7 +401,7 @@ def main() -> None:
             ).interactive()
             st.altair_chart(line, width='stretch')
 
-    with tab3:
+    with tab4:
         st.subheader("Metric distribution by trial")
         if filtered_long.empty:
             st.info("No numeric metric history found for selected trials.")
@@ -370,7 +422,7 @@ def main() -> None:
             )
             st.altair_chart(box, width='stretch')
 
-    with tab4:
+    with tab5:
         st.subheader("Raw tables")
         st.markdown("Summary table")
         st.dataframe(filtered_summary, width='stretch', hide_index=True)

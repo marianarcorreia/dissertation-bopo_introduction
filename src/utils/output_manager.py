@@ -20,7 +20,8 @@ class OutputManager:
         self.test_metrics_file = "test_metrics.json"
         self.run_dir = self._create_run_directory(self.run_name)
         self.plot_dir = os.path.join(self.run_dir, plot_dir)
-
+        self.best_schedule_file = "best_schedule.json"
+        
         os.makedirs(self.run_dir, exist_ok=True)
         os.makedirs(self.plot_dir, exist_ok=True)
 
@@ -75,9 +76,6 @@ class OutputManager:
         return os.path.join(self.run_dir, self.test_metrics_file)
 
     def save_json(self, data, path, retries=20, delay=0.25):
-        """Write atomically (temp file + os.replace) and retry on Windows file-lock
-        errors (Errno 22/13), which happen when another process - e.g. the Streamlit
-        dashboard or an antivirus scan - has the file open at the moment of writing."""
         tmp_path = f"{path}.tmp"
         for attempt in range(retries):
             try:
@@ -111,13 +109,14 @@ class OutputManager:
         self.save_json(summary, self.run_summary_path())
 
     def save_test_metrics(self, metrics):
-        """One-time, post-training report on the held-out test split (see
-        src/train.py's evaluate_on_test_set call and
-        src/utils/validation_utils.py:get_test_dataset). Kept in its own file, separate
-        from validation_history.json, so it's never mistaken for one of the periodic
-        during-training checkpoints."""
         self.save_json(metrics, self.test_metrics_path())
 
+    def best_schedule_path(self):
+        return os.path.join(self.run_dir, self.best_schedule_file)
+
+    def save_best_schedule(self, data):
+        self.save_json(data, self.best_schedule_path())
+        
     def _plot_series(self, x_values, y_values, title, x_label, y_label, save_name, color="#8da0cb"):
         if len(x_values) == 0 or len(y_values) == 0:
             return None
