@@ -24,6 +24,10 @@ from src.utils.chart_theme import color_by, register_theme
 from src.utils.dashboard_data import to_long_metrics
 
 RESULTS_DIR = Path("results")
+# blocking / unavailability runs write under their own results subfolder (src/train.py:output_paths
+# on the blocking branches); on branches without them these folders simply don't exist
+STUDY_SUBDIRS = ("", "blocking", "unavailability")
+WINDOW_KINDS = {0: "planned maintenance", 1: "breakdown"}
 
 
 def _is_scalar_number(value: Any) -> bool:
@@ -60,16 +64,17 @@ def normalize_metrics(raw: Any) -> pd.DataFrame:
 
 
 def find_optuna_studies(results_dir: Path) -> list[Path]:
-    if not results_dir.exists():
-        return []
-
     studies: list[Path] = []
-    for child in sorted(results_dir.iterdir()):
-        if not child.is_dir():
+    for sub in STUDY_SUBDIRS:
+        root = results_dir / sub if sub else results_dir
+        if not root.exists():
             continue
-        has_trial_dirs = any(p.is_dir() and p.name.startswith("trial_") for p in child.iterdir())
-        if has_trial_dirs:
-            studies.append(child)
+        for child in sorted(root.iterdir()):
+            if not child.is_dir():
+                continue
+            has_trial_dirs = any(p.is_dir() and p.name.startswith("trial_") for p in child.iterdir())
+            if has_trial_dirs:
+                studies.append(child)
     return studies
 
 
@@ -210,55 +215,109 @@ def load_study_data(study_dir_str: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     )
     return summary_df, long_df
 
+
+def _gantt_segments(schedule: list[dict]) -> pd.DataFrame:
+    """One bar per operation (start -> end) plus, on the blocking problem, one lighter bar for
+    the time the finished part kept its machine blocked (end -> depart)."""
+    df = pd.DataFrame(schedule)
+    df["machine_label"] = "M" + df["machine"].astype(int).astype(str)
+    df["job_label"] = "J" + df["job"].astype(int).astype(str)
+    frames = [df.assign(segment="processing", seg_start=df["start"], seg_end=df["end"])]
+    if "depart" in df.columns:
+        held = df[pd.to_numeric(df["depart"], errors="coerce") > df["end"] + 1e-9]
+        if not held.empty:
+            frames.append(held.assign(segment="blocked", seg_start=held["end"], seg_end=held["depart"]))
+    out = pd.concat(frames, ignore_index=True)
+    out["duration"] = out["seg_end"] - out["seg_start"]
+    return out
+
+
+def _window_rows(windows: list, horizon: float) -> pd.DataFrame:
+    """Unavailability windows ([start, end, kind] per machine) that start before the horizon."""
+    rows = [
+        {"machine_label": f"M{m}", "start": s, "end": min(e, horizon), "kind": WINDOW_KINDS.get(int(k), str(k))}
+        for m, ws in enumerate(windows or [])
+        for s, e, k in ws
+        if s < horizon
+    ]
+    return pd.DataFrame(rows, columns=["machine_label", "start", "end", "kind"])
+
+
 def render_best_schedule(study_dir: Path, filtered_summary: pd.DataFrame) -> None:
     st.subheader("Best schedule (Gantt chart)")
-    ranked = filtered_summary .sort_values("best_validation_avg_gap", na_position="last")
+    ranked = filtered_summary.sort_values("best_validation_avg_gap", na_position="last")
     trials = [t for t in ranked["trial"] if (study_dir / t / "best_schedule.json").exists()]
     if not trials:
-        st.info("No best_schedule.json in the selected trials. It is only saved by trials run after the Gantt chart change.")
+        st.info("No best_schedule.json in the selected trials. New trials write it at the end of training; "
+                "for trials that already ran, use `python backfill_best_schedules.py`.")
         return
 
     trial = st.selectbox("Trial", trials, key="gantt_trials")
-    data = load_json(str(study_dir / trial / "best_schedule.json")) # type: ignore
+    data = load_json(str(study_dir / trial / "best_schedule.json"))
     instances = data.get("instances", [])
     if not instances:
-        st.info("This trial's best_schedule.json has no instances")
+        st.info("This trial's best_schedule.json has no instances.")
         return
 
     names = [inst["name"] for inst in instances]
     default = names.index(data["best_instance"]) if data.get("best_instance") in names else 0
     idx = st.selectbox(
         "Instance", range(len(names)), index=default, key="gantt_instances",
-        format_func=lambda i: f"{names[i]}(gap {instances[i]['gap']:.4f})",
+        format_func=lambda i: f"{names[i]} (gap {instances[i]['gap']:.4f})",
     )
     inst = instances[idx]
+    segments = _gantt_segments(inst["schedule"])
+    windows = _window_rows(inst.get("windows"), max(inst["makespan"], inst["reference"]))
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Makespan", f"{inst['makespan']:.1f}")
-    c2.metric("CP-SAT reference", f"{inst['reference']:.1f}")
-    c3.metric("Gap", f"{inst['gap']:.4f}")
-    c4.metric("Operations", len(inst["schedule"]))
+    cols = st.columns(6 if "depart" in segments.columns or not windows.empty else 4)
+    cols[0].metric("Makespan", f"{inst['makespan']:.1f}")
+    cols[1].metric("CP-SAT reference", f"{inst['reference']:.1f}")
+    cols[2].metric("Gap", f"{inst['gap']:.4f}")
+    cols[3].metric("Operations", len(inst["schedule"]))
+    if len(cols) > 4:
+        blocked = segments.loc[segments["segment"] == "blocked", "duration"].sum()
+        cols[4].metric("Machine time blocked", f"{blocked:.1f}")
+        cols[5].metric("Unavailability windows", len(windows))
 
-    df = pd.DataFrame(inst["schedule"])
-    df["duration"] = df["end"] - df["start"]
-    df["machine_label"] = "M" + df["machine"].astype(int).astype(str)
-    df["job_label"] = "J" + df["job"].astype(int).astype(str)
-    machine_order = [f"M{m}" for m in sorted(df["machine"].astype(int).unique())]
-    job_order = [f"J{j}" for j in sorted(df["job"].astype(int).unique())]
+    machines = set(segments["machine"].astype(int))
+    machines |= {int(m[1:]) for m in windows["machine_label"]}
+    machine_order = [f"M{m}" for m in sorted(machines)]
+    job_order = [f"J{j}" for j in sorted(segments["job"].astype(int).unique())]
+    y = alt.Y("machine_label:N", title="Machine", sort=machine_order)
 
-    bars = alt.Chart(df).mark_bar(stroke="white", strokeWidth=0.5).encode(
-        x = alt.X("start:Q", title="Start time"),
-        x2 = "end:Q",
-        y = alt.Y("machine_label:N", title="Machine", sort=machine_order),
-        color = alt.Color("job_label:N", sort=job_order, scale=alt.Scale(scheme="tableau10"), title="Job"),
-        tooltip =["job", "operation", "machine", "start", "end", "duration"],
+    tooltip = ["job", "operation", "machine", "segment",
+               alt.Tooltip("seg_start:Q", title="from"), alt.Tooltip("seg_end:Q", title="to"), "duration"]
+    tooltip += [c for c in ("routed", "depart", "leave_out", "interrupted") if c in segments.columns]
+    bars = alt.Chart(segments).mark_bar(stroke="white", strokeWidth=0.5).encode(
+        x=alt.X("seg_start:Q", title="Time"),
+        x2="seg_end:Q",
+        y=y,
+        color=alt.Color("job_label:N", sort=job_order, scale=alt.Scale(scheme="tableau20"), title="Job"),
+        opacity=alt.Opacity("segment:N", scale=alt.Scale(domain=["processing", "blocked"], range=[1.0, 0.35]),
+                            title="Segment"),
+        tooltip=tooltip,
     )
-    ref_rule = alt.Chart(pd.DataFrame({"reference": [inst["reference"]]})).mark_rule(color="red", strokeDash=[4, 4]).encode(x="reference:Q", 
-                                                                                                                            tooltip=[alt.Tooltip("reference:Q", title="CP-SAT reference")])
+    layers = [bars]
+    if not windows.empty:
+        # drawn on top, semi-transparent: a breakdown interrupts the part running on the machine
+        layers.append(alt.Chart(windows).mark_bar(opacity=0.55).encode(
+            x="start:Q",
+            x2="end:Q",
+            y=y,
+            color=alt.Color("kind:N", title="Unavailable",
+                            scale=alt.Scale(domain=list(WINDOW_KINDS.values()), range=["#9ca3af", "#111827"])),
+            tooltip=["machine_label", "kind", "start", "end"],
+        ))
+    layers.append(alt.Chart(pd.DataFrame({"reference": [inst["reference"]]})).mark_rule(
+        color="red", strokeDash=[4, 4]
+    ).encode(x="reference:Q", tooltip=[alt.Tooltip("reference:Q", title="CP-SAT reference")]))
+
     st.altair_chart(
-        (bars + ref_rule).properties(height=max(200, 28 * len(machine_order))).interactive(bind_y=False),
-        width='stretch',
+        alt.layer(*layers).resolve_scale(color="independent")
+        .properties(height=max(200, 28 * len(machine_order))).interactive(bind_y=False),
+        width="stretch",
     )
+
 
 def main() -> None:
     try:
@@ -274,9 +333,10 @@ def main() -> None:
         st.error("No Optuna-style study folders found under results/.")
         st.stop()
 
-    study_options = [p.name for p in studies]
+    study_options = [p.relative_to(RESULTS_DIR).as_posix() for p in studies]
     selected_study_name = st.sidebar.selectbox("Study folder", study_options)
-    selected_study = next(p for p in studies if p.name == selected_study_name)
+    selected_study = studies[study_options.index(selected_study_name)]
+    file_prefix = selected_study_name.replace("/", "_")
 
     with st.spinner("Loading study data..."):
         summary_df, long_df = load_study_data(str(selected_study))
@@ -351,7 +411,7 @@ def main() -> None:
 
     with tab2:
         render_best_schedule(selected_study, filtered_summary)
-    
+
     with tab3:
         st.subheader("Metric curves across trials")
         if filtered_long.empty:
@@ -433,13 +493,13 @@ def main() -> None:
         st.download_button(
             "Download summary CSV",
             data=filtered_summary.to_csv(index=False).encode("utf-8"),
-            file_name=f"{selected_study_name}_trial_summary.csv",
+            file_name=f"{file_prefix}_trial_summary.csv",
             mime="text/csv",
         )
         st.download_button(
             "Download long metrics CSV",
             data=filtered_long.to_csv(index=False).encode("utf-8"),
-            file_name=f"{selected_study_name}_long_metrics.csv",
+            file_name=f"{file_prefix}_long_metrics.csv",
             mime="text/csv",
         )
 
