@@ -253,7 +253,7 @@ def render_best_schedule(study_dir: Path, filtered_summary: pd.DataFrame) -> Non
         return
 
     trial = st.selectbox("Trial", trials, key="gantt_trials")
-    data = load_json(str(study_dir / trial / "best_schedule.json"))
+    data = load_json(str(study_dir / trial / "best_schedule.json")) # pyright: ignore[reportOperatorIssue]
     instances = data.get("instances", [])
     if not instances:
         st.info("This trial's best_schedule.json has no instances.")
