@@ -151,9 +151,8 @@ def run(args):
                 continue
             for metric in ("makespan", "relative_error_lb", "scheduling_score"):
                 c = compare([r[metric] for r in ra["rows"]], [r[metric] for r in rb["rows"]])
-                c.update({"folder": folder, "model_a": a, "model_b": b, "metric": metric,
-                          "n_needed_for_observed_effect": required_sample_size(c.get("cohens_d", 0))})
-                comparisons.append(c)
+                comparisons.append({**c, "folder": folder, "model_a": a, "model_b": b, "metric": metric,
+                                    "n_needed_for_observed_effect": required_sample_size(c.get("cohens_d", 0))})
 
     # generalization to unseen sizes, relative to the in-distribution folder
     base_folder = args.in_distribution_folder or args.folders[0]
