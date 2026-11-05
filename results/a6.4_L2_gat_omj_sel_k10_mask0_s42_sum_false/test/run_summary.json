@@ -1,0 +1,1 @@
+{"run_name": "a6.4_L2_gat_omj_sel_k10_mask0_s42_sum_false\\test", "run_dir": "results\\a6.4_L2_gat_omj_sel_k10_mask0_s42_sum_false\\test", "models_file": "candidate_models\\model_params.json", "source_folder": "val", "folders": ["instances"], "workers": 0, "total_runtime_sec": 1206.308662891388}

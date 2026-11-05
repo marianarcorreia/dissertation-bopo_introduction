@@ -1,0 +1,1 @@
+{"run_name": "a3.2_L2_gat_omj_sel_k10_mask1_s42_mean_true\\test", "run_dir": "results\\a3.2_L2_gat_omj_sel_k10_mask1_s42_mean_true\\test", "models_file": "candidate_models\\model_params.json", "source_folder": "val", "folders": ["instances"], "workers": 0, "total_runtime_sec": 1178.4952232837677}
