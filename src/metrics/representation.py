@@ -34,6 +34,7 @@ Heterophily (how different are the nodes each edge connects?)
 """
 from collections import defaultdict
 
+from typing import Any
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -140,7 +141,7 @@ class RepresentationProbe:
         """Position to pass to summary(start=...) to summarise only the states seen after now."""
         return len(self._records)
 
-    def summary(self, start=0):
+    def summary(self, start=0) -> dict[str, Any]:
         """Aggregate over the states seen since `start` (pooled over nodes / edges)."""
         recs = self._records[start:]
         if not recs:

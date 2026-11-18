@@ -9,11 +9,11 @@ import os
 import random
 import sys
 
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 import torch
-
 from src.metrics.evaluate import evaluate_agent, summarize
 from src.metrics.representation import RepresentationProbe
 from src.metrics.schedule import check_schedule, lower_bound, relative_error, schedule_metrics, scheduling_score
@@ -69,6 +69,11 @@ def test_each_violation_is_detected():
     assert c["violations"]["completeness"] == 1 and c["n_violating_steps"] == 1
     assert math.isclose(c["violation_rate_per_step"], 1 / 4)
 
+def test_invalid_record():
+    bad = with_entry(1, machine=7)
+    c = check_schedule(TOY, bad)
+    assert not c["feasible"] and c["violations"]["invalid_record"] == 1
+    assert c["n_violating_steps"] == 1 
 
 def test_bounds_and_scores():
     # longest job: 3 + 2 = 5; work: (3 + 2 + 1) / 2 = 3
@@ -157,6 +162,7 @@ def test_evaluate_every_representation():
             for k in ("action_distinct_ratio", "embedding_distinct_ratio", "effective_rank_ratio",
                       "embedding_heterophily"):
                 assert r[k] is None or 0.0 <= r[k] <= 1.0 + 1e-9, (rep, k, r[k])
+        assert repr_summary is not None, rep
         assert repr_summary["n_states"] > 0
         assert repr_summary["heterophily"]["per_relation"], rep
         s = summarize(rows, repr_summary, agent.policy.actor)
@@ -169,7 +175,7 @@ def test_evaluate_every_representation():
 def test_probe_detects_ties():
     """A constant actor scores every action the same -> action_distinct_ratio = 1 / n_valid."""
     instances = small_instances(1)
-    rep, env, agent = build("oo", instances)
+    __, env, agent = build("oo", instances)
     with torch.no_grad():
         state = env.reset(sel_index=0)
         agent.select_action(state, 2, 1)  # materialises the lazy Linear(-1, 1) before zeroing it

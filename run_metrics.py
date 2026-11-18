@@ -18,6 +18,7 @@ Usage:
     python run_metrics.py --folders data/test/large --solve-missing-references --solve-workers 4
 """
 import argparse
+import importlib
 import json
 import os
 import subprocess
@@ -28,8 +29,7 @@ from itertools import combinations
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import torch
-
+torch = importlib.import_module("torch")
 from src.metrics.evaluate import evaluate_agent, summarize
 from src.metrics.references import load_instances, solve_missing_references
 from src.metrics.report import HEADLINE_HEADER, fmt, headline_row, markdown_table, plot_metric_bars
@@ -51,6 +51,8 @@ def parse_args(argv=None):
                         "splits with references, e.g. data/batching/batching_dataset.json.")
     p.add_argument("--in-distribution-folder", default=None,
                    help="Folder whose sizes match training, the baseline for generalization (default: first folder).")
+    p.add_argument("--results", nargs="+", default=None,
+                   help="Training results folders to compare; each one's best_model_path(run_sumary.json) is evaluated.")
     p.add_argument("--train-jobs", nargs=2, type=int, default=[8, 10], help="Training range of jobs (min max).")
     p.add_argument("--train-machines", nargs=2, type=int, default=[5, 10], help="Training range of machines (min max).")
     p.add_argument("--limit", type=int, default=None, help="Evaluate at most this many instances per folder.")
@@ -93,7 +95,15 @@ def in_training_range(row, args):
     return (args.train_jobs[0] <= row["num_jobs"] <= args.train_jobs[1]
             and args.train_machines[0] <= row["num_machines"] <= args.train_machines[1])
 
-
+def models_from_results(dirs):
+    runs = {}
+    for d in dirs:
+        with open(os.path.join(d, "run_summary.json")) as f:
+            path = json.load(f).get("best_model_path")
+        if not path:
+            raise ValueError(f"No best_model_path in {d}/run_summary.json")
+        runs[os.path.basename(path)] = os.path.basename(os.path.normpath(d))
+    return runs 
 def _unique_path(path):
     if not os.path.exists(path):
         return path
@@ -104,6 +114,9 @@ def _unique_path(path):
 def run(args):
     with open(args.models_file) as f:
         params = json.load(f)
+    runs = models_from_results(args.results) if args.results else {}
+    if runs:
+        args.models = (args.models or []) + list(runs)
     if args.models:
         params = [p for p in params if p["name"] in set(args.models)]
         missing = set(args.models) - {p["name"] for p in params}
@@ -111,6 +124,8 @@ def run(args):
             raise ValueError(f"Not in {args.models_file}: {sorted(missing)}")
     if not params:
         raise ValueError(f"No models to evaluate in {args.models_file}")
+    for p in params:
+        p["run"] = runs.get(p["name"], p["name"])
     models_dir = os.path.dirname(args.models_file) or "."
 
     folders = {}
@@ -140,24 +155,29 @@ def run(args):
                 print(f"[METRICS]   makespan={fmt(m['makespan'].get('mean'))} | RE={fmt(m['relative_error'].get('mean'))} | "
                       f"RE_lb={fmt(m['relative_error_lb'].get('mean'))} | score={fmt(m['scheduling_score'].get('mean'))} | "
                       f"feasible={fmt(summary['feasibility_rate'])} | ms/decision={fmt(m['time_per_decision_ms'].get('mean'))}")
-                results.append({"model": param["name"], "representation": rep, "folder": folder,
+                results.append({"model": param["name"], "run": param["run"], "representation": rep, "folder": folder,
                                 "summary": summary, "rows": rows})
+                partial_path = os.path.join(args.output_dir, f"{args.run_name}_partial.json")
+                os.makedirs(args.output_dir, exist_ok=True)
+                with open(partial_path, "w") as f:
+                    json.dump(results, f)
 
     by = {(r["model"], r["folder"]): r for r in results}
 
     # paired comparisons between the models of this run, per folder (same instances)
     comparisons = []
     for folder in folders:
-        for a, b in combinations([p["name"] for p in params], 2):
+        for pa, pb in combinations(params, 2):
+            a, b = pa["name"], pb["name"]
             ra, rb = by.get((a, folder)), by.get((b, folder))
             if not ra or not rb:
                 continue
             for metric in ("makespan", "relative_error_lb", "scheduling_score"):
                 c = compare([r[metric] for r in ra["rows"]], [r[metric] for r in rb["rows"]])
-                c.update({"folder": folder, "model_a": a, "model_b": b, "metric": metric,
-                          "n_needed_for_observed_effect": required_sample_size(c.get("cohens_d", 0))})
-                comparisons.append(c)
-
+            comparisons.append({**c, "folder":folder, "model_a": a, "model_b": b,
+                                "run_a": pa["run"], "run_b": pb["run"], "metric": metric,
+                                "n_needed_for_observed_effect": required_sample_size(c.get("cohens_d", 0))})
+            
     # generalization to unseen sizes, relative to the in-distribution folder
     base_folder = args.in_distribution_folder or args.folders[0]
     generalization = []
@@ -167,7 +187,7 @@ def run(args):
         base_re = base["summary"]["metrics"]["relative_error_lb"].get("mean") if base else None
         re_lb = m["relative_error_lb"].get("mean")
         generalization.append({
-            "model": r["model"], "representation": r["representation"], "folder": r["folder"],
+            "model": r["model"], "run": r["run"], "representation": r["representation"], "folder": r["folder"],
             "size_range": r["summary"]["size_range"],
             "in_training_range_fraction": r["summary"]["in_training_range_fraction"],
             "relative_error": m["relative_error"].get("mean"),
@@ -206,17 +226,18 @@ def to_markdown(report):
            f"- models file: {meta['args']['models_file']}", ""]
 
     for folder in dict.fromkeys(r["folder"] for r in report["results"]):
-        rows = [[r["model"], r["representation"], r["summary"]["n_instances"], *headline_row(r["summary"])]
+        rows = [[r["model"], r["run"], r["representation"], r["summary"]["n_instances"], *headline_row(r["summary"])]
                 for r in report["results"] if r["folder"] == folder]
+
         out += [f"## {folder}", "", "Mean ± 95% CI half-width.", "",
-                markdown_table(["Model", "Repr.", "n", *HEADLINE_HEADER], rows), ""]
+                markdown_table(["Model", "Run", "Repr.", "n", *HEADLINE_HEADER], rows), ""]
 
     if report["generalization"]:
         out += ["## Generalization to unseen sizes", "",
                 f"Gap = RE (LB) on the folder minus RE (LB) on `{report['generalization'][0]['baseline_folder']}`.", "",
                 markdown_table(
-                    ["Model", "Folder", "Jobs", "Machines", "In training range", "RE (CP-SAT)", "RE (LB)", "Score", "Gap"],
-                    [[g["model"], g["folder"], "-".join(map(str, g["size_range"]["num_jobs"])),
+                    ["Run", "Folder", "Jobs", "Machines", "In training range", "RE (CP-SAT)", "RE (LB)", "Score", "Gap"],
+                    [[g["run"], g["folder"], "-".join(map(str, g["size_range"]["num_jobs"])),
                       "-".join(map(str, g["size_range"]["num_machines"])), fmt(g["in_training_range_fraction"], 2),
                       fmt(g["relative_error"]), fmt(g["relative_error_lb"]), fmt(g["scheduling_score"]),
                       fmt(g["generalization_gap"])] for g in report["generalization"]]), ""]
@@ -225,9 +246,9 @@ def to_markdown(report):
         out += ["## Paired comparisons between models", "",
                 "Wilcoxon signed-rank on the same instances; negative mean diff = model A lower.", "",
                 markdown_table(
-                    ["Folder", "Metric", "Model A", "Model B", "n", "Mean diff", "p", "Significant", "Cohen's d",
+                    ["Folder", "Metric", "Run A", "Run B", "n", "Mean diff", "p", "Significant", "Cohen's d",
                      "Rank-biserial", "n needed"],
-                    [[c["folder"], c["metric"], c["model_a"], c["model_b"], c["n"], fmt(c.get("mean_diff")),
+                    [[c["folder"], c["metric"], c["run_a"], c["run_b"], c["n"], fmt(c.get("mean_diff")),
                       fmt(c.get("wilcoxon_p")), fmt(c.get("significant")), fmt(c.get("cohens_d")),
                       fmt(c.get("rank_biserial")), fmt(c.get("n_needed_for_observed_effect"))]
                      for c in report["comparisons"]]), ""]
