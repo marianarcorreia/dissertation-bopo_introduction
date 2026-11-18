@@ -50,21 +50,31 @@ Recommended invocation:
 """
 
 import argparse
+import importlib
 import json
 import os
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
-import optuna
+
+try:
+    # Keep module import usable in environments where the optional tuning
+    # dependency has not been installed yet.
+    optuna = importlib.import_module("optuna")
+except ModuleNotFoundError as exc:
+    if exc.name != "optuna":
+        raise
+    optuna = None
 
 from src.train import train, expand_representations, BATCHING_REPRESENTATIONS, REPRESENTATION_CHOICES, JM_DESIGN_CHOICES
 from src.utils import open_dashboard, generate_fixed_splits
 
+_run_metrics = importlib.import_module("run_metrics")
+metrics_args = _run_metrics.parse_args
+run_metrics = getattr(_run_metrics, "run_metrics")
 BATCHING_DATASET = Path("data/batching/batching_dataset.json")
-
-
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def parse_args() -> argparse.Namespace:
@@ -193,7 +203,7 @@ def critical_param_names(rep: str, smoke: bool) -> List[str]:
     return names
 
 
-def suggest_hyperparameters(rep: str, trial: optuna.Trial, smoke: bool) -> Dict:
+def suggest_hyperparameters(rep: str, trial: Any, smoke: bool) -> Dict:
     if smoke:
         return {
             "train_freq": 1, "new_freq": 1, "n_cases": 3,
@@ -273,6 +283,11 @@ def last_val_q80(run_name: str) -> float:
 # ── tuning loop ───────────────────────────────────────────────────────────────
 
 def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
+    if optuna is None:
+        raise ModuleNotFoundError(
+            "Optuna is required for tuning. Install it with: pip install optuna"
+        )
+
     rep_upper = rep.upper()
     gnn_type = getattr(args, "gnn_type", "gat")
     # "gat" keeps the bare (legacy) study name so existing gat studies/trials
@@ -297,7 +312,7 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
     effective_val_freq     = 1 if args.smoke else args.validation_freq
     effective_val_size     = 3 if args.smoke else args.validation_size
 
-    def objective(trial: optuna.Trial) -> float:
+    def objective(trial: Any) -> float:
         sampled  = suggest_hyperparameters(rep, trial, args.smoke)
         # "study_folder/trial_N" → train() will create results/study_folder/trial_N/
         run_name = f"{study_folder}/trial_{trial.number}"
@@ -356,6 +371,23 @@ def tune_representation(rep: str, args: argparse.Namespace) -> Dict:
         trial.set_user_attr("best_difference", summary.get("best_difference"))
         trial.set_user_attr("total_runtime_sec", summary.get("total_runtime_sec"))
         trial.set_user_attr("best_val_avg_gap",  summary.get("best_validation_avg_gap"))
+        if summary.get("run_dir") and summary.get("best_model_path") and not args.smoke:
+            try:
+                models_file = os.path.join(os.path.dirname(summary["best_model_path"]), "model_params.json")
+                report = run_metrics(metrics_args([
+                    "--run-name", f"optuna_{rep}_trial_{trial.number}",
+                    "--models-file", models_file, 
+                    "--results", summary["run_dir"],
+                    "--folders", "val/instances",
+                    "--no-representation",
+                ]))
+                result = report["results"][0]["summary"]
+                for key in ("relative_error", "relative_error_lb", "scheduling_score",
+                            "makespan", "time_per_decision_ms"):
+                    trial.set_user_attr(f"metrics_{key}", result["metrics"][key].get("mean"))
+                trial.set_user_attr("metrics_feasibility_rate", result["feasibility_rate"])
+            except Exception as e:
+                print(f"[PARAM][{rep_upper}] Trial {trial.number} | metrics report failed: {e}")
         return q80
 
     print(
