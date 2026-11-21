@@ -73,7 +73,7 @@ from src.utils import open_dashboard, generate_fixed_splits
 
 _run_metrics = importlib.import_module("run_metrics")
 metrics_args = _run_metrics.parse_args
-run_metrics = getattr(_run_metrics, "run_metrics")
+run_metrics = _run_metrics.run
 BATCHING_DATASET = Path("data/batching/batching_dataset.json")
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
