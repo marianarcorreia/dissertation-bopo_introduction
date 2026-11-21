@@ -153,6 +153,14 @@ class MachineCapacity(Constraint):
 FJSP_CONSTRAINTS = (Completeness(), Eligibility(), ProcessingTime(), Precedence(), MachineCapacity())
 
 
+def valid_record(instance, rec):
+    """Operation, job and machine indices are in range (otherwise the constraints can't be checked)."""
+    n_ops, n_jobs = len(instance["operations"]), len(instance["jobs"])
+    n_machines = len(instance["operations"][0])
+    return (0 <= int(rec["operation"]) < n_ops and
+            0 <= int(rec["job"]) < n_jobs and
+            0 <= int(rec["machine"]) < n_machines)
+
 def check_schedule(instance, schedule, constraints=FJSP_CONSTRAINTS, step_key=None):
     """Independent feasibility check of a recorded schedule.
 
@@ -169,12 +177,16 @@ def check_schedule(instance, schedule, constraints=FJSP_CONSTRAINTS, step_key=No
     violations = defaultdict(int)
     step_violated = {}
     for i in range(len(schedule)):
+        step = i if step_key is None else schedule[i][step_key]
+        if not valid_record(instance, schedule[i]):
+            violations["invalid_record"] += 1
+            step_violated[step] = True
+            continue
         step_errors = 0
         for c in constraints:
             n = c.check_step(instance, schedule, i)
             violations[c.name] += n
             step_errors += n
-        step = i if step_key is None else schedule[i][step_key]
         step_violated[step] = step_violated.get(step, False) or step_errors > 0
     for c in constraints:
         violations[c.name] += c.check_final(instance, schedule)
@@ -186,7 +198,8 @@ def check_schedule(instance, schedule, constraints=FJSP_CONSTRAINTS, step_key=No
         "n_steps": n_steps,
         "n_violating_steps": violating_steps,
         "violation_rate_per_step": violating_steps / n_steps if n_steps else 0.0,
-        "violations": {c.name: int(violations[c.name]) for c in constraints},
+        "violations": {**{c.name: int(violations[c.name]) for c in constraints},
+                       "invalid_record": int(violations["invalid_record"])},
     }
 
 
